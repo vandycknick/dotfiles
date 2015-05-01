@@ -5,12 +5,12 @@ read -n 1
 
 #Install homebrew : http://brew.sh/
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew tap homebrew/versions
 
 #Install cask : http://caskroom.io/
 brew install caskroom/cask/brew-cask
+brew tap caskroom/versions
 
-#Install node
-brew install node
 
 # https://github.com/rupa/z
 # z, oh how i love you

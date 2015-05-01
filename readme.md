@@ -8,7 +8,7 @@ You can clone the repository wherever you want. (I like to keep it in `~/Project
 git clone https://github.com/vdyckn/dotfiles.git
 ```
 
-Make sure dependencies are installed, run commands in dependencies.sh (please do not execute the script, copy pase commands).
+Make sure dependencies are installed, run commands in setup.sh (please do not execute the script, copy pase commands).
 
 To install or update:
 
