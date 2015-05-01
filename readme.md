@@ -1,4 +1,4 @@
-#My Personal Dotfiles repo
+#My personal dotfiles repo
 
 ##Installation
 
