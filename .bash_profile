@@ -57,18 +57,19 @@ source ~/code/z/z.sh
 
 #NPM install without sudo : in home dir
 #Reference to npm packages directory
-NPM_PACKAGES="${HOME}/.npm-packages"
+export NPM_PACKAGES="${HOME}/.npm-packages"
 
 #Node reference to npm packages
-NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
+export NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
 
 #Ensure you'll find installed binaries and man pages
-PATH="$NPM_PACKAGES/bin:$PATH"
+export PATH="$NPM_PACKAGES/bin:$PATH"
 # Unset manpath so we can inherit from /etc/manpath via the `manpath`
 # command
 unset MANPATH # delete if you already modified MANPATH elsewhere in your config
-MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
+export MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
 
 #Generally update path
 #Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
-PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
+export PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
+export PATH="$HOME/bin:$PATH";
