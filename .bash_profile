@@ -68,3 +68,7 @@ PATH="$NPM_PACKAGES/bin:$PATH"
 # command
 unset MANPATH # delete if you already modified MANPATH elsewhere in your config
 MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
+
+#Generally update path
+#Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
+PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
