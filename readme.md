@@ -21,3 +21,9 @@ Alternatively, to update while avoiding the confirmation prompt:
 ```bash
 set -- -f; source bootstrap.sh
 ```
+
+##Stolen from
+- https://github.com/mathiasbynens/dotfiles
+- https://github.com/paulirish/dotfiles
+- https://github.com/sindresorhus/mathiasbynens-dotfiles
+- https://github.com/necolas/dotfiles

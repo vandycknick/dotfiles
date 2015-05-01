@@ -75,8 +75,6 @@ alias cleanup="find . -name '*.DS_Store' -type f -ls -delete"
 alias g="git"
 alias v="vim"
 alias cls="clear"
-alias code="open -a 'Visual Studio Code'"
-alias sbl="open -a 'Sublime Text'"
 
 # File size
 alias fs="stat -f \"%z bytes\""
