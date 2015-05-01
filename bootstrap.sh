@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
-echo "Make sure dependencies are installed first"
-read -n 1
+if [ "$1" != "--force" -o "$1" != "-f" ]; then
+	echo "Make sure dependencies are installed first"
+	read -n 1
+fi;
   
 cd "$(dirname "${BASH_SOURCE}")";
 
