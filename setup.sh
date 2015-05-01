@@ -16,7 +16,6 @@ brew tap caskroom/versions
 brew untap aspnet/dnx
 brew tap aspnet/dnx
 
-
 # https://github.com/rupa/z
 # z, oh how i love you
 cd ~/code

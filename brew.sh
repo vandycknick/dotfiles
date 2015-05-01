@@ -34,5 +34,8 @@ brew install bash-completion2
 #Install node
 brew install node
 
+#Install the .NET Version Manager (DNVM)
+brew install dnvm
+
 #Cleanup the house
 brew cleanup

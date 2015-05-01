@@ -55,6 +55,9 @@ shopt -s cdspell;
 #   github.com/rupa/z
 source ~/code/z/z.sh
 
+#Load .NET Version Manager (DNVM)
+source dnvm.sh
+
 #NPM install without sudo : in home dir
 #Reference to npm packages directory
 export NPM_PACKAGES="${HOME}/.npm-packages"
