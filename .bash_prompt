@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# bash_prompt
-
 # Example:
 # nicolas@host: ~/.dotfiles on master [+!?$]
 # $
