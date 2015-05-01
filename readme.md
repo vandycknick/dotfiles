@@ -1,4 +1,5 @@
 #My personal dotfiles repo
+dotfiles for mac osx, windows powershell and cmd config files coming soon
 
 ##Installation
 
