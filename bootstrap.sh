@@ -11,7 +11,8 @@ git pull origin master;
 
 function doIt() {
 	rsync --exclude ".git/" --exclude ".DS_Store" --exclude "bootstrap.sh" \
-		--exclude "README.md" --exclude "LICENSE" --exclude "dependencies.sh" -avh --no-perms . ~;
+		--exclude "README.md" --exclude "LICENSE" --exclude "setup.sh" \
+		--exclude "brew.sh" --exclude "brew-cask.sh" -avh --no-perms . ~;
 	source ~/.bash_profile;
 }
 
