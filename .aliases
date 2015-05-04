@@ -17,8 +17,11 @@ alias where=which
 alias please=sudo
 alias hosts='sudo $EDITOR /etc/hosts'
 
+# use coreutils `ls` if possible…
+[ $(which gls) > /dev/null ] && lscmd="gls" || lscmd="ls"
+
 # Detect which `ls` flavor is in use
-if ls --color > /dev/null 2>&1; then # GNU `ls`
+if $lscmd --color > /dev/null 2>&1; then # GNU `ls`
 	colorflag="--color"
 else # OS X `ls`
 	colorflag="-G"
