@@ -5,6 +5,7 @@
 # dev
 brew cask install visual-studio-code
 brew cask install sublime-text3
+brew cask install github
 
 # fun
 brew cask install gitter
