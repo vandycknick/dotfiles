@@ -18,6 +18,6 @@ brew tap aspnet/dnx
 
 # https://github.com/rupa/z
 # z, oh how i love you
-cd ~/code
+cd ~/bin
 git clone https://github.com/rupa/z.git
-chmod +x ~/code/z/z.sh
+chmod +x ~/bin/z/z.sh
