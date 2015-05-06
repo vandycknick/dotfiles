@@ -28,3 +28,7 @@ export MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
 #Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
 export PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
 export PATH="$HOME/bin:$PATH";
+
+# here's LS_COLORS
+# github.com/trapd00r/LS_COLORS
+eval $(gdircolors -b ~/.dircolors)
