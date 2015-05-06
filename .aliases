@@ -5,8 +5,6 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 
-alias rm="rm -i"
-
 # i <3 u cask
 alias cask='brew cask'
 
