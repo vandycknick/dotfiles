@@ -1,32 +1,26 @@
-#My personal dotfiles repo
-dotfiles for mac osx, windows powershell and cmd config files coming soon
+#My dotfiles
+My personal collection of dotfiles, with install instructions for windows and mac.Ideas stolen from various repo's: https://dotfiles.github.io/.
+
+##Prerequisite
+To setup the required bits and piecs run the commands in setup.sh.
 
 ##Installation
-
-You can clone the repository wherever you want. (I like to keep it in `~/Projects/dotfiles`, with `~/dotfiles` as a symlink.) The bootstrapper script will pull in the latest version and copy the files to your home folder.
-
+Clone the repo somewhere in your home folder.
 ```bash
 git clone https://github.com/vdyckn/dotfiles.git
 ```
-
-Make sure dependencies are installed, run commands in setup.sh 
-
-(please do not execute the script, copy and paste commands).
-
-To install or update:
+Run the bootstrap script
 
 ```bash
 source bootstrap.sh
 ```
 
-Alternatively, to update while avoiding the confirmation prompt:
-
-```bash
-set -- -f; source bootstrap.sh
-```
-
-##Stolen from
+##Ideas coming from:
 - https://github.com/mathiasbynens/dotfiles
 - https://github.com/paulirish/dotfiles
 - https://github.com/sindresorhus/mathiasbynens-dotfiles
 - https://github.com/necolas/dotfiles
+
+##Todo
+- Update build process, look at symlinking
+- Add windows modules
