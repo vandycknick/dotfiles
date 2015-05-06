@@ -1,10 +1,4 @@
 #!/usr/bin/env bash
-
-if [ "$1" != "--force" -o "$1" != "-f" ]; then
-	echo "Make sure dependencies are installed first"
-	read -n 1
-fi;
-  
 cd "$(dirname "${BASH_SOURCE}")";
 
 git pull origin master;

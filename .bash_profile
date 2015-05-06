@@ -53,26 +53,7 @@ shopt -s cdspell;
 
 # z beats cd most of the time.
 #   github.com/rupa/z
-source ~/code/z/z.sh
+source ~/bin/z/z.sh
 
 #Load .NET Version Manager (DNVM)
 source dnvm.sh
-
-#NPM install without sudo : in home dir
-#Reference to npm packages directory
-export NPM_PACKAGES="${HOME}/.npm-packages"
-
-#Node reference to npm packages
-export NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
-
-#Ensure you'll find installed binaries and man pages
-export PATH="$NPM_PACKAGES/bin:$PATH"
-# Unset manpath so we can inherit from /etc/manpath via the `manpath`
-# command
-unset MANPATH # delete if you already modified MANPATH elsewhere in your config
-export MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
-
-#Generally update path
-#Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
-export PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
-export PATH="$HOME/bin:$PATH";
