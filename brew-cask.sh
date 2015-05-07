@@ -15,6 +15,7 @@ brew cask update
 brew cask install visual-studio-code
 brew cask install sublime-text3
 brew cask install github
+brew cask install parallels-desktop
 
 # fun
 brew cask install gitter
