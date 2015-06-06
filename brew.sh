@@ -39,5 +39,8 @@ brew install node
 #Install the .NET Version Manager (DNVM)
 brew install dnvm
 
+#Install Boot2Docker along with Docker
+brew install boot2docker
+
 #Cleanup the house
 brew cleanup
