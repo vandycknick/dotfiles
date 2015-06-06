@@ -20,10 +20,11 @@ brew cask install github
 brew cask install parallels-desktop
 brew cask install virtualbox # boot2docker
 
-# fun
+# personal
 brew cask install gitter
 brew cask install vlc
 brew cask install spotify
+brew cask install transmission
 
 # browsers
 brew cask install google-chrome
