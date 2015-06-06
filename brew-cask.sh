@@ -16,7 +16,9 @@ brew cask install skype
 brew cask install visual-studio-code
 brew cask install sublime-text3
 brew cask install github
+
 brew cask install parallels-desktop
+brew cask install virtualbox # boot2docker
 
 # fun
 brew cask install gitter
