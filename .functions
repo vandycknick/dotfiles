@@ -69,6 +69,12 @@ function whois() {
 function msbuild(){
 	if [ ! -f ~/bin/msbuild/bin/Unix/Debug-MONO/MSBuild.exe ]; then
 	    echo "MSBuild not found please download and build source into ~/bin/msbuild"
+		echo "Execute following commands: "
+		echo "- cd ~/bin"
+		echo "- git clone https://github.com/Microsoft/msbuild.git"
+		echo "- cd ~/bin/msbuild"
+		echo "- git checkout xplat"
+		echo "- perl build.pl"
 	else
 		mono ~/bin/msbuild/bin/Unix/Debug-MONO/MSBuild.exe $*
 	fi
