@@ -65,6 +65,15 @@ function whois() {
 	/usr/bin/whois -h whois.internic.net $domain | sed '/NOTICE:/q'
 }
 
+#MSBuild
+function msbuild(){
+	if [ ! -f ~/bin/msbuild/bin/Unix/Debug-MONO/MSBuild.exe ]; then
+	    echo "MSBuild not found please download and build source into ~/bin/msbuild"
+	else
+		mono ~/bin/msbuild/bin/Unix/Debug-MONO/MSBuild.exe $*
+	fi
+}
+
 #Visual Studio Code
 function code () {
     VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $*

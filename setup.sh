@@ -21,3 +21,10 @@ brew tap aspnet/dnx
 cd ~/bin
 git clone https://github.com/rupa/z.git
 chmod +x ~/bin/z/z.sh
+
+# Build and install msbuild (mono required)
+cd ~/bin
+git clone https://github.com/Microsoft/msbuild.git
+cd ~/bin/msbuild
+git checkout xplat
+perl build.pl
