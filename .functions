@@ -85,12 +85,8 @@ function msbuild(){
 #Nuget
 function nuget(){
 	if [ ! -f ~/bin/nuget/nuget.exe ]; then
-		echo "Installing nuget.exe to ~/bin/nuget/nuget.exe"
-		mkdir -p ~/bin/nuget
-		cd ~/bin/nuget
-		curl -L -O https://nuget.org/nuget.exe
-	fi
-	
+		curl -sSL --create-dirs -o ~/bin/nuget/nuget.exe https://nuget.org/nuget.exe
+	fi	
 	mono ~/bin/nuget/nuget.exe $*
 }
 
