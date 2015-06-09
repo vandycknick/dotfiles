@@ -65,6 +65,8 @@ function whois() {
 	/usr/bin/whois -h whois.internic.net $domain | sed '/NOTICE:/q'
 }
 
+#Windows
+
 #MSBuild
 function msbuild(){
 	if [ ! -f ~/bin/msbuild/bin/Unix/Debug-MONO/MSBuild.exe ]; then
@@ -80,10 +82,24 @@ function msbuild(){
 	fi
 }
 
+#Nuget
+function nuget(){
+	if [ ! -f ~/bin/nuget/nuget.exe ]; then
+		echo "Installing nuget.exe to ~/bin/nuget/nuget.exe"
+		mkdir -p ~/bin/nuget
+		cd ~/bin/nuget
+		curl -L -O https://nuget.org/nuget.exe
+	fi
+	
+	mono ~/bin/nuget/nuget.exe $*
+}
+
 #Visual Studio Code
 function code () {
     VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $*
 }
+
+#---
 
 # Extract archives - use: extract <file>
 # Based on http://dotfiles.org/~pseup/.bashrc
