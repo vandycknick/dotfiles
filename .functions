@@ -65,7 +65,16 @@ function whois() {
 	/usr/bin/whois -h whois.internic.net $domain | sed '/NOTICE:/q'
 }
 
-#Windows
+#.NetFramework and C#
+
+#mono
+function mono(){
+	if [ -f ~/bin/mono/bin/mono ]; then
+		~/bin/mono/bin/mono $*
+	else
+		/usr/local/bin/mono $*
+	fi
+}
 
 #MSBuild
 function msbuild(){
