@@ -67,15 +67,6 @@ function whois() {
 
 #.NetFramework and C#
 
-#mono
-function mono(){
-	if [ -f ~/bin/mono/bin/mono ]; then
-		~/bin/mono/bin/mono $*
-	else
-		/usr/local/bin/mono $*
-	fi
-}
-
 #MSBuild
 function msbuild(){
 	if [ ! -f ~/bin/msbuild/bin/Unix/Debug-MONO/MSBuild.exe ]; then

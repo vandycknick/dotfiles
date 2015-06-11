@@ -9,7 +9,7 @@
 # Color ref: http://vim.wikia.com/wiki/Xterm256_color_names_for_console_Vim
 # More tips: http://www.cyberciti.biz/tips/howto-linux-unix-bash-shell-setup-prompt.html
 
-prompt_git() {
+function prompt_git() {
     local s=""
     local branchName=""
 
