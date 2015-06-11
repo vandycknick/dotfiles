@@ -16,12 +16,6 @@ brew tap caskroom/versions
 brew untap aspnet/dnx
 brew tap aspnet/dnx
 
-# https://github.com/rupa/z
-# z, oh how i love you
-cd ~/bin
-git clone https://github.com/rupa/z.git
-chmod +x ~/bin/z/z.sh
-
 # Build and install msbuild (mono required)
 cd ~/bin
 git clone https://github.com/Microsoft/msbuild.git
