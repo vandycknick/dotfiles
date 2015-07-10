@@ -40,3 +40,6 @@ fi
 # here's LS_COLORS
 # github.com/trapd00r/LS_COLORS
 eval $(gdircolors -b ~/.dircolors)
+
+#Export android-home (brew)
+export ANDROID_HOME=/usr/local/opt/android-sdk
