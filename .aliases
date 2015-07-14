@@ -79,6 +79,7 @@ alias g="git"
 alias v="vim"
 alias cls="clear"
 alias sbl="open -a 'Sublime Text'"
+alias iossimulator="open -a 'IOS Simulator'"
 
 # File size
 alias fs="stat -f \"%z bytes\""
