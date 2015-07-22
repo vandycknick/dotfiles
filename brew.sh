@@ -48,8 +48,5 @@ brew install dnvm
 #Install Boot2Docker along with Docker
 brew install boot2docker
 
-#install android-sdk
-brew install android-sdk
-
 #Cleanup the house
 brew cleanup
