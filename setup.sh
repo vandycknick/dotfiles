@@ -10,15 +10,3 @@ brew tap homebrew/versions
 #Install cask : http://caskroom.io/
 brew install caskroom/cask/brew-cask
 brew tap caskroom/versions
-
-#Install the .NET Version Manager (DNVM)
-#http://docs.asp.net/en/latest/getting-started/installing-on-mac.html
-brew untap aspnet/dnx
-brew tap aspnet/dnx
-
-# Build and install msbuild (mono required)
-cd ~/bin
-git clone https://github.com/Microsoft/msbuild.git
-cd ~/bin/msbuild
-git checkout xplat
-perl build.pl

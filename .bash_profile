@@ -54,6 +54,3 @@ shopt -s cdspell;
 # z beats cd most of the time.
 # github.com/rupa/z
 source `brew --prefix`/etc/profile.d/z.sh
-
-#Load .NET Version Manager (DNVM)
-source dnvm.sh

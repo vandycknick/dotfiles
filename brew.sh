@@ -42,8 +42,5 @@ brew install node
 #Install mono
 brew install mono
 
-#Install the .NET Version Manager (DNVM)
-brew install dnvm
-
 #Cleanup the house
 brew cleanup
