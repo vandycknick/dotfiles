@@ -14,7 +14,6 @@ brew cask install skype
 
 # dev
 brew cask install visual-studio-code
-brew cask install sublime-text3
 brew cask install github-desktop
 
 brew cask install parallels-desktop
