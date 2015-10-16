@@ -23,25 +23,6 @@ fi
 export HISTTIMEFORMAT='%F %T '
 
 ##
-## Completion…
-##
-
-# bash completion.
-if which brew > /dev/null && [ -f "$(brew --prefix)/share/bash-completion/bash_completion" ]; then
-    source "$(brew --prefix)/share/bash-completion/bash_completion";
-elif [ -f /etc/bash_completion ]; then
-    source /etc/bash_completion;
-fi;
-
-# homebrew completion
-source `brew --repository`/Library/Contributions/brew_bash_completion.sh
-
-# Enable tab completion for `g` by marking it as an alias for `git`
-if type _git &> /dev/null && [ -f /usr/local/etc/bash_completion.d/git-completion.bash ]; then
-    complete -o default -o nospace -F _git g;
-fi;
-
-##
 ## better `cd`'ing
 ## 
 

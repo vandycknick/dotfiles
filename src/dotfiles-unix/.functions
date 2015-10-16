@@ -23,12 +23,12 @@ function fs() {
 }
 
 # cd into whatever is the forefront Finder window.
-cdf() {  # short for cdfinder
+function cdf() {  # short for cdfinder
   cd "`osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)'`"
 }
 
 # Copy w/ progress
-cp_p () {
+function cp_p () {
   rsync -WavP --human-readable --progress $1 $2
 }
 
@@ -67,27 +67,12 @@ function whois() {
 
 #.NetFramework and C#
 
-#MSBuild
-function msbuild(){
-	if [ ! -f ~/bin/msbuild/bin/Unix/Debug-MONO/MSBuild.exe ]; then
-	    echo "MSBuild not found please download and build source into ~/bin/msbuild"
-		echo "Execute following commands: "
-		echo "- cd ~/bin"
-		echo "- git clone https://github.com/Microsoft/msbuild.git"
-		echo "- cd ~/bin/msbuild"
-		echo "- git checkout xplat"
-		echo "- perl build.pl"
-	else
-		mono ~/bin/msbuild/bin/Unix/Debug-MONO/MSBuild.exe $*
-	fi
-}
-
 #Nuget
 function nuget(){
-	if [ ! -f ~/bin/nuget/nuget.exe ]; then
-		curl -sSL --create-dirs -o ~/bin/nuget/nuget.exe https://nuget.org/nuget.exe
+	if [ ! -f ~/.bin/nuget/nuget.exe ]; then
+		curl -sSL --create-dirs -o ~/.bin/nuget/nuget.exe https://nuget.org/nuget.exe
 	fi	
-	mono ~/bin/nuget/nuget.exe $*
+	mono ~/.bin/nuget/nuget.exe $*
 }
 
 #Visual Studio Code
@@ -135,7 +120,7 @@ function extract() {
 }
 
 # who is using the laptop's iSight camera?
-camerausedby() {
+function camerausedby() {
     echo "Checking to see who is using the iSight camera… 📷"
     usedby=$(lsof | grep -w "AppleCamera\|USBVDC\|iSight" | awk '{printf $2"\n"}' | xargs ps)
     echo -e "Recent camera uses:\n$usedby"
@@ -143,7 +128,7 @@ camerausedby() {
 
 # animated gifs from any video
 # from alex sexton   gist.github.com/SlexAxton/4989674
-gifify() {
+function gifify() {
   if [[ -n "$1" ]]; then
     if [[ $2 == '--good' ]]; then
       ffmpeg -i $1 -r 10 -vcodec png out-static-%05d.png

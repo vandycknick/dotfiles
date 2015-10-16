@@ -1,4 +1,4 @@
-export MYBINS="$HOME/bin"
+export MYBINS="$HOME/.bin"
 
 # Make vim the default editor
 export EDITOR="vim"
