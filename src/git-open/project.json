@@ -9,8 +9,7 @@
   "dependencies": {},
 
   "commands": {
-    "git-open": "git-open",
-    "run": "git-open"
+    "git-open": "git-open"
   },
 
   "frameworks": {
