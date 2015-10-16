@@ -1,5 +1,4 @@
-﻿#if !DNXCORE50
-using System;
+﻿using System;
 using LibGit2Sharp;
 using System.IO;
 
@@ -38,4 +37,3 @@ namespace git_open
         }
     }
 }
-#endif

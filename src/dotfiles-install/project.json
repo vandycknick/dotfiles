@@ -15,9 +15,7 @@
 
   "frameworks": {
     "dnx451": {
-      "dependencies": {
-        "LibGit2Sharp": "0.21.0.176"
-      }
+      "dependencies": {}
     },
     "dnxcore50": {
       "dependencies": {

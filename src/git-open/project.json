@@ -6,27 +6,15 @@
   "projectUrl": "",
   "licenseUrl": "",
 
-  "dependencies": {},
+  "dependencies": {
+     "LibGit2Sharp": ""
+  },
 
   "commands": {
     "git-open": "git-open"
   },
 
   "frameworks": {
-    "dnx451": {
-      "dependencies": {
-        "LibGit2Sharp": ""
-      }
-    },
-    "dnxcore50": {
-      "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23409",
-        "System.Collections": "4.0.11-beta-23409",
-        "System.Console": "4.0.0-beta-23409",
-        "System.IO.FileSystem": "4.0.1-beta-23409",
-        "System.Linq": "4.0.1-beta-23409",
-        "System.Threading": "4.0.11-beta-23409"
-      }
-    }
+    "dnx451": { }
   }
 }

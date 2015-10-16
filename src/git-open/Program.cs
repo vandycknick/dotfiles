@@ -1,10 +1,7 @@
 using System;
-
-#if !DNXCORE50
 using System.IO;
 using System.Diagnostics;
 using LibGit2Sharp;
-#endif
 
 namespace git_open
 {
@@ -12,12 +9,6 @@ namespace git_open
     {
         public static int Main(string[] args)
         {
-#if DNXCORE50
-            Console.WriteLine($"Program not working with dotnet coreclr!");
-            return 1;
-#endif
-
-#if !DNXCORE50
             var curDir = Directory.GetCurrentDirectory();
             try
             {
@@ -38,7 +29,6 @@ namespace git_open
             }
             
             return 0;
-#endif
         }
     }
 }

@@ -9,7 +9,14 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "dotfiles-install", "src\dot
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "git-open", "src\git-open\git-open.xproj", "{842743C8-0BFD-44D8-BAD7-4B194AF4DB25}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "LibGit2Sharp", "src\LibGit2Sharp\LibGit2Sharp.xproj", "{850E959C-79CC-4573-9569-46EC836574DA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{6B85487F-50BF-4EC7-BC16-81FDD98EA843}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "global", "global", "{C61060DC-054C-4F3D-8C25-1CB39F20782C}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "LibGit2Sharp", "lib\LibGit2Sharp\LibGit2Sharp.xproj", "{850E959C-79CC-4573-9569-46EC836574DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +43,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{FA19D795-7DBD-4863-9049-ECAFE40ABE84} = {4317561A-5323-4F22-943E-259A5D9FCCE3}
 		{842743C8-0BFD-44D8-BAD7-4B194AF4DB25} = {4317561A-5323-4F22-943E-259A5D9FCCE3}
-		{850E959C-79CC-4573-9569-46EC836574DA} = {4317561A-5323-4F22-943E-259A5D9FCCE3}
+		{850E959C-79CC-4573-9569-46EC836574DA} = {6B85487F-50BF-4EC7-BC16-81FDD98EA843}
 	EndGlobalSection
 EndGlobal

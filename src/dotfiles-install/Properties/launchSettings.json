@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "dotfiles-install": {
-      "commandName": "dotfiles-install",
-      "sdkVersion": "dnx-clr-win-x86.1.0.0-beta8"
-    }
-  }
-}
