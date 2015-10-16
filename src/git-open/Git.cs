@@ -23,6 +23,7 @@ namespace git_open
                 catch (Exception ex)
                 {
                     if (gitRepo != null) gitRepo.Dispose();
+                    Logger.Verbose(ex.Message);
                 }
 
                 curDir = curDir.Parent;
