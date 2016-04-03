@@ -1,20 +1,13 @@
 {
-  "version": "1.0.0-*",
-  "description": "git_open Console Application",
-  "authors": ["your name"],
-  "tags": [""],
-  "projectUrl": "",
-  "licenseUrl": "",
-
-  "dependencies": {
-     "LibGit2Sharp": ""
-  },
-
-  "commands": {
-    "git-open": "git-open"
-  },
-
-  "frameworks": {
-    "dnx451": { }
-  }
+    "version": "1.0.0-*",
+    "compilationOptions": {
+        "emitEntryPoint": true
+    },
+    "dependencies": {
+        "NETStandard.Library": "1.0.0-rc2-23811",
+        "LibGit2Sharp": "0.22.0"
+    },
+    "frameworks": {
+        "dnxcore50": {}
+    }
 }

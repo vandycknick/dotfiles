@@ -6,7 +6,10 @@ read -n 1
 #Install homebrew : http://brew.sh/
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 brew tap homebrew/versions
+brew tap caskroom/versions
 
 #Install cask : http://caskroom.io/
 brew install caskroom/cask/brew-cask
-brew tap caskroom/versions
+brew install docker
+brew install docker-machine
+brew install docker-machine-parallels
