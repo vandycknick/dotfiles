@@ -1,3 +1,8 @@
+# Docker shortcut functions
+function dshell() {
+    docker exec -it $1 env TERM=xterm bash -l
+}
+
 # Create a new directory and enter it
 function md() {
 	mkdir -p "$@" && cd "$@"
@@ -32,17 +37,6 @@ function cp_p () {
   rsync -WavP --human-readable --progress $1 $2
 }
 
-# Syntax-highlight JSON strings or files
-function json() {
-	if [ -p /dev/stdin ]; then
-		# piping, e.g. `echo '{"foo":42}' | json`
-		python -mjson.tool | pygmentize -l javascript
-	else
-		# e.g. `json '{"foo":42}'`
-		python -mjson.tool <<< "$*" | pygmentize -l javascript
-	fi
-}
-
 # get gzipped size
 function gz() {
 	echo "orig size    (bytes): "
@@ -65,22 +59,15 @@ function whois() {
 	/usr/bin/whois -h whois.internic.net $domain | sed '/NOTICE:/q'
 }
 
-#.NetFramework and C#
-
-#Nuget
-function nuget(){
-	if [ ! -f ~/.bin/nuget/nuget.exe ]; then
-		curl -sSL --create-dirs -o ~/.bin/nuget/nuget.exe https://nuget.org/nuget.exe
-	fi	
-	mono ~/.bin/nuget/nuget.exe $*
+# Function to open chrome and easily pass it some config parameters
+function chrome () {
+  open -n -b 'com.google.Chrome' --args $*
 }
 
-#Visual Studio Code
-function code () {
-    VSCODE_CWD="$PWD" open -n -b "com.microsoft.VSCode" --args $*
+function canary() {
+  open -n -b 'com.google.Chrome.canary' --args $*
 }
 
-#---
 
 # Extract archives - use: extract <file>
 # Based on http://dotfiles.org/~pseup/.bashrc

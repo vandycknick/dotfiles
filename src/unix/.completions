@@ -12,19 +12,3 @@ source `brew --repository`/Library/Contributions/brew_bash_completion.sh
 if type _git &> /dev/null && [ -f /usr/local/etc/bash_completion.d/git-completion.bash ]; then
     complete -o default -o nospace -F _git g;
 fi;
-
-#Azure completion (make sure Azure x-plat cli tools are installed via npm)
-## To install run: npm install -g azure-cli
-## Code generate by azure tools : azure --completion (https://www.npmjs.com/package/azure-cli)
-if type compdef &>/dev/null; then
-  _azure_complette() {
-    compadd -- `azure --compzsh --compgen "${CURRENT}" "${words[CURRENT-1]}" "${BUFFER}"`
-  }
-  compdef _azure_complette azure
-elif type complete &>/dev/null; then
-  _azure_complette() {
-    COMPREPLY=( $(compgen -W '$(azure --compbash --compgen "${COMP_CWORD}" "${COMP_WORDS[COMP_CWORD-1]}" "${COMP_LINE}")' -- "${COMP_WORDS[COMP_CWORD]}") )
-  }
-  complete -F _azure_complette azure
-fi
-#Azure completion - end

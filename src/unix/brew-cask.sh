@@ -14,20 +14,24 @@ brew cask install skype
 
 # dev
 brew cask install visual-studio-code
-brew cask install github-desktop
-
+brew cask install visual-studio-code-insiders
+brew cask install iterm2
 brew cask install parallels-desktop
 brew cask install java
+brew cask install dash
+brew cask install docker
 
 # personal
 brew cask install gitter
 brew cask install vlc
 brew cask install spotify
 brew cask install transmission
+brew cask install android-file-transfer
 
 # browsers
 brew cask install google-chrome
 brew cask install google-chrome-canary
+brew cask install firefox
 brew cask install torbrowser
 
 #other

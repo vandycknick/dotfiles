@@ -22,6 +22,15 @@ export NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
 #Ensure you'll find installed binaries and man pages
 export PATH="$NPM_PACKAGES/bin:$PATH"
 
+#Set path to custom node binary
+export PATH="$HOME/.node-vm/bin:$PATH"
+
+# Set go path
+export GOPATH=$HOME/Code
+
+# Add workspace binfolder to search path
+export PATH=$PATH:$GOPATH/bin
+
 # Unset manpath so we can inherit from /etc/manpath via the `manpath`
 # command
 unset MANPATH # delete if you already modified MANPATH elsewhere in your config

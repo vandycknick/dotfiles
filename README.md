@@ -9,10 +9,20 @@ Clone the repo somewhere in your home folder.
 ```bash
 git clone https://github.com/vdyckn/dotfiles.git
 ```
-Run the bootstrap script
+
+## Unix setup (MAC)
+
+First manually setup some required binaries by running each line in the following script:
+```sh
+pre-bootstrap.sh
+```
+
+Then run the followin scripts to do the full setup
 
 ```bash
-source bootstrap.sh
+source src/unix/bootstrap.sh
+source src/unix/brew.sh
+source src/unix/brew-cask.sh
 ```
 
 ##Ideas coming from:
@@ -20,7 +30,3 @@ source bootstrap.sh
 - https://github.com/paulirish/dotfiles
 - https://github.com/sindresorhus/mathiasbynens-dotfiles
 - https://github.com/necolas/dotfiles
-
-##Todo
-- Update build process, look at symlinking
-- Add windows modules

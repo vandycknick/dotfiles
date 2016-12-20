@@ -36,11 +36,18 @@ brew install bash
 # brew tap homebrew/versions : done in setup.sh
 brew install bash-completion2
 
-#Install node
-brew install node
-
-#Install mono
+# Programming binaries
+brew install go
 brew install mono
+brew install python
+brew install python3
+
+# Libraries
+brew install libgit2
+
+# Some tools
+brew install cf-cli
+brew install jq
 
 #Cleanup the house
 brew cleanup

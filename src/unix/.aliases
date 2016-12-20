@@ -81,7 +81,6 @@ alias cleanup="find . -name '*.DS_Store' -type f -ls -delete"
 alias g="git"
 alias v="vim"
 alias cls="clear"
-alias sbl="open -a 'Sublime Text'"
 alias iossimulator="open -a 'IOS Simulator'"
 
 # File size

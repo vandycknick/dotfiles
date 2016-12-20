@@ -10,6 +10,3 @@ brew tap caskroom/versions
 
 #Install cask : http://caskroom.io/
 brew install caskroom/cask/brew-cask
-brew install docker
-brew install docker-machine
-brew install docker-machine-parallels
