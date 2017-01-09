@@ -20,9 +20,9 @@ brew cask install parallels-desktop
 brew cask install java
 brew cask install dash
 brew cask install docker
+brew cask install vim
 
 # personal
-brew cask install gitter
 brew cask install vlc
 brew cask install spotify
 brew cask install transmission
