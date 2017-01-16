@@ -22,9 +22,6 @@ export NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
 #Ensure you'll find installed binaries and man pages
 export PATH="$NPM_PACKAGES/bin:$PATH"
 
-#Set path to custom node binary
-export PATH="$HOME/.node-vm/bin:$PATH"
-
 # Set go path
 export GOPATH=$HOME/Code
 
@@ -40,11 +37,6 @@ export MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
 #Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
 export PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
 export PATH="$MYBINS:$PATH";
-
-#Set mono path to bin folder
-if [ -d $MYBINS/mono/bin ]; then
-	export PATH="$MYBINS/mono/bin:$PATH"
-fi
 
 # here's LS_COLORS
 # github.com/trapd00r/LS_COLORS

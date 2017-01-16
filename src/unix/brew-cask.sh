@@ -9,8 +9,12 @@ while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 # Make sure we’re using the latest and greatest.
 brew cask update
 
+# tools
+brew cask install 1password
+
 # daily
 brew cask install skype
+brew cask install slack
 
 # dev
 brew cask install visual-studio-code
@@ -20,7 +24,6 @@ brew cask install parallels-desktop
 brew cask install java
 brew cask install dash
 brew cask install docker
-brew cask install vim
 
 # personal
 brew cask install vlc
