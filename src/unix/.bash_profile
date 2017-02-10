@@ -35,3 +35,6 @@ shopt -s cdspell;
 # z beats cd most of the time.
 # github.com/rupa/z
 source `brew --prefix`/etc/profile.d/z.sh
+
+# enable pyenv shims and completion
+eval "$(pyenv init -)"

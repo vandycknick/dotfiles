@@ -39,8 +39,7 @@ brew install bash-completion2
 # Programming binaries
 brew install go
 brew install mono
-brew install python
-brew install python3
+brew install pyenv
 
 # Libraries
 brew install libgit2
