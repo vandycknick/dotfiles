@@ -24,7 +24,7 @@ cp ./system/.bash_profile ~/.bash_profile
 cp ./system/.bash_prompt ~/.bash_prompt
 cp ./system/.bashrc ~/.bashrc
 cp ./system/.completions ~/.completions
-cp ./system/.curl-timings ~/.curl-timings
+cp ./system/.curl-timings.txt ~/.curl-timings.txt
 cp ./system/.dircolors ~/.dircolors
 cp ./system/.exports ~/.exports
 cp ./system/.functions ~/.functions
