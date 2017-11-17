@@ -5,9 +5,6 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 
-# i <3 u cask
-alias cask='brew cask'
-
 # sometimes i forget
 alias where=which
 

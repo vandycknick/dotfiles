@@ -10,7 +10,7 @@ export MANPAGER="less -X"
 export LC_ALL="en_US.UTF-8"
 export LANG="en_US"
 
-export HOMEBREW_CASK_OPTS="--appdir=/Applications"
+export PATH="$MYBINS:$PATH"
 
 #NPM install without sudo : in home dir
 #Reference to npm packages directory
@@ -33,14 +33,6 @@ export PATH=$PATH:$GOPATH/bin
 unset MANPATH # delete if you already modified MANPATH elsewhere in your config
 export MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
 
-#Generally update path
-#Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
-export PATH="$(brew --prefix coreutils)/libexec/gnubin:$PATH"
-export PATH="$MYBINS:$PATH";
-
 # here's LS_COLORS
 # github.com/trapd00r/LS_COLORS
-eval $(gdircolors -b ~/.dircolors)
-
-#Export android-home (brew)
-export ANDROID_HOME=/usr/local/opt/android-sdk
+eval $(dircolors -b ~/.dircolors)
