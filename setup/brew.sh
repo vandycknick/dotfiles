@@ -1,5 +1,19 @@
 #!/usr/bin/env bash
 
+# don't run it.
+echo "do not run this script in one go. hit ctrl-c NOW"
+read -n 1
+
+#Install homebrew : http://brew.sh/
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew tap homebrew/versions
+brew tap caskroom/versions
+
+#Install cask : http://caskroom.io/
+brew install caskroom/cask/brew-cask
+
+## Should be safe from this point
+
 # Install command-line tools using Homebrew.
 
 # Ask for the administrator password upfront.
@@ -51,3 +65,40 @@ brew install vim
 
 #Cleanup the house
 brew cleanup
+
+# Make sure we’re using the latest and greatest.
+brew cask update
+
+# tools
+brew cask install 1password
+
+# daily
+brew cask install skype
+brew cask install slack
+
+# dev
+brew cask install visual-studio-code
+brew cask install visual-studio-code-insiders
+brew cask install iterm2
+brew cask install parallels-desktop
+brew cask install java
+brew cask install dash
+brew cask install docker
+
+# personal
+brew cask install vlc
+brew cask install spotify
+brew cask install transmission
+brew cask install android-file-transfer
+
+# browsers
+brew cask install google-chrome
+brew cask install google-chrome-canary
+brew cask install firefox
+brew cask install torbrowser
+
+#other
+brew cask install disk-inventory-x
+
+#Cleanup the house
+brew cask cleanup
