@@ -21,9 +21,11 @@ echo ''
 sudo apt-get install mc -y
 
 # Setup bin
-cp -r ./bin ~/bin
+echo 'Copy bin folder'
+cp -r ./bin ~
 
 # Setup system files
+echo 'Copy setup files'
 cp ./system/.aliases ~/.aliases
 cp ./system/.bash_profile ~/.bash_profile
 cp ./system/.bash_prompt ~/.bash_prompt
@@ -38,4 +40,5 @@ cp ./system/.npmrc ~/.npmrc
 cp ./system/.vimrc ~/.vimrc
 
 # Setup vim
-cp -r ./vim ~/.vim
+echo 'Copy vim folder'
+cp -r ./vim ~
