@@ -6,6 +6,4 @@ function is_wsl() {
     fi
 }
 
-p = is_wsl()
-
-echo $p
+echo $(is_wsl)

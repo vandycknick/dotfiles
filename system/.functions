@@ -69,16 +69,6 @@ function whois() {
 	/usr/bin/whois -h whois.internic.net $domain | sed '/NOTICE:/q'
 }
 
-# Function to open chrome and easily pass it some config parameters
-function chrome () {
-  open -n -b 'com.google.Chrome' --args $*
-}
-
-function canary() {
-  open -n -b 'com.google.Chrome.canary' --args $*
-}
-
-
 # Extract archives - use: extract <file>
 # Based on http://dotfiles.org/~pseup/.bashrc
 function extract() {

@@ -9,6 +9,11 @@ echo ''
 echo "Now installing git and bash-completion..."
 sudo apt-get install git bash-completion -y
 
+# Installing extras
+echo ''
+echo 'Now installing htop, '
+sudo apt-get install htop
+
 # Midnight commander install
 echo ''
 echo "Now installing Midnight commander..."
