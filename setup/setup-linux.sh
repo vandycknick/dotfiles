@@ -2,29 +2,29 @@
 
 # Update pkg lists
 echo "Updating package lists..."
-sudo apt-get update
+sudo apt update
 
 # Installing git and completions
 echo ""
 echo "Now installing git and bash-completion..."
-sudo apt-get install git bash-completion -y
+sudo apt install git bash-completion -y
 
 echo ""
 echo "Installing build dependencies"
-sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
 libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
 xz-utils tk-dev
 
 # Installing htop
 echo ""
 echo "Now installing htop, "
-sudo apt-get install htop
+sudo apt install htop
 
 # Midnight commander install
 echo ""
 echo "Now installing Midnight commander..."
 echo ""
-sudo apt-get install mc -y
+sudo apt install mc -y
 
 echo ""
 echo "Installing pyenv"
