@@ -5,27 +5,37 @@ echo "Updating package lists..."
 sudo apt-get update
 
 # Installing git and completions
-echo ''
+echo ""
 echo "Now installing git and bash-completion..."
 sudo apt-get install git bash-completion -y
 
-# Installing extras
-echo ''
-echo 'Now installing htop, '
+echo ""
+echo "Installing build dependencies"
+sudo apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
+libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+xz-utils tk-dev
+
+# Installing htop
+echo ""
+echo "Now installing htop, "
 sudo apt-get install htop
 
 # Midnight commander install
-echo ''
+echo ""
 echo "Now installing Midnight commander..."
-echo ''
+echo ""
 sudo apt-get install mc -y
 
+echo ""
+echo "Installing pyenv"
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+
 # Setup bin
-echo 'Copy bin folder'
+echo "Copy bin folder"
 cp -r ./bin ~
 
 # Setup system files
-echo 'Copy setup files'
+echo "Copy setup files"
 cp ./system/.aliases ~/.aliases
 cp ./system/.bash_profile ~/.bash_profile
 cp ./system/.bash_prompt ~/.bash_prompt
@@ -40,5 +50,5 @@ cp ./system/.npmrc ~/.npmrc
 cp ./system/.vimrc ~/.vimrc
 
 # Setup vim
-echo 'Copy vim folder'
+echo "Copy vim folder"
 cp -r ./vim ~

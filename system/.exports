@@ -12,6 +12,10 @@ export LANG="en_US"
 
 export PATH="$MYBINS:$PATH"
 
+# Setup pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+
 #NPM install without sudo : in home dir
 #Reference to npm packages directory
 export NPM_PACKAGES="${HOME}/.npm-packages"
