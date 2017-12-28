@@ -2,7 +2,7 @@ function is_wsl() {
     if grep -q Microsoft /proc/version; then
         echo "Ubuntu on Windows"
     else
-        echo "native Linux"
+        echo "Native Linux"
     fi
 }
 
