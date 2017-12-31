@@ -19,6 +19,7 @@ Copy-Item "$($CURDIR.Path)/powershell/sudo.ps1" $PROFILEPATH
 [System.Environment]::SetEnvironmentVariable("GNUPGHOME", "$HOME\.gnupg", "User")
 
 # Install applications
+choco install sysinternals -y
 choco install visualstudiocode -y --params "/NoDesktopIcon"
 choco install git -y
 choco install dotnetcore-sdk -y

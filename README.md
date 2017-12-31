@@ -21,6 +21,11 @@ Run configuration and install scripts:
 Invoke-Expression ./configure.ps1
 ```
 
+When running in a vm enabl nested vrtualization:
+```powershell
+Set-VMProcessor -VMName <VMName> -ExposeVirtualizationExtensions $true
+```
+
 ## Ideas coming from:
 - https://github.com/mathiasbynens/dotfiles
 - https://github.com/paulirish/dotfiles
