@@ -22,7 +22,13 @@ choco install dotnetcore-sdk -y
 choco install python -y
 choco install nodejs -y
 choco install docker-for-windows -y
-choco install FiraCode -y
+
+# Download FiraCode
+Invoke-WebRequest -Uri "https://github.com/tonsky/FiraCode/releases/download/1.204/FiraCode_1.204.zip" -OutFile "$HOME/Downloads/FiraCode.zip"
+Expand-Archive -LiteralPath "$HOME/Downloads/FiraCode.zip" -DestinationPath "$HOME/Downloads/FiraCode"
+
+# Reload path
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 
 # Setup vscode extensions and preferences
 

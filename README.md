@@ -5,9 +5,20 @@ My personal collection of dotfiles, with install instructions for windows and ma
 
 ### Windows
 Run the following command to download the configurations files to your system
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; iwr "https://github.com/nickvdyck/dotfiles/archive/master.zip" "$HOME/Downloads/dotfiles.zip"; Expand-Archive "$HOME/Downloads/dotfiles" "$HOME/Downloads/dotfiles"
+```
 
-```ps1
-Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString("https://github.com/nickvdyck/dotfiles/archive/master.zip"))
+Install chocolatey
+```powershell
+Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+```
+
+Run configuration and install scripts:
+- Open powershell with administrative privileges
+- Navigate to dotfiles directory and execute the following script
+```powershell
+$HOME/Downloads/dotfiles/configure.ps1
 ```
 
 ## Ideas coming from:
