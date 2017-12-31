@@ -2,6 +2,9 @@
 $CURDIR = Get-Location
 $PROFILEPATH = ($PROFILE | Split-Path)
 
+# Setup package providers
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+
 # Install PowerShell  modules
 Install-Module z -Scope CurrentUser -AllowClobber -Force
 Install-Module posh-git -Scope CurrentUser -Force

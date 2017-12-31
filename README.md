@@ -18,7 +18,7 @@ Run configuration and install scripts:
 - Open powershell with administrative privileges
 - Navigate to dotfiles directory and execute the following script
 ```powershell
- Invoke-Expression $HOME\Downloads\dotfiles\dotfiles-master\configure.ps1
+Invoke-Expression $HOME\Downloads\dotfiles\dotfiles-master\configure.ps1
 ```
 
 ## Ideas coming from:
