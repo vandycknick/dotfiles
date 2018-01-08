@@ -16,15 +16,13 @@ Copy-Item "$($CURDIR.Path)/powershell/Get-Uptime.ps1" $PROFILEPATH
 Copy-Item "$($CURDIR.Path)/powershell/sudo.ps1" $PROFILEPATH
 
 # Setup environment variables
-[System.Environment]::SetEnvironmentVariable("GNUPGHOME", "$HOME\.gnupg", "User")
+[Environment]::SetEnvironmentVariable("GNUPGHOME", "$HOME\.gnupg", "User")
+[Environment]::SetEnvironmentVariable("_NT_SYMBOL_PATH", "srv*C:\symbols*http://msdl.microsoft.com/downloads/symbols", "User")
 
 # Install applications
-choco install sysinternals -y
 choco install visualstudiocode -y --params "/NoDesktopIcon"
-choco install git -y
+choco install git -y --params "/GitOnlyOnPath /NoAutoCrlf /WindowsTerminal /NoShellIntegration"
 choco install dotnetcore-sdk -y
-choco install python -y
-choco install nodejs -y
 choco install docker-for-windows -y
 
 # Download FiraCode
