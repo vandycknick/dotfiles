@@ -35,19 +35,19 @@ echo "Copy bin folder"
 cp -r ./bin ~
 
 # Setup system files
-echo "Copy setup files"
-cp ./system/.aliases ~/.aliases
-cp ./system/.bash_profile ~/.bash_profile
-cp ./system/.bash_prompt ~/.bash_prompt
-cp ./system/.bashrc ~/.bashrc
-cp ./system/.completions ~/.completions
-cp ./system/.curl-timings.txt ~/.curl-timings.txt
-cp ./system/.dircolors ~/.dircolors
-cp ./system/.exports ~/.exports
-cp ./system/.functions ~/.functions
-cp ./system/.inputrc ~/.inputrc
-cp ./system/.npmrc ~/.npmrc
-cp ./system/.vimrc ~/.vimrc
+echo "Copy bash config files"
+cp ./bash/.aliases ~/.aliases
+cp ./bash/.bash_profile ~/.bash_profile
+cp ./bash/.bash_prompt ~/.bash_prompt
+cp ./bash/.bashrc ~/.bashrc
+cp ./bash/.completions ~/.completions
+cp ./bash/.curl-timings.txt ~/.curl-timings.txt
+cp ./bash/.dircolors ~/.dircolors
+cp ./bash/.exports ~/.exports
+cp ./bash/.functions ~/.functions
+cp ./bash/.inputrc ~/.inputrc
+cp ./bash/.npmrc ~/.npmrc
+cp ./bash/.vimrc ~/.vimrc
 
 # Setup config files
 cp ./config/.gitconfig ~/.gitconfig
