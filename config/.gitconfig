@@ -1,0 +1,6 @@
+[user]
+	email = vandyck.nick@outlook.com
+	name = Nick Van Dyck
+	signingkey = 35E7BC13D49B8D49
+[core]
+	autocrlf = input

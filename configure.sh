@@ -49,6 +49,9 @@ cp ./system/.inputrc ~/.inputrc
 cp ./system/.npmrc ~/.npmrc
 cp ./system/.vimrc ~/.vimrc
 
+# Setup config files
+cp ./config/.gitconfig ~/.gitconfig
+
 # Setup vim
 echo "Copy vim folder"
 cp -r ./vim ~
