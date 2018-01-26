@@ -16,12 +16,16 @@ Copy-Item "$($CURDIR.Path)/powershell/Get-Uptime.ps1" $PROFILEPATH
 Copy-Item "$($CURDIR.Path)/powershell/sudo.ps1" $PROFILEPATH
 
 # Setup environment variables
-[Environment]::SetEnvironmentVariable("GNUPGHOME", "$HOME\.gnupg", "User")
 [Environment]::SetEnvironmentVariable("_NT_SYMBOL_PATH", "srv*C:\symbols*http://msdl.microsoft.com/downloads/symbols", "User")
+[Environment]::SetEnvironmentVariable("GNUPGHOME", "$HOME\.gnupg", "User")
+[Environment]::SetEnvironmentVariable("GIT_SSH_COMMAND", "'C:\Program Files\OpenSSH-Win64\ssh.exe' -T", "User") # https://github.com/PowerShell/Win32-OpenSSH/wiki/Setting-up-a-Git-server-on-Windows-using-Git-for-Windows-and-Win32_OpenSSH
+[Environment]::SetEnvironmentVariable("GIT_EDITOR", "'C:/Program Files (x86)/vim/vim80/vim.exe'", "User")
 
 # Install applications
 choco install visualstudiocode -y --params "/NoDesktopIcon"
 choco install git -y --params "/GitOnlyOnPath /NoAutoCrlf /WindowsTerminal /NoShellIntegration"
+choco install vim -y
+choco install openssh -y --params "/SSHAgentFeature"
 choco install dotnetcore-sdk -y
 choco install docker-for-windows -y
 

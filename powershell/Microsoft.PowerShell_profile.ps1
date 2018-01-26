@@ -26,11 +26,6 @@ $global:GitPromptSettings.BeforeForegroundColor = [System.ConsoleColor]::White
 $global:GitPromptSettings.BeforeText = ' on '
 $global:GitPromptSettings.AfterText  = ''
 
-Start-SshAgent -Quiet
-
-Set-Alias Ssh-Agent "$env:ProgramFiles\git\usr\bin\ssh-agent.exe"
-Set-Alias Ssh-Add "$env:ProgramFiles\git\usr\bin\ssh-add.exe"
-
 Set-Alias g git
 Set-Alias which Get-Command
 
