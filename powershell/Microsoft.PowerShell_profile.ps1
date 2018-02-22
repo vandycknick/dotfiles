@@ -21,6 +21,11 @@ function prompt {
 Import-Module z
 Import-Module posh-git
 
+# POSH Git sets these env variables which breaks my ssh setup
+# TODO: find out why it is doing this and what it is exactually doing
+$env:SSH_AGENT_PID = $null
+$env:SSH_AUTH_SOCK = $null
+
 $global:GitPromptSettings.BranchAheadStatusForegroundColor = [System.ConsoleColor]::Cyan
 $global:GitPromptSettings.BeforeForegroundColor = [System.ConsoleColor]::White
 $global:GitPromptSettings.BeforeText = ' on '

@@ -6,7 +6,6 @@
     "editor.fontSize": 13,
     "terminal.integrated.fontSize": 13,
     "files.eol": "\n",
-    "python.linting.enabledWithoutWorkspace": false,
     "window.zoomLevel": 0,
     "gitlens.advanced.messages": {
         "suppressCommitHasNoPreviousCommitWarning": false,
@@ -17,5 +16,9 @@
         "suppressNoRepositoryWarning": false,
         "suppressUpdateNotice": false,
         "suppressWelcomeNotice": true
-    }
+    },
+    "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\6.0.1\\pwsh.exe",
+    "powershell.powerShellExePath": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "git.confirmSync": false,
+    "javascript.implicitProjectConfig.experimentalDecorators": true
 }
