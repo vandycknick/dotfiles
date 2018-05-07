@@ -26,6 +26,12 @@ When running in a vm enabl nested vrtualization:
 Set-VMProcessor -VMName <VMName> -ExposeVirtualizationExtensions $true
 ```
 
+### Linux
+Run the following script to setup your linux environment
+```sh
+./configure.sh
+```
+
 ## Ideas coming from:
 - https://github.com/mathiasbynens/dotfiles
 - https://github.com/paulirish/dotfiles

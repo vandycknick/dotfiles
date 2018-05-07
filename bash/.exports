@@ -16,12 +16,8 @@ export PATH="$MYBINS:$PATH"
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 
-#NPM install without sudo : in home dir
-#Reference to npm packages directory
-export NPM_PACKAGES="${HOME}/.npm-packages"
-
-#Node reference to npm packages
-export NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
+# Setup nvm home dir
+export NVM_DIR="$HOME/.nvm"
 
 #Ensure you'll find installed binaries and man pages
 export PATH="$NPM_PACKAGES/bin:$PATH"

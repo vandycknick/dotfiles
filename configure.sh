@@ -30,6 +30,10 @@ echo ""
 echo "Installing pyenv"
 git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 
+echo ""
+echo "Installing nvm"
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+
 # Setup bin
 echo "Copy bin folder"
 cp -r ./bin ~
