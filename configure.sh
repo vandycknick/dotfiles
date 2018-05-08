@@ -38,6 +38,10 @@ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | 
 echo "Copy bin folder"
 cp -r ./bin ~
 
+echo ""
+echo "Installing z (https://github.com/rupa/z)"
+git clone https://github.com/rupa/z ~/bin/z
+
 # Setup system files
 echo "Copy bash config files"
 cp ./bash/.aliases ~/.aliases

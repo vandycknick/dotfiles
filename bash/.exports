@@ -10,6 +10,9 @@ export MANPAGER="less -X"
 export LC_ALL="en_US.UTF-8"
 export LANG="en_US"
 
+# Z don't resolve symlinks
+export _Z_NO_RESOLVE_SYMLINKS=1
+
 export PATH="$MYBINS:$PATH"
 
 # Setup pyenv

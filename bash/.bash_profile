@@ -39,3 +39,6 @@ fi
 
 # Initialize nvm
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Initialize z (https://github.com/rupa/z)
+. ~/bin/z/z.sh
