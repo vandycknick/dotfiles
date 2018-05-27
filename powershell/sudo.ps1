@@ -24,7 +24,7 @@ function sudo() {
     $stdout = [System.IO.File]::ReadAllText($file)
 
     [System.IO.File]::Delete($file)
-    Write-Output $stdout    
+    Write-Output $stdout
 }
 
 function amiadmin() {
