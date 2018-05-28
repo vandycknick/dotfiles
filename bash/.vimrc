@@ -8,9 +8,9 @@ set nocompatible
 
 " Syntax highlighting {{{
 set t_Co=256
+syntax enable
 set background=dark
-syntax on
-colorscheme molotov
+colorscheme monokai
 " }}}
 
 " Mapleader {{{
@@ -176,16 +176,6 @@ augroup general_config
   " map <silent> <leader>qs <Esc>:let @/ = ""<CR>
   " }}}
 
-  " Vim on the iPad {{{
-  if &term == "xterm-ipad"
-    nnoremap <Tab> <Esc>
-    vnoremap <Tab> <Esc>gV
-    onoremap <Tab> <Esc>
-    inoremap <Tab> <Esc>`^
-    inoremap <Leader><Tab> <Tab>
-  endif
-  " }}}
-
   " Remap keys for auto-completion menu {{{
   inoremap <expr> <CR>   pumvisible() ? "\<C-y>" : "\<CR>"
   inoremap <expr> <Down> pumvisible() ? "\<C-n>" : "\<Down>"
@@ -240,6 +230,16 @@ augroup general_config
   set relativenumber " Use relative line numbers. Current line is still in status bar.
   au BufReadPost,BufNewFile * set relativenumber
   " }}}
+
+  " Ctrl-Space for completions. Heck Yeah! {{{
+  inoremap <expr> <C-Space> pumvisible() \|\| &omnifunc == '' ?
+              \ "\<lt>C-n>" :
+              \ "\<lt>C-x>\<lt>C-o><c-r>=pumvisible() ?" .
+              \ "\"\\<lt>c-n>\\<lt>c-p>\\<lt>c-n>\" :" .
+              \ "\" \\<lt>bs>\\<lt>C-n>\"\<CR>"
+  imap <C-@> <C-Space>
+  " }}}
+
 augroup END
 " }}}
 
@@ -426,43 +426,6 @@ augroup filetype_c
 augroup END
 " }}}
 
-" Clojure {{{
-augroup filetype_clojure
-  autocmd!
-  let g:vimclojure#ParenRainbow = 1 " Enable rainbow parens
-  let g:vimclojure#DynamicHighlighting = 1 " Dynamic highlighting
-  let g:vimclojure#FuzzyIndent = 1 " Names beginning in 'def' or 'with' to be indented as if they were included in the 'lispwords' option
-augroup END
-" }}}
-
-" Coffee {{{
-augroup filetype_coffee
-  autocmd!
-  au BufNewFile,BufReadPost *.coffee setl foldmethod=indent nofoldenable
-augroup END
-" }}}
-
-" Fish {{{
-augroup filetype_fish
-  autocmd!
-  au BufRead,BufNewFile *.fish set ft=fish
-augroup END
-" }}}
-
-" Handlebars {{{
-augroup filetype_hbs
-  autocmd!
-  au BufRead,BufNewFile *.hbs,*.handlebars,*.hbs.erb,*.handlebars.erb setl ft=mustache syntax=mustache
-augroup END
-" }}}
-
-" Jade {{{
-augroup filetype_jade
-  autocmd!
-  au BufRead,BufNewFile *.jade set ft=jade syntax=jade
-augroup END
-" }}}
-
 " JavaScript {{{
 augroup filetype_javascript
   autocmd!
@@ -484,28 +447,6 @@ augroup filetype_markdown
 augroup END
 " }}}
 
-" Nu {{{
-augroup filetype_nu
-  autocmd!
-  au BufNewFile,BufRead *.nu,*.nujson,Nukefile setf nu
-augroup END
-" }}}
-
-" Ruby {{{
-augroup filetype_ruby
-  autocmd!
-
-  au BufRead,BufNewFile Rakefile,Capfile,Gemfile,.autotest,.irbrc,*.treetop,*.tt set ft=ruby syntax=ruby
-
-  " Ruby.vim {{{
-  let ruby_operators = 1
-  let ruby_space_errors = 1
-  let ruby_fold = 1
-  " }}}
-augroup END
-" }}}
-
-" }}}
 " XML {{{
 augroup filetype_xml
   autocmd!
@@ -516,20 +457,22 @@ augroup END
 
 " Plugin Configuration -------------------------------------------------------------
 
-" Airline.vim {{{
-augroup airline_config
-  autocmd!
-" let g:airline_powerline_fonts = 1
-  let g:airline_enable_syntastic = 1
-  let g:airline#extensions#tabline#buffer_nr_format = '%s '
-  let g:airline#extensions#tabline#buffer_nr_show = 1
-  let g:airline#extensions#tabline#enabled = 1
-  let g:airline#extensions#tabline#fnamecollapse = 0
-  let g:airline#extensions#tabline#fnamemod = ':t'
-augroup END
-" }}}
+" " Airline.vim {{{
+" augroup airline_config
+"   autocmd!
+" " let g:airline_powerline_fonts = 1
+"   let g:airline_enable_syntastic = 1
+"   let g:airline#extensions#tabline#buffer_nr_format = '%s '
+"   let g:airline#extensions#tabline#buffer_nr_show = 1
+"   let g:airline#extensions#tabline#enabled = 1
+"   let g:airline#extensions#tabline#fnamecollapse = 0
+"   let g:airline#extensions#tabline#fnamemod = ':t'
+" augroup END
+" " }}}
 
 " NERDTree {{{
+map <C-n> :NERDTreeToggle<CR>
+
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 1 && isdirectory(argv()[0]) && !exists("s:std_in") | exe 'NERDTree' argv()[0] | wincmd p | ene | endif
 let NERDTreeShowHidden=1
@@ -540,7 +483,6 @@ augroup syntastic_config
   autocmd!
   let g:syntastic_error_symbol = '✗'
   let g:syntastic_warning_symbol = '⚠'
-  let g:syntastic_ruby_checkers = ['mri', 'rubocop']
 augroup END
 " }}}
 
@@ -555,15 +497,32 @@ set updatetime=250
 call plug#begin('~/.vim/plugged')
 
 Plug 'ap/vim-css-color'
-Plug 'bling/vim-airline'
+Plug 'itchyny/lightline.vim'
 Plug 'airblade/vim-gitgutter'
 Plug 'scrooloose/nerdtree'
-Plug 'scrooloose/syntastic'
-Plug 'pangloss/vim-javascript'
+Plug 'vim-syntastic/syntastic'
+Plug 'pangloss/vim-javascript', { 'for': ['javascript', 'javascript.jsx'] }
+Plug 'mxw/vim-jsx', { 'for': ['javascript', 'javascript.jsx'] }
+Plug 'leafgarland/typescript-vim'
+Plug 'Quramy/tsuquyomi'
+Plug 'vim-scripts/nginx.vim' " Highlight nginx scripts
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-haml'
 Plug 'tpope/vim-markdown',     { 'for': 'markdown' }
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+Plug 'Valloric/YouCompleteMe'
+Plug 'Shougo/vimproc.vim'
+
+" Maybe intersiting for later
+" Plug 'tpope/vim-surround'
+" Plug 'godlygeek/tabular'
+" Plug 'junegunn/goyo.vim'
+" Plug 'Raimondi/delimitMate'
+
+" Interesting complet things
+" needs special config for vim8: https://github.com/Shougo/deoplete.nvim
+" Plug 'Shougo/deoplete.nvim'
 
 call plug#end()
 " }}}

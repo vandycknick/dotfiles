@@ -17,13 +17,12 @@ xz-utils tk-dev
 
 # Installing htop
 echo ""
-echo "Now installing htop, "
+echo "Now installing htop"
 sudo apt install htop
 
 # Midnight commander install
 echo ""
 echo "Now installing Midnight commander..."
-echo ""
 sudo apt install mc -y
 
 echo ""
@@ -60,11 +59,11 @@ cp ./bash/.vimrc ~/.vimrc
 # Setup config files
 cp ./config/.gitconfig ~/.gitconfig
 
-# Setup vim
-echo "Copy vim folder"
-cp -r ./vim/* ~/.vim
-
 # Install vim plugin manager
 echo "Installing Plug for vim "
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 echo "Plugin manager installed! Run :PlugInstall inside vim to install plugins"
+
+# Setup vim
+echo "Copy vim folder"
+cp -r ./vim/* ~/.vim
