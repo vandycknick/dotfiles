@@ -60,9 +60,9 @@ cp ./bash/.vimrc ~/.vimrc
 cp ./config/.gitconfig ~/.gitconfig
 
 # Install vim plugin manager
-echo "Installing Plug for vim "
+echo "Installing Plug for vim"
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-echo "Plugin manager installed! Run :PlugInstall inside vim to install plugins"
+echo "Plugin manager installed! Run :PlugInstall inside vim to install plugins."
 
 # Setup vim
 echo "Copy vim folder"
