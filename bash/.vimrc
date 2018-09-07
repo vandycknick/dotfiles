@@ -511,7 +511,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-haml'
 Plug 'tpope/vim-markdown',     { 'for': 'markdown' }
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-Plug 'Valloric/YouCompleteMe'
+" Plug 'Valloric/YouCompleteMe'
 Plug 'Shougo/vimproc.vim'
 
 " Maybe intersiting for later

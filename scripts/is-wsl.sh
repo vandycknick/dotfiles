@@ -1,4 +1,4 @@
-function is_wsl() {
+function is-wsl() {
     if grep -q Microsoft /proc/version; then
         echo "Ubuntu on Windows"
     else
@@ -6,4 +6,4 @@ function is_wsl() {
     fi
 }
 
-echo $(is_wsl)
+echo $(is-wsl)

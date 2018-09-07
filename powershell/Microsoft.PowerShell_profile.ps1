@@ -84,5 +84,4 @@ Set-Alias which Get-Command
 
 # Functions
 $PROFILEPATH = ($PROFILE | Split-Path)
-# . $PROFILEPATH/sudo.ps1
 . $PROFILEPATH/Get-Uptime.ps1

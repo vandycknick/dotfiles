@@ -11,9 +11,7 @@ Install-Module posh-git -Scope CurrentUser -Force
 
 # Setup User Profile scripts
 Copy-Item "$($CURDIR.Path)/powershell/Microsoft.PowerShell_profile.ps1" $PROFILEPATH
-Copy-Item "$($CURDIR.Path)/powershell/Colorful.Console.dll" $PROFILEPATH
 Copy-Item "$($CURDIR.Path)/powershell/Get-Uptime.ps1" $PROFILEPATH
-Copy-Item "$($CURDIR.Path)/powershell/sudo.ps1" $PROFILEPATH
 
 # Setup environment variables
 [Environment]::SetEnvironmentVariable("_NT_SYMBOL_PATH", "srv*C:\symbols*http://msdl.microsoft.com/downloads/symbols", "User")
@@ -25,7 +23,6 @@ Copy-Item "$($CURDIR.Path)/powershell/sudo.ps1" $PROFILEPATH
 choco install visualstudiocode -y --params "/NoDesktopIcon"
 choco install git -y --params "/GitOnlyOnPath /NoAutoCrlf /WindowsTerminal /NoShellIntegration"
 choco install vim -y
-choco install openssh -y --params "/SSHAgentFeature"
 choco install dotnetcore-sdk -y
 choco install docker-for-windows -y
 
@@ -58,3 +55,6 @@ code --install-extension jtlowe.vscode-icon-theme
 code --install-extension wayou.vscode-todo-highlight
 
 Copy-Item "$($CURDIR.Path)/vscode/settings.json" "$($env:APPDATA)/Code/User" -Force
+
+# Install WSL Ubuntu 18.04
+./scripts/wsl-install.ps1 -Distro "ubuntu-1804"
