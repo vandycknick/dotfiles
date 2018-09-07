@@ -1,6 +1,5 @@
 # My dotfiles
 My personal collection of dotfiles, with install instructions for windows and linux.
-Ideas stolen from various repo's: https://dotfiles.github.io/.
 
 ## Download
 Download this respository with git or curl:
@@ -43,7 +42,7 @@ Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-L
 2.Restart your computer when prompted.
 
 ### Setup Machine
-That is all fot the manual part. Run the following command to finish off setting up your machine.
+That is all for the manual part. Run the following command to finish off setting up your machine:
 - Open powershell with administrative privileges
 - Navigate to dotfiles directory and execute the following script
 ```powershell
@@ -52,7 +51,7 @@ Invoke-Expression ./setup.ps1
 
 
 ## Linux
-Run the following script to setup your linux environment
+The setup for linux is easy just run the following script:
 ```sh
 ./setup.sh
 ```
