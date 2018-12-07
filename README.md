@@ -2,7 +2,7 @@
 My personal collection of dotfiles, with install instructions for windows and linux.
 
 ## Download
-Download this respository with git or curl:
+Download this repository with git or curl:
 
 **Git:**
 
@@ -58,7 +58,7 @@ The setup for linux is easy just run the following script:
 
 ## Notes
 
-When setting up windows box in a vm, enable nested vrtualization:
+When setting up windows box in a vm, enable nested virtualization:
 ```powershell
 Set-VMProcessor -VMName <VMName> -ExposeVirtualizationExtensions $true
 ```

@@ -35,13 +35,13 @@ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | 
 
 echo ""
 echo "Installing dotnet"
-./scripts/dotnet-install.sh --channel Current
+./linux/scripts/dotnet-install.sh --channel Current
 
 # Setup bin
 echo ""
 echo "Setup bin folder"
 mkdir -p ~/bin
-rsync -avh --no-perms --exclude='*.ps1' ./scripts/. ~/bin
+rsync -avh --no-perms ./linux/scripts/. ~/bin
 
 echo ""
 echo "Installing z (https://github.com/rupa/z)"
@@ -50,10 +50,10 @@ git clone https://github.com/rupa/z ~/bin/z
 # Setup system files
 echo ""
 echo "Sync bash config files"
-rsync -avh --no-perms ./bash/. ~
+rsync -avh --no-perms ./linux/profile/. ~
 
 # Setup config files
-cp ./config/.gitconfig ~/.gitconfig
+cp ./common/config/.gitconfig ~/.gitconfig
 
 # Install vim plugin manager
 echo ""
@@ -65,4 +65,4 @@ echo "Plugin manager installed! Run :PlugInstall inside vim to install plugins."
 echo ""
 echo "Sync vim config folder"
 mkdir -p ~/.vim
-rsync -avh --no-perms ./vim/. ~/.vim
+rsync -avh --no-perms ./common/vim/. ~/.vim
