@@ -1,27 +1,13 @@
 {
     "workbench.colorTheme": "Monokai-Cobalt",
     "workbench.iconTheme": "vscode-icon-theme",
-    "window.titleBarStyle": "custom",
     "editor.fontFamily": "Fira Code",
     "editor.fontLigatures": true,
     "editor.fontSize": 13,
-    "terminal.integrated.fontSize": 13,
-    "files.eol": "\n",
-    "window.zoomLevel": 0,
-    "gitlens.advanced.messages": {
-        "suppressShowKeyBindingsNotice": true
-    },
-    "gitlens.advanced.telemetry.enabled": false,
-    "gitlens.gitExplorer.location": "scm",
-    "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\6-preview\\pwsh.exe",
-    "powershell.powerShellExePath": "C:\\Program Files\\PowerShell\\6-preview\\pwsh.exe",
-    "git.confirmSync": false,
-    "javascript.implicitProjectConfig.experimentalDecorators": true,
-    "diffEditor.ignoreTrimWhitespace": false,
     "editor.renderWhitespace": "boundary",
-    "gitlens.keymap": "none",
-    "gitlens.historyExplorer.enabled": false,
-    "window.menuBarVisibility": "default",
-    "python.jediEnabled": false,
-    "csharp.suppressHiddenDiagnostics": false
+    "files.eol": "\n",
+    "terminal.integrated.fontSize": 13,
+    "terminal.integrated.shell.windows": "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
+    "powershell.powerShellExePath": "C:\\Program Files\\PowerShell\\6\\pwsh.exe",
+    "cSpell.language": "en-GB",
 }

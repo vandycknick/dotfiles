@@ -71,7 +71,6 @@ alias trimcopy="tr -d '\n' | pbcopy"
 alias g="git"
 alias v="vim"
 alias cls="clear"
-alias iossimulator="open -a 'IOS Simulator'"
 
 # File size
 alias fs="stat -f \"%z bytes\""

@@ -53,6 +53,7 @@ function prompt {
     $prompt += Write-Prompt "$([char]0x001b)[1m(win): "
     $prompt += Write-Prompt "$([char]0x001b)[38;5;64m$curPath$([char]0x001b)[0m"
     $prompt += Write-VcsStatus
+    $prompt += "`n"
     $prompt += "$([char]0x001b)[1m$('$' * ($nestedPromptLevel + 1)) $([char]0x001b)[0m"
 
     $LASTEXITCODE = $origLastExitCode
@@ -79,7 +80,4 @@ New-PSDrive -Name Work -PSProvider FileSystem -Root D:\Work\ -Description "Every
 
 Set-Alias g git
 Set-Alias which Get-Command
-
-# Functions
-$PROFILEPATH = ($PROFILE | Split-Path)
-. $PROFILEPATH/Get-Uptime.ps1
+Set-Alias uptime Get-Uptime
