@@ -1,0 +1,5 @@
+select vdisk file="C:\Users\nickvd\Drives\SourceCode.vhdx"
+attach vdisk
+select part 1
+assign letter=D
+exit

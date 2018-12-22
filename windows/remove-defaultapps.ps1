@@ -21,6 +21,7 @@ $applicationList = @(
     "Microsoft.Messaging"
     "*Minecraft*"
     "Microsoft.MicrosoftOfficeHub"
+    "Microsoft.Office.OneNote"
     "Microsoft.OneConnect"
     "Microsoft.WindowsPhone"
     "Microsoft.WindowsSoundRecorder"
@@ -48,6 +49,8 @@ $applicationList = @(
     "*.EclipseManager"
     "ActiproSoftwareLLC.562882FEEB491" # Code Writer
     "*.AdobePhotoshopExpress"
+    "ThumbmunkeysLtd.PhototasticCollage"
+    "Fitbit.FitbitCoach"
 )
 
 foreach ($app in $applicationList) {

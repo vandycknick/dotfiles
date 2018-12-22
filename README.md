@@ -12,43 +12,33 @@ git clone https://github.com/nickvdyck/dotfiles
 
 **Curl:**
 
+- Windows
 ```sh
-curl -L -o "~/Downloads/dotfiles.zip" "https://github.com/nickvdyck/dotfiles/archive/master.zip"
+curl -Lo "$($env:HOME)/Downloads/dotfiles.zip" "https://github.com/nickvdyck/dotfiles/archive/master.zip"
 ```
 
-or
-
-```powershell
-curl -L -o "$($env:HOME)/Downloads/dotfiles.zip" "https://github.com/nickvdyck/dotfiles/archive/master.zip"
+- Linux
+```sh
+curl -Lo "~/Downloads/dotfiles.zip" "https://github.com/nickvdyck/dotfiles/archive/master.zip"
 ```
 
 If you used curl unzip the archive. All other commands should be run from inside the `dotfiles` directory.
 
 ## Windows
-For windows there are a few manual steps that you need to execute before you can kick off the setup process.
 
-### Install chocolatey
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force;
-iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'));
+### 1. Configure features and download prerequisites. 
+For windows there is extra `init.ps1` that should be run first. This will download chocolatey and enable Hyper-V and Windows Subsystem for Linux. It will automatically restart your computer afterwards.
+
+Open powershell with administrative privileges. And run the following script:
 ```
-### Install the Windows Subsystem for Linux
-The setup script will install a default linux subsystem. Run the following command to ensure that the "Windows Subsystem for Linux" optional feature is enabled:
-
-1. Open PowerShell as Administrator and run:
-```powershell
-Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux
+init.ps1
 ```
-2.Restart your computer when prompted.
+### 2. Run setup script
 
-### Setup Machine
-That is all for the manual part. Run the following command to finish off setting up your machine:
-- Open powershell with administrative privileges
-- Navigate to dotfiles directory and execute the following script
+Open *powershell core* with administrative privileges. And run the following script:
 ```powershell
-Invoke-Expression ./setup.ps1
+setup.ps1
 ```
-
 
 ## Linux
 The setup for linux is easy just run the following script:
@@ -58,9 +48,9 @@ The setup for linux is easy just run the following script:
 
 ## Notes
 
-When setting up windows box in a vm, enable nested virtualization:
+When setting up windows box in a vm, enable nested virtualization on host machine:
 ```powershell
-Set-VMProcessor -VMName <VMName> -ExposeVirtualizationExtensions $true
+Set-VMProcessor -VMName <VMName> -ExposeVirtualizationExtensions
 ```
 
 ## Ideas coming from:

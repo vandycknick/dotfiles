@@ -29,3 +29,5 @@ code --install-extension ms-azuretools.vscode-azurestorage
 code --install-extension ms-azuretools.vscode-azurefunctions
 # GitHub
 code --install-extension github.vscode-pull-request-github
+# EditorConfig
+code --install-extension editorconfig.editorconfig
