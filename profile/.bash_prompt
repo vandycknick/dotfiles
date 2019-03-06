@@ -131,9 +131,9 @@ set_prompts() {
     PS1+="\[$reset$white\]@"
     PS1+="$hostStyle\h" # host
     PS1+="\[$reset$white\]"
-    if grep -q Microsoft /proc/version; then
-        PS1+="(wsl)"
-    fi
+    # if grep -q Microsoft /proc/version; then
+    #     PS1+="(wsl)"
+    # fi
     PS1+=": "
     PS1+="\[$green\]\w" # working directory
     PS1+="\$(prompt_git \"$white on $cyan\")" # git repository details

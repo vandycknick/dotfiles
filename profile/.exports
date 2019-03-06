@@ -1,5 +1,3 @@
-export MYBINS="$HOME/bin"
-
 # Make vim the default editor
 export EDITOR="vim"
 
@@ -12,8 +10,6 @@ export LANG="en_US"
 
 # Z don't resolve symlinks
 export _Z_NO_RESOLVE_SYMLINKS=1
-
-export PATH="$MYBINS:$PATH"
 
 # Setup pyenv
 export PYENV_ROOT="$HOME/.pyenv"
@@ -30,6 +26,6 @@ export DOTNET_ROOT=$(dirname $(realpath $(which dotnet)))
 # Setup path to go binary
 export PATH=$PATH:/usr/local/go/bin
 
-# here's LS_COLORS
 # github.com/trapd00r/LS_COLORS
-eval $(dircolors -b ~/.dircolors)
+command -v gdircolors >/dev/null 2>&1 || alias gdircolors="dircolors"
+eval "$(gdircolors -b ~/.dircolors)"
