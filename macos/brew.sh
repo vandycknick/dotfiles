@@ -22,7 +22,9 @@ BREW_PREFIX=$(brew --prefix)
 echo ""
 echo "Install coreutils, moreutils, findutils, gnu-sed"
 brew install coreutils
-ln -s "${BREW_PREFIX}/bin/gsha256sum" "${BREW_PREFIX}/bin/sha256sum"
+if [ ! -f "${BREW_PREFIX}/bin/sha256sum" ]; then
+    ln -sf "${BREW_PREFIX}/bin/gsha256sum" "${BREW_PREFIX}/bin/sha256sum"
+fi
 
 # Install some other useful utilities like `sponge`
 brew install moreutils
@@ -60,6 +62,8 @@ echo "Installing some code related stuff"
 brew install go
 brew install mono
 brew install pyenv
+brew install nvm
+brew install azure-cli
 
 # Libraries
 echo ""

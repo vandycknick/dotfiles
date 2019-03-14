@@ -9,6 +9,9 @@ fi
 # Install Applications
 source "$(dirname "${BASH_SOURCE[0]}")/brew.sh"
 
+# Settings
+source "$(dirname "${BASH_SOURCE[0]}")/settings.sh"
+
 # Synchronise configuration
 function doIt() {
     rsync -avh --no-perms . ~
@@ -16,8 +19,10 @@ function doIt() {
 }
 
 CURRENT_DIR="$(pwd)"
-cd  ./profile
+cd "$(dirname "${BASH_SOURCE[0]}")/profile"
 
+echo ""
+echo "Synchronise profile script"
 if [ "$1" == "--force" -o "$1" == "-f" ]; then
     doIt
 else

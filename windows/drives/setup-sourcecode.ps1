@@ -23,4 +23,3 @@ schtasks /create `
     /tr "diskpart.exe /s 'C:\Users\nickvd\Drives\source-code-vhd.txt'" `
     /sc ONLOGON `
     /ru SYSTEM 
-

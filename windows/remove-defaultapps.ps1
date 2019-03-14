@@ -53,7 +53,8 @@ $applicationList = @(
     "Fitbit.FitbitCoach"
 )
 
-foreach ($app in $applicationList) {
+foreach ($app in $applicationList)
+{
     Write-Output "Trying to remove $app"
     Get-AppxPackage $app -AllUsers | Remove-AppxPackage
 }
