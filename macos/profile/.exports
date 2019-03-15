@@ -1,3 +1,6 @@
+#Disabel Homebrew analytics
+export HOMEBREW_NO_ANALYTICS=1
+
 # Make vim the default editor
 export EDITOR="vim"
 

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
 # Install homebrew
+export HOMEBREW_NO_ANALYTICS=1
+
 if [ ! -f /usr/local/bin/brew ]; then
     echo "Homebrew not found. Installing ..."
     /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
