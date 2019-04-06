@@ -12,4 +12,6 @@ Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://cho
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -NoRestart
 Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
 
+New-Item -Type File -Force -Path $HOME/.dofiles/init
+
 Restart-Computer

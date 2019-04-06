@@ -12,6 +12,12 @@
 #>
 
 #--- Init ---
+if ($False -eq (Test-Path "$HOME/.dofiles/init"))
+{
+    . "$PSScriptRoot/windows/init.ps1"
+}
+
+#--- Variables ---
 $PROFILEPATH = ($PROFILE | Split-Path)
 
 #--- Powershell modules ---
@@ -50,7 +56,6 @@ choco install vim -y
 choco install 7zip -y
 choco install azure-cli -y
 choco install ilspy -y
-choco install kubernetes-cli -y
 choco install sysinternals -y
 choco install nvm -y
 

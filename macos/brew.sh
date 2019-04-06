@@ -60,10 +60,11 @@ fi
 echo ""
 echo "Installing some code related stuff"
 brew install go
-brew install mono
 brew install pyenv
 brew install nvm
 brew install azure-cli
+brew install entr
+brew install --ignore-dependencies yarn
 
 # Libraries
 echo ""
@@ -87,6 +88,7 @@ brew cask install slack
 brew cask install visual-studio-code
 brew cask install iterm2
 brew cask install docker
+brew cask install mono-mdk
 
 # personal
 # brew cask install vlc
