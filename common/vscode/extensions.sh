@@ -3,8 +3,6 @@
 
 # C#
 code --install-extension ms-vscode.csharp
-# PowerShell
-code --install-extension ms-vscode.powershell
 # Python
 code --install-extension ms-python.python
 # GitLens
