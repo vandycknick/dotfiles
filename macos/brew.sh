@@ -59,7 +59,6 @@ fi
 # Programming binaries
 echo ""
 echo "Installing some code related stuff"
-brew install go
 brew install pyenv
 brew install nvm
 brew install azure-cli
@@ -88,7 +87,6 @@ brew cask install slack
 brew cask install visual-studio-code
 brew cask install iterm2
 brew cask install docker
-brew cask install mono-mdk
 
 # personal
 # brew cask install vlc

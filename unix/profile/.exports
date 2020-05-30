@@ -8,6 +8,9 @@ export MANPAGER="less -X"
 export LC_ALL="en_US.UTF-8"
 export LANG="en_US"
 
+# Configure tty for gpg
+export GPG_TTY=$(tty)
+
 # Z don't resolve symlinks
 export _Z_NO_RESOLVE_SYMLINKS=1
 
