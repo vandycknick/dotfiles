@@ -117,7 +117,7 @@ set_prompts() {
     fi
 
     # connected via ssh
-    if [[ "$SSH_TTY" ]]; then
+    if [[ -n ${SSH_TTY} ]]; then
         hostStyle="\[$bold$red\]"
     else
         hostStyle="\[$yellow\]"

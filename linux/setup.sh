@@ -1,14 +1,9 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
-# Update pkg listse
+# Update pkg lists
 echo ""
 echo "Updating package lists..."
 sudo apt update
-
-# Installing git and completions
-echo ""
-echo "Now installing git and bash-completion..."
-sudo apt install git bash-completion -y
 
 echo ""
 echo "Installing build dependencies"
@@ -18,7 +13,7 @@ sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev \
 
 echo ""
 echo "Installing utilities"
-sudo apt install -y entr bash-completion
+sudo apt install -y git entr bash-completion
 
 # Installing htop
 echo ""
@@ -36,26 +31,29 @@ git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 
 echo ""
 echo "Installing nvm"
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.35.3/install.sh | bash
+
+echo ""
+echo "Installing yarn"
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt update && sudo apt install yarn --no-install-recommends yarn
 
 echo ""
 echo "Installing dotnet"
-./linux/scripts/dotnet-install.sh --channel Current
+source ./unix/scripts/dotnet-install.sh --channel Current
 
 # Setup bin
 echo ""
 echo "Setup bin folder"
 mkdir -p ~/bin
-rsync -avh --no-perms ./linux/scripts/. ~/bin
+rsync -avh --no-perms unix/scripts/. ~/bin
 
 echo ""
 echo "Installing z (https://github.com/rupa/z)"
-git clone https://github.com/rupa/z ~/bin/z
-
-# Setup system files
-echo ""
-echo "Sync bash config files"
-rsync -avh --no-perms ./linux/profile/. ~
+if [ ! -d ~/bin/z ]; then
+  git clone https://github.com/rupa/z ~/bin/z
+fi
 
 # Setup config files
 cp ./common/config/.gitconfig ~/.gitconfig
@@ -72,26 +70,7 @@ echo "Sync vim config folder"
 mkdir -p ~/.vim
 rsync -avh --no-perms ./common/vim/. ~/.vim
 
-# Synchronise configuration
-function doIt() {
-    rsync -avh --no-perms . ~
-    source ~/.bash_profile
-}
-
-CURRENT_DIR="$(pwd)"
-cd "$(dirname "${BASH_SOURCE[0]}")/profile"
-
+# Sync profile config
 echo ""
-echo "Synchronise profile script"
-if [ "$1" == "--force" -o "$1" == "-f" ]; then
-    doIt
-else
-    read -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1
-    echo ""
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        doIt
-    fi
-fi
-unset doIt
-
-cd $CURRENT_DIR
+echo "Sync profile config"
+. ./unix/setup.sh --force

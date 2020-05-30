@@ -23,8 +23,5 @@ export PATH="$HOME/.dotnet:$PATH"
 export PATH="$HOME/.dotnet/tools:$PATH"
 export DOTNET_ROOT=$(dirname $(realpath $(which dotnet)))
 
-# Setup path to go binary
-export PATH=$PATH:/usr/local/go/bin
-
 # github.com/trapd00r/LS_COLORS
 eval "$(dircolors -b ~/.dircolors)"

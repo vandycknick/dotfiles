@@ -26,7 +26,13 @@ for option in autocd globstar; do
 done;
 
 # Add tab completion for many Bash commands
-[ -s "/etc/profile.d/bash_completion.sh" ] && . "/etc/profile.d/bash_completion.sh"
+if which brew &> /dev/null && [ -f "$(brew --prefix)/share/bash-completion/bash_completion" ]; then
+	source "$(brew --prefix)/share/bash-completion/bash_completion";
+elif [ -f "/etc/profile.d/bash_completion.sh" ]; then
+	source "/etc/profile.d/bash_completion.sh"
+elif [ -f /etc/bash_completion ]; then
+	source /etc/bash_completion;
+fi;
 
 # Enable tab completion for `g` by marking it as an alias for `git`
 if type _git &> /dev/null && [ -f /usr/local/etc/bash_completion.d/git-completion.bash ]; then
@@ -40,6 +46,19 @@ if command -v pyenv 1>/dev/null 2>&1; then
 fi
 
 # Initialize z (https://github.com/rupa/z)
-[ -s "$HOME/bin/z/z.sh" ] && . "$HOME/bin/z/z.sh"
+if [ -s "$HOME/bin/z/z.sh" ]; then # Linux
+	source "$HOME/bin/z/z.sh"
+elif [ -s "/usr/local/etc/profile.d/z.sh" ]; then # MacOS
+	source "/usr/local/etc/profile.d/z.sh"
+else
+	echo "Z script not found!"
+fi;
 
-[ -s "$HOME/.nvm/nvm.sh" ] && . "$HOME/.nvm/nvm.sh"
+# Initialize nvm
+if [ -s "$HOME/.nvm/nvm.sh" ]; then # Linux
+	source "$HOME/.nvm/nvm.sh"
+elif [ -s "/usr/local/opt/nvm/nvm.sh" ]; then # MacOS
+	source "/usr/local/opt/nvm/nvm.sh"
+else
+	echo "NVM script not found!"
+fi;
