@@ -59,9 +59,14 @@ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.37.2/install.sh | b
 
 echo ""
 echo "Installing yarn"
+if ! [ -x "$(command -v yarn)" ]; then
+    echo "Yarn not installed"
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-sudo apt update && sudo apt install yarn --no-install-recommends yarn
+    sudo apt update
+fi
+
+sudo apt install yarn --no-install-recommends yarn
 
 echo ""
 echo "Installing gpg"
