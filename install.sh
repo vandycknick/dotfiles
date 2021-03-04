@@ -44,10 +44,19 @@ echo ""
 echo "Installing nvm"
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.37.2/install.sh | bash
 
+echo ""
+echo "Installing yarn"
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt update && sudo apt install yarn --no-install-recommends yarn
 
 echo ""
 echo "Installing gpg"
 sudo apt install -y gnupg
+
+echo ""
+echo "Setting up git"
+source ./git/configure.sh
 
 echo ""
 echo "Installing Docker"
