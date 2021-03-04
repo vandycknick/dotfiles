@@ -61,8 +61,8 @@ echo ""
 echo "Installing yarn"
 if ! [ -x "$(command -v yarn)" ]; then
     echo "Yarn not installed"
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+    curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
     sudo apt update
 fi
 
@@ -75,6 +75,10 @@ sudo apt install -y gnupg
 echo ""
 echo "Setting up git"
 source ./git/configure.sh
+
+echo ""
+echo "Setting up vscode"
+source ./code/configure.sh
 
 echo ""
 echo "Installing Docker"
