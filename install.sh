@@ -12,7 +12,20 @@ sudo apt install -y \
     wget \
     curl \
     apt-transport-https \
-    ca-certificates
+    ca-certificates \
+    libssl-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    llvm \
+    tk-dev \
+    libncurses5-dev \
+    xz-utils tk-dev \
+    libxml2-dev \
+    libxmlsec1-dev \
+    libffi-dev \
+    liblzma-dev
 
 echo ""
 echo "Installing htop"
