@@ -27,3 +27,5 @@ code --install-extension github.vscode-pull-request-github
 code --install-extension editorconfig.editorconfig
 # Monokai Pro Theme
 code --install-extension monokai.theme-monokai-pro-vscode
+# Version Lens
+code --install-extension pflannery.vscode-versionlens

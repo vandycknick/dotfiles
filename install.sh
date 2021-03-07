@@ -7,10 +7,7 @@ sudo apt update
 echo ""
 echo "Install dev utilities"
 sudo apt install -y \
-    make \
     build-essential \
-    wget \
-    curl \
     apt-transport-https \
     ca-certificates \
     libssl-dev \
@@ -25,7 +22,16 @@ sudo apt install -y \
     libxml2-dev \
     libxmlsec1-dev \
     libffi-dev \
-    liblzma-dev
+    liblzma-dev \
+    lsb-release
+
+echo ""
+echo "Install CLI Utilities"
+sudo apt install -y \
+    curl \
+    wget \
+    make \
+    jq
 
 echo ""
 echo "Installing htop"
@@ -42,6 +48,10 @@ echo "Installing tmux"
 sudo apt install -y tmux
 
 source ./tmux/configure.sh
+
+echo ""
+echo "Installing bpftrace"
+sudo apt install -y bpftrace
 
 echo ""
 echo "Installing pyenv"
@@ -71,6 +81,10 @@ sudo apt install yarn --no-install-recommends yarn
 echo ""
 echo "Installing gpg"
 sudo apt install -y gnupg
+
+echo ""
+echo "Setting up azure tools"
+source ./az/setup.sh
 
 echo ""
 echo "Setting up git"
