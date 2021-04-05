@@ -2,7 +2,7 @@
 # https://marketplace.visualstudio.com/items?itemName={extension_name}
 
 # C#
-# code --install-extension ms-vscode.csharp
+code --install-extension ms-vscode.csharp
 # Python
 code --install-extension ms-python.python
 # GitLens

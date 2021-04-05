@@ -41,13 +41,13 @@ echo ""
 echo "Installing zsh"
 sudo apt install -y zsh
 
-source ./zsh/configure.sh
+. install/zsh.sh
 
 echo ""
 echo "Installing tmux"
 sudo apt install -y tmux
 
-source ./tmux/configure.sh
+. install/tmux.sh
 
 echo ""
 echo "Installing bpftrace"
@@ -55,12 +55,12 @@ sudo apt install -y bpftrace
 
 echo ""
 echo "Installing pyenv"
-if [ ! -d $HOME/.pyenv ]; then
+if [ ! -d "$HOME/.pyenv" ]; then
     git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 else
-    pushd $HOME/.pyenv
+    pushd "$HOME/.pyenv" || exit 1
     git pull --rebase
-    popd
+    popd || exit 1
 fi
 
 echo ""
@@ -84,15 +84,15 @@ sudo apt install -y gnupg
 
 echo ""
 echo "Setting up azure tools"
-source ./az/setup.sh
+. install/az.sh
 
 echo ""
 echo "Setting up git"
-source ./git/configure.sh
+. install/git.sh
 
 echo ""
 echo "Setting up vscode"
-source ./code/configure.sh
+. install/code.sh
 
 echo ""
 echo "Installing Docker"

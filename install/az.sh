@@ -24,4 +24,3 @@ if ! [ -x "$(command -v func)" ]; then
 fi
 
 sudo apt install -y azure-functions-core-tools-3
-

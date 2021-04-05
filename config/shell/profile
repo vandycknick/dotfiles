@@ -1,0 +1,64 @@
+#!/bin/zsh
+
+# profile file. Runs on login. Environmental variables are set here.
+
+# If you don't plan on reverting to bash, you can remove the link in ~/.profile
+# to clean up.
+
+# if running bash
+if [ -n "$BASH_VERSION" ]; then
+    # include .bashrc if it exists
+    if [ -f "$HOME/.bashrc" ]; then
+	. "$HOME/.bashrc"
+    fi
+fi
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+    PATH="$HOME/bin:$PATH"
+fi
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/.local/bin" ] ; then
+    PATH="$HOME/.local/bin:$PATH"
+fi
+
+# Default programs:
+export EDITOR="vim"
+export TERMINAL="st"
+export BROWSER="edge"
+
+# XDG Configuration
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_CACHE_HOME="$HOME/.cache"
+
+export LESSHISTFILE="-"
+export ZDOTDIR="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
+export TMUX_TMPDIR="$XDG_RUNTIME_DIR"
+
+# Golang:
+export GOPATH="${XDG_DATA_HOME:-$HOME/.local/share}/go"
+export PATH="$PATH:/usr/local/go/bin:$GOPATH/bin"
+
+# Dotnet:
+# TODO: Move this out of $HOME at some point
+# The following allows relocating some of it, but dotnet will still put files in .dotnet
+# https://github.com/dotnet/sdk/blob/870254bacc3f169789b679e6e39420875b5d9b56/src/Cli/Microsoft.DotNet.Configurer/CliFolderPathCalculator.cs#L14
+# export DOTNET_CLI_HOME="$DOTNET_INSTALL_DIR"
+export DOTNET_INSTALL_DIR="$HOME/.dotnet"
+export DOTNET_ROOT="$DOTNET_INSTALL_DIR"
+export PATH="$PATH:$DOTNET_INSTALL_DIR:$DOTNET_INSTALL_DIR/tools"
+
+# AWS Cli
+# https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
+export AWS_CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/aws/config"
+export AWS_SHARED_CREDENTIALS_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/aws/credentials"
+
+# Azure CLI
+# https://docs.microsoft.com/en-us/cli/azure/azure-cli-configuration#cli-configuration-file
+export AZURE_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/azure"
+
+
+# GnuPG
+export GNUPGHOME="${XDG_DATA_HOME:-$HOME/.local/share}/gnupg"
