@@ -40,9 +40,10 @@ bindkey -s '^o' 'lfcd\n'
 # Exports
 export FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT="true"
 export DOTNET_CLI_TELEMETRY_OPTOUT="true"
+export OMNISHARPHOME="$XDG_CONFIG_HOME/omnisharp"
 
-# Path
 
-# Aliases
-alias clip="xclip -selection clipboard"
-alias code="code --user-data-dir $XDG_DATA_HOME/vscode --extensions-dir $XDG_DATA_HOME/vscode/extensions"
+# Load aliases and shortcuts if existent.
+[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/shortcutrc" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/shortcutrc"
+[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliasrc" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliasrc"
+[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/zshnameddirrc" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/zshnameddirrc"

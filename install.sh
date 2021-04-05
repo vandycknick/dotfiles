@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+. config/shell/profile
+
 echo ""
 echo "Updating package lists..."
 sudo apt update
@@ -44,6 +46,10 @@ sudo apt install -y zsh
 . install/zsh.sh
 
 echo ""
+echo "Installing vim"
+sudo apt install -y neovim
+
+echo ""
 echo "Installing tmux"
 sudo apt install -y tmux
 
@@ -55,10 +61,10 @@ sudo apt install -y bpftrace
 
 echo ""
 echo "Installing pyenv"
-if [ ! -d "$HOME/.pyenv" ]; then
-    git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+if [ ! -d "$PYENV_ROOT" ]; then
+    git clone https://github.com/pyenv/pyenv.git "$PYENV_ROOT"
 else
-    pushd "$HOME/.pyenv" || exit 1
+    pushd "$PYENV_ROOT" || exit 1
     git pull --rebase
     popd || exit 1
 fi
