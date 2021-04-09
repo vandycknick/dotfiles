@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 echo ""
 echo "Installing azure-cli"
 if ! [ -x "$(command -v az)" ]; then

@@ -7,7 +7,7 @@ SAVEHIST=10000000
 HISTFILE=~/.cache/zsh/history
 
 # Oh my zsh
-ZSH="$HOME/.config/zsh/oh-my-zsh"
+ZSH="$ZDOTDIR/oh-my-zsh"
 ZSH_THEME="robbyrussell"
 
 plugins=(
@@ -41,7 +41,6 @@ bindkey -s '^o' 'lfcd\n'
 export FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT="true"
 export DOTNET_CLI_TELEMETRY_OPTOUT="true"
 export OMNISHARPHOME="$XDG_CONFIG_HOME/omnisharp"
-
 
 # Load aliases and shortcuts if existent.
 [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/shortcutrc" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/shortcutrc"

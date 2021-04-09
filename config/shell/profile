@@ -65,8 +65,11 @@ export AZURE_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/azure"
 # GnuPG
 export GNUPGHOME="${XDG_DATA_HOME:-$HOME/.local/share}/gnupg"
 
+# K9S
+export K9SCONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/k9s"
+
 # NPM
-export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/npmrc
+export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME/npm/npmrc"
 
 # NVM
 export NVM_DIR="$XDG_DATA_HOME/nvm"

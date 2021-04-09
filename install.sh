@@ -3,6 +3,17 @@
 . config/shell/profile
 
 echo ""
+echo "Sync config files"
+rsync -rpltv ./config/* "$XDG_CONFIG_HOME"
+
+ln -sf "$XDG_CONFIG_HOME/shell/profile" "$HOME/.profile"
+ln -sf "$HOME/.profile" "$HOME/.zprofile"
+
+echo "Sync local bin"
+mkdir -p "$HOME/.local/bin"
+rsync -rpltv ./local/bin/* "$HOME/.local/bin"
+
+echo ""
 echo "Updating package lists..."
 sudo apt update
 
@@ -91,10 +102,6 @@ sudo apt install -y gnupg
 echo ""
 echo "Setting up azure tools"
 . install/az.sh
-
-echo ""
-echo "Setting up git"
-. install/git.sh
 
 echo ""
 echo "Setting up vscode"

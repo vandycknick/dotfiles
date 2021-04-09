@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Setup vscode extensions and preferences
 # https://marketplace.visualstudio.com/items?itemName={extension_name}
 
