@@ -3,8 +3,6 @@
 echo ""
 echo "Configuring tmux"
 
-install-tpm
-
 install-tpm() {
     local TPM_DIR="$XDG_CONFIG_HOME/tmux/plugins/tpm"
 
@@ -12,3 +10,5 @@ install-tpm() {
         git clone https://github.com/tmux-plugins/tpm "$TPM_DIR"
     fi
 }
+
+install-tpm
