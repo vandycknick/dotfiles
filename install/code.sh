@@ -31,3 +31,7 @@ code --install-extension editorconfig.editorconfig
 code --install-extension monokai.theme-monokai-pro-vscode
 # Version Lens
 code --install-extension pflannery.vscode-versionlens
+# Golang
+code --install-extension golang.go
+# Terraform
+code --install-extension hashicorp.terraform
