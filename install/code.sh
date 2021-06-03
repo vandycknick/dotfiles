@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 
+echo ""
+echo "Installing vscode"
+if ! [ -x "$(command -v code)" ]; then
+    echo "az cli not installed"
+    curl -L https://go.microsoft.com/fwlink/?LinkID=760868 -o /tmp/vscode.deb
+    sudo apt install /tmp/vscode.deb
+fi
+
+
+echo ""
+echo "Installing vscode extensions"
 # Setup vscode extensions and preferences
 # https://marketplace.visualstudio.com/items?itemName={extension_name}
 
