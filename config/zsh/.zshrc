@@ -42,6 +42,9 @@ export FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT="true"
 export DOTNET_CLI_TELEMETRY_OPTOUT="true"
 export OMNISHARPHOME="$XDG_CONFIG_HOME/omnisharp"
 
+# Utils
+eval "$(pyenv init -)"
+
 # Load aliases and shortcuts if existent.
 [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/shortcutrc" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/shortcutrc"
 [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliasrc" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliasrc"
