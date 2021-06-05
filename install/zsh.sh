@@ -4,7 +4,9 @@ echo ""
 echo "Configuring zsh"
 
 echo "Changing shell to zsh"
-chsh -s "$(which zsh)"
+if [ $SHELL != $(which zsh) ]; then
+    chsh -s "$(which zsh)"
+fi
 
 echo "Install oh my zsh"
 ZSH_OHMY="$ZDOTDIR/oh-my-zsh"
