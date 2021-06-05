@@ -110,6 +110,7 @@ echo "Setting up azure tools"
 
 echo ""
 echo "Setting up vscode"
+sudo apt install codium
 . install/code.sh
 
 echo ""

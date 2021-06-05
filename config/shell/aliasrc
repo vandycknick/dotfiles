@@ -4,7 +4,7 @@
 [ -x "$(command -v nvim)" ] && alias vim="nvim" vimdiff="nvim -d"
 
 alias clip="xclip -selection clipboard"
-alias code="code --user-data-dir $XDG_DATA_HOME/vscode --extensions-dir $XDG_DATA_HOME/vscode/extensions"
+alias code="codium --user-data-dir $XDG_DATA_HOME/VSCodium --extensions-dir $XDG_DATA_HOME/VSCodium/extensions"
 
 alias \
 	cp="cp -iv" \
