@@ -42,6 +42,10 @@ export FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT="true"
 export DOTNET_CLI_TELEMETRY_OPTOUT="true"
 export OMNISHARPHOME="$XDG_CONFIG_HOME/omnisharp"
 
+# Settings
+export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s"
+export LESS=" -R "
+
 # Utils
 eval "$(pyenv init -)"
 
