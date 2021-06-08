@@ -4,7 +4,7 @@
 [ -x "$(command -v nvim)" ] && alias vim="nvim" vimdiff="nvim -d"
 
 alias clip="xclip -selection clipboard"
-alias code="codium --user-data-dir $XDG_DATA_HOME/VSCodium --extensions-dir $XDG_DATA_HOME/VSCodium/extensions"
+alias code="code --user-data-dir $XDG_DATA_HOME/vscode --extensions-dir $XDG_DATA_HOME/vscode/extensions"
 
 alias \
 	cp="cp -iv" \
@@ -20,3 +20,9 @@ alias tfs="tfswitch -b /home/nickvd/.local/bin/terraform"
 # Utilities
 alias myip="dig txt ch +short whoami.cloudflare @1.1.1.1"
 alias myip6="dig txt ch +short whoami.cloudflare @2606:4700:4700::1111"
+
+body() {
+    IFS= read -r header
+    printf '%s\n' "$header"
+    "$@"
+}
