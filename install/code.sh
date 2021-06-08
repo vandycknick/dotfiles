@@ -5,9 +5,15 @@ echo "Installing vscode extensions"
 # Setup vscode extensions and preferences
 # https://marketplace.visualstudio.com/items?itemName={extension_name}
 
-codium \
-    --user-data-dir $XDG_DATA_HOME/VSCodium \
-    --extensions-dir $XDG_DATA_HOME/VSCodium/extensions \
+if ! [ -x "$(command -v code)" ]; then
+    echo "vscode not installed"
+    curl -L https://update.code.visualstudio.com/latest/linux-deb-x64/stable -o /tmp/vscode.deb
+    sudo apt install /tmp/vscode.deb
+fi
+
+code \
+    --user-data-dir $XDG_DATA_HOME/vscode \
+    --extensions-dir $XDG_DATA_HOME/vscode/extensions \
     --install-extension ms-dotnettools.csharp \
     --install-extension ms-python.python \
     --install-extension ms-python.vscode-pylance \
