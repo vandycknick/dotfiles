@@ -1,0 +1,61 @@
+#!/usr/bin/env sh
+
+set -eo pipefail
+
+show_help() {
+    cat <<EOF
+ecr-docker-login:
+  Makes logging into ECR with docker a breeze!
+
+Usage:
+  ecr-docker-login [options]
+
+Options:
+  -p <profile>                          AWS profile to use.
+  -r <region>                           AWS region to use
+  -l                                    List named profiles.
+  -?, -h                                Show help and usage information
+EOF
+}
+
+RED="\x1b[31m."
+RESET="\x1b[0m"
+
+ecr_docker_login() {
+    local profile="$1"
+    local region="$2"
+
+    [ -z "$profile" ] && echo "$RED Profile not provided, either provide a profile with -p or set AWS_PROFILE!$RESET" && exit 1
+
+    local registry_id=$(aws --profile $profile --region $region ecr describe-registry --query 'registryId' --output text)
+
+    aws --profile $profile --region $region ecr get-login-password |
+        docker login --username AWS --password-stdin "$registry_id.dkr.ecr.$region.amazonaws.com"
+    exit 0
+}
+
+list_profiles() {
+    aws configure list-profiles
+}
+
+
+while getopts "h?p:?l?r?" opt; do
+    case "$opt" in
+    h|\?)
+        show_help
+        exit 0
+        ;;
+    l)
+        list_profiles
+        exit 0
+        ;;
+    p)
+        PROFILE="$OPTARG"
+        ;;
+    r)
+        REGION="$OPTARG"
+        ;;
+    esac
+done
+
+ecr_docker_login "${PROFILE:-$AWS_PROFILE}" "${REGION:-us-east-1}"
