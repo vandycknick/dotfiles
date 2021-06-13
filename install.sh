@@ -83,7 +83,7 @@ fi
 echo ""
 echo "less is more"
 # Some utilities for less sytntax highlighting
-sudo apt install source-highlight libsource-highlight-common
+sudo apt install -y source-highlight libsource-highlight-common
 
 echo ""
 echo "Installing nvm"
@@ -98,7 +98,7 @@ if ! [ -x "$(command -v yarn)" ]; then
     sudo apt update
 fi
 
-sudo apt install yarn --no-install-recommends yarn
+sudo apt install -y yarn --no-install-recommends yarn
 
 echo ""
 echo "Installing gpg"
@@ -110,7 +110,6 @@ echo "Setting up azure tools"
 
 echo ""
 echo "Setting up vscode"
-sudo apt install codium
 . install/code.sh
 
 echo ""
