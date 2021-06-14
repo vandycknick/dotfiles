@@ -5,7 +5,7 @@ set -eo pipefail
 show_help() {
     cat <<EOF
 ecr-docker-login:
-  Makes logging into ECR with docker a breeze!
+  Log into ECR with docker without breaking a sweat!
 
 Usage:
   ecr-docker-login [options]
