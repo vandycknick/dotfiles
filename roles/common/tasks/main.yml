@@ -1,0 +1,6 @@
+---
+- include_tasks: macos.yml
+  when: ansible_os_family == "Darwin"
+
+- include_tasks: linux.yml
+  when: ansible_os_family == "Linux"

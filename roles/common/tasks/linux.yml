@@ -1,0 +1,4 @@
+---
+- name: Apt Update registry
+  apt:
+    update_cache: yes

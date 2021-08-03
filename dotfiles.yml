@@ -1,0 +1,7 @@
+- name: Set up local workstation
+  hosts: local
+  gather_facts: yes
+  roles:
+    - common
+    - zsh
+    - macos-defaults

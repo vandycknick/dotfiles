@@ -1,0 +1,1 @@
+z_dot_dir: "{{ xdg_config_home }}/zsh"

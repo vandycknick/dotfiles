@@ -1,0 +1,32 @@
+---
+- name: Disable the sound effects on boot
+  shell: nvram SystemAudioVolume=" "
+  become: true
+
+- name: Enable F1,F2, F3, ... function keys
+  shell: defaults write -g com.apple.keyboard.fnState -bool true
+
+- name: Expand save panel by default
+  shell: |
+    defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
+    defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
+
+- name: Expand print panel by default
+  shell: |
+    defaults write NSGlobalDomain PMPrintingExpandedStateForPrint -bool true
+    defaults write NSGlobalDomain PMPrintingExpandedStateForPrint2 -bool true
+
+- name: Save to disk (not to iCloud) by default
+  shell: defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
+
+- name: Automatically quit printer app once the print jobs complete
+  shell: defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
+
+- name: Disable Guest account
+  shell: |
+    if [ -f /Users/Guest ]; then
+        dscl . -delete /Users/Guest
+        security delete-generic-password -a Guest -s com.apple.loginwindow.guest-account -D "application password" /Library/Keychains/System.keychain
+    fi
+    defaults write /Library/Preferences/com.apple.loginwindow GuestEnabled -bool false
+  become: true
