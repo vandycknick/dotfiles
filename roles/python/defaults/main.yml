@@ -1,0 +1,9 @@
+pyenv_python_global: "3.9.6"
+
+pyenv_python_versions:
+  - "{{ pyenv_python_global }}"
+  - "3.9.5"
+
+pyenv_install_shell: /usr/bin/zsh
+
+pyenv_home_directory: "{{ xdg_data_home }}/pyenv"

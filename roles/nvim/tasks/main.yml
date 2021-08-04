@@ -1,0 +1,10 @@
+---
+- name: Install nvim
+  apt:
+    name: neovim
+  become: true
+
+- name: Copy nvim config
+  copy:
+    src: init.vim
+    dest: "{{ xdg_data_home }}/nvim/init.vim"
