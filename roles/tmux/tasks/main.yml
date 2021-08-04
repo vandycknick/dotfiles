@@ -8,6 +8,11 @@
   stat: path="{{ tmux_config_dir }}/tmux/plugins/tpm"
   register: p
 
+- name: Create directory
+  file:
+    path: "{{ tmux_config_dir }}"
+    state: directory
+
 - name: Copy tmux.conf file
   copy:
     src: tmux.conf
