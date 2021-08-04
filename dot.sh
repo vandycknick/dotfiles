@@ -32,7 +32,7 @@ case "$(uname -s)" in
                 . /etc/os-release
 
                 case "$ID" in
-                    debian | ubuntu | pop)
+                    debian | ubuntu | pop | kali)
                         if [[ ! -x $(command -v ansible) ]]; then
                             echo "[i] Install Ansible"
                             sudo apt-get update

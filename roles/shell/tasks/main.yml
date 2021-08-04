@@ -4,6 +4,10 @@
   become: yes
   when: ansible_os_family == "Linux"
 
+- name: Detect if 0 day setup
+  stat: path="{{ z_dot_dir }}"
+  register: p
+
 - name: Create directory
   file:
     path: "{{ z_dot_dir }}"
@@ -29,6 +33,13 @@
     dest: "{{ z_dot_dir }}/custom/plugins/zsh-syntax-highlighting"
     clone: yes
     update: yes
+
+- name: Backup existing config files
+  shell: |
+    mkdir ~/.backup
+    mv ~/.profile ~/.backup || true
+    mv ~/.zshrc ~/.backup || true
+  when: not p.stat.exists
 
 - name: Copy zshrc file
   copy:
