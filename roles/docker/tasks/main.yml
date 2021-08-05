@@ -46,6 +46,18 @@
   become: true
   when: not docker_installed and ansible_distribution == 'Debian'
 
+- name: Add Docker's official GPG key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+  become: true
+  when: not docker_installed and ansible_distribution == 'Kali'
+
+- name: Add Docker stable repository
+  shell: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian buster stable"
+  become: true
+  when: not docker_installed and ansible_distribution == 'Kali'
+
 - name: Install Docker CE
   apt:
     name: docker-ce
