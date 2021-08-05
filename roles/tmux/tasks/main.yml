@@ -27,10 +27,10 @@
 
 - name: Install plugins
   shell: |
-    /bin/zsh --login -c "{{ tmux_config_dir }}/tmux/plugins/tpm/bin/install_plugins"
+    /bin/zsh --login -c "{{ tmux_config_dir }}/plugins/tpm/bin/install_plugins"
   when: not p.stat.exists
 
 - name: Update plugins
   shell: |
-    /bin/zsh --login -c "{{ tmux_config_dir }}/tmux/plugins/tpm/bin/update_plugins all"
+    /bin/zsh --login -c "{{ tmux_config_dir }}/plugins/tpm/bin/update_plugins all"
   when: p.stat.exists
