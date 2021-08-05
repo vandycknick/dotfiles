@@ -2,7 +2,7 @@
   apt:
     name: zsh
   become: yes
-  when: ansible_os_family == "Linux"
+  when: ansible_system == "Linux"
 
 - name: Detect if 0 day setup
   stat: path="{{ z_dot_dir }}"

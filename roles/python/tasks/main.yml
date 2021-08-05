@@ -15,7 +15,7 @@
   shell: |
     {{ pyenv_bin_path }} install --skip-existing {{ item }}
   args:
-    executable: "{{ pyenv_install_shell | default(omit) }}"
+    executable: "{{ pyenv_install_shell | default(omit) }} --login"
     creates: "{{ pyenv_home_directory }}/versions/{{ item }}/bin/python"
   with_items: "{{ pyenv_python_versions }}"
 
