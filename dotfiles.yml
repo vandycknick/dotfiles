@@ -4,7 +4,6 @@
   roles:
     - role: common
     - role: shell
-    - role: azure
     - role: python
     - role: kubectl
     - role: tmux
