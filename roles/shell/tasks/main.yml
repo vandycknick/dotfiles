@@ -4,6 +4,11 @@
   become: yes
   when: ansible_system == "Linux"
 
+- name: Disable login banners
+  copy:
+    src: .hushlogin
+    dest: "{{ home }}/.hushlogin"
+
 - name: Detect if 0 day setup
   stat: path="{{ z_dot_dir }}"
   register: p
