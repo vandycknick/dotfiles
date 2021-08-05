@@ -13,14 +13,11 @@
 
 - name: Install Python Interpreters
   shell: |
-    {{ pyenv_bin_path }} install --skip-existing {{ item }}
+    {{ pyenv_install_shell | default(omit) }} --login -c "{{ pyenv_bin_path }} install --skip-existing {{ item }}"
   args:
-    executable: "{{ pyenv_install_shell | default(omit) }} --login"
     creates: "{{ pyenv_home_directory }}/versions/{{ item }}/bin/python"
   with_items: "{{ pyenv_python_versions }}"
 
 - name: Set Python Global Interpreter
   shell: |
-    {{ pyenv_bin_path }} global {{ pyenv_python_global }}
-  args:
-    executable: "{{ pyenv_install_shell | default(omit) }}"
+    {{ pyenv_install_shell | default(omit) }} --login -c "{{ pyenv_bin_path }} global {{ pyenv_python_global }}""
