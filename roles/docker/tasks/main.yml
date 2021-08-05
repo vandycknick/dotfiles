@@ -82,9 +82,12 @@
     state: present
   become: true
 
-- name: Add users to the Docker group
+- name: Add user to the Docker group
   user:
     name: "{{ ansible_user_id }}"
     groups: docker
     append: yes
   become: true
+
+- name: Activate group changes
+  shell: newgrp docker

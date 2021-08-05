@@ -20,4 +20,4 @@
 
 - name: Set Python Global Interpreter
   shell: |
-    {{ pyenv_install_shell | default(omit) }} --login -c "{{ pyenv_bin_path }} global {{ pyenv_python_global }}""
+    {{ pyenv_install_shell | default(omit) }} --login -c "{{ pyenv_bin_path }} global {{ pyenv_python_global }}"

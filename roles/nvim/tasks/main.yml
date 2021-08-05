@@ -4,7 +4,12 @@
     name: neovim
   become: true
 
+- name: Create directory
+  file:
+    path: "{{ xdg_config_home }}/nvim"
+    state: directory
+
 - name: Copy nvim config
   copy:
     src: init.vim
-    dest: "{{ xdg_data_home }}/nvim/init.vim"
+    dest: "{{ xdg_config_home }}/nvim/init.vim"

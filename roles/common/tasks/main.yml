@@ -1,4 +1,9 @@
 ---
+- name: Create .ssh directory
+  file:
+    path: "{{ home }}/.ssh"
+    state: directory
+
 - include_tasks: macos.yml
   when: ansible_system == "Darwin"
 
