@@ -1,0 +1,23 @@
+---
+- name: Install pyenv
+  git:
+    repo: https://github.com/pyenv/pyenv.git
+    dest: "{{ pyenv_home_directory }}"
+    clone: yes
+    update: yes
+
+- name: Set path to pyenv binary
+  set_fact:
+    pyenv_bin_path: "{{ pyenv_home_directory }}/bin/pyenv"
+  when: pyenv_bin_path is undefined
+
+- name: Install Python Interpreters
+  shell: |
+    {{ pyenv_install_shell | default(omit) }} --login -c "{{ pyenv_bin_path }} install --skip-existing {{ item }}"
+  args:
+    creates: "{{ pyenv_home_directory }}/versions/{{ item }}/bin/python"
+  with_items: "{{ pyenv_python_versions }}"
+
+- name: Set Python Global Interpreter
+  shell: |
+    {{ pyenv_install_shell | default(omit) }} --login -c "{{ pyenv_bin_path }} global {{ pyenv_python_global }}"

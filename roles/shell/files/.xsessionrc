@@ -1,0 +1,4 @@
+# XFCE sytems don't load .profile by default. It will however load this file
+
+. /etc/profile
+. $HOME/.profile

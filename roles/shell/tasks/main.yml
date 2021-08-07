@@ -1,0 +1,94 @@
+- name: Install ZSH
+  apt:
+    name: zsh
+  become: yes
+  when: ansible_system == "Linux"
+
+- name: Disable login banners
+  copy:
+    src: .hushlogin
+    dest: "{{ home }}/.hushlogin"
+
+- name: Detect if 0 day setup
+  stat: path="{{ z_dot_dir }}"
+  register: p
+
+- name: Create directory
+  file:
+    path: "{{ z_dot_dir }}"
+    state: directory
+
+- name: Create dir for shell history files
+  file:
+    path: "{{ shell_cache_dir }}"
+    state: directory
+
+- name: Install Oh My ZSH
+  git:
+    repo: https://github.com/ohmyzsh/ohmyzsh.git
+    dest: "{{ z_dot_dir }}/oh-my-zsh"
+    clone: yes
+    update: yes
+
+- name: Install ZSH Auto Suggestions
+  git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions.git
+    dest: "{{ z_dot_dir }}/custom/plugins/zsh-autosuggestions"
+    clone: yes
+    update: yes
+
+- name: Install ZSH Syntax Highlighting
+  git:
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+    dest: "{{ z_dot_dir }}/custom/plugins/zsh-syntax-highlighting"
+    clone: yes
+    update: yes
+
+- name: Backup existing config files
+  shell: |
+    mkdir ~/.backup
+    mv ~/.profile ~/.backup || true
+    mv ~/.zshrc ~/.backup || true
+  when: not p.stat.exists
+
+- name: Copy zshrc file
+  copy:
+    src: .zshrc
+    dest: "{{ z_dot_dir }}/.zshrc"
+
+- name: Copy profile config
+  copy:
+    src: profile
+    dest: "{{ z_dot_dir }}/profile"
+    mode: u+x
+
+- name: Copy aliasrc config
+  copy:
+    src: aliasrc
+    dest: "{{ z_dot_dir }}/aliasrc"
+    mode: u+x
+
+- name: Create .profile symlink
+  file:
+    src: "{{ z_dot_dir }}/profile"
+    dest: "{{ home }}/.profile"
+    state: link
+
+- name: Create .zprofile symlink
+  file:
+    src: "{{ z_dot_dir }}/profile"
+    dest: "{{ home }}/.zprofile"
+    state: link
+
+# https://askubuntu.com/questions/1127990/profile-not-working-on-xfce4
+- name: Create .xsessionrc on XFCE based systems
+  copy:
+    src: .xsessionrc
+    dest: "{{ home }}/.xsessionrc"
+  when: ansible_distribution == 'Kali'
+
+- name: ZSH as default shell
+  user:
+    name: "{{ ansible_user_id }}"
+    shell: /bin/zsh
+  become: yes

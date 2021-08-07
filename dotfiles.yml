@@ -1,0 +1,13 @@
+- name: Set up local workstation
+  hosts: local
+  gather_facts: yes
+  roles:
+    - role: common
+    - role: shell
+    - role: python
+    - role: kubectl
+    - role: tmux
+    - role: docker
+    - role: nvim
+    - role: macos-defaults
+      when: ansible_os_family == "Darwin"

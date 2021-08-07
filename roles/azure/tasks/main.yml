@@ -1,0 +1,19 @@
+---
+- name: Import the APT repo key
+  apt_key:
+    keyserver: "{{ apt_key_server }}"
+    id: "{{ apt_key_id }}"
+  become: true
+
+- name: Create the APT repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ {{ansible_distribution_release}} main"
+    filename: "{{ azure_package_name }}"
+    state: present
+  become: true
+
+- name: Install the application package
+  apt:
+    name: "{{ azure_package_name }}"
+    update_cache: yes
+  become: true

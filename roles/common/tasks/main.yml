@@ -1,0 +1,21 @@
+---
+- name: Create .ssh directory
+  file:
+    path: "{{ home }}/.ssh"
+    state: directory
+
+- include_tasks: macos.yml
+  when: ansible_system == "Darwin"
+
+- include_tasks: linux.yml
+  when: ansible_system == "Linux"
+
+- name: Copy git config
+  copy:
+    src: git
+    dest: "{{ xdg_config_home }}"
+
+- name: Copy wget config
+  copy:
+    src: wget
+    dest: "{{ xdg_config_home }}"

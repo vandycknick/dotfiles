@@ -1,0 +1,36 @@
+---
+- name: Install tmux
+  apt:
+    name: tmux
+  become: true
+
+- name: Detect if TPM is already installed
+  stat: path="{{ tmux_config_dir }}/tmux/plugins/tpm"
+  register: p
+
+- name: Create directory
+  file:
+    path: "{{ tmux_config_dir }}"
+    state: directory
+
+- name: Copy tmux.conf file
+  copy:
+    src: tmux.conf
+    dest: "{{ tmux_config_dir }}/tmux.conf"
+
+- name: Install TPM (Tmux Plugin Manager)
+  git:
+    repo: https://github.com/tmux-plugins/tpm.git
+    dest: "{{ tmux_config_dir }}/plugins/tpm"
+    clone: yes
+    update: yes
+
+- name: Install plugins
+  shell: |
+    /bin/zsh --login -c "{{ tmux_config_dir }}/plugins/tpm/bin/install_plugins"
+  when: not p.stat.exists
+
+- name: Update plugins
+  shell: |
+    /bin/zsh --login -c "{{ tmux_config_dir }}/plugins/tpm/bin/update_plugins all"
+  when: p.stat.exists

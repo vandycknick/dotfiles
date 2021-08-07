@@ -1,0 +1,42 @@
+---
+- name: Kill System Preferences Window
+  # Close any open System Preferences panes, to prevent them from overriding
+  # settings we’re about to change
+  shell: osascript -e 'tell application "System Preferences" to quit'
+
+- include_tasks: ui-and-ux.yml
+
+- include_tasks: screen.yml
+
+- include_tasks: finder.yml
+
+- include_tasks: dock-and-dash.yml
+
+- include_tasks: photos.yml
+
+###############################################################################
+# Kill affected applications                                                  #
+###############################################################################
+# for app in "Activity Monitor" \
+#     "Address Book" \
+#     "Calendar" \
+#     "cfprefsd" \
+#     "Contacts" \
+#     "Dock" \
+#     "Finder" \
+#     "Google Chrome Canary" \
+#     "Google Chrome" \
+#     "Mail" \
+#     "Messages" \
+#     "Opera" \
+#     "Photos" \
+#     "Safari" \
+#     "SizeUp" \
+#     "Spectacle" \
+#     "SystemUIServer" \
+#     "Terminal" \
+#     "Transmission" \
+#     "Twitter" \
+#     "iCal"; do
+#     killall "${app}" &>/dev/null
+# done
