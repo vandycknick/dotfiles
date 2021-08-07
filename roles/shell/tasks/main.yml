@@ -75,6 +75,13 @@
     dest: "{{ home }}/.zprofile"
     state: link
 
+# https://askubuntu.com/questions/1127990/profile-not-working-on-xfce4
+- name: Create .xsessionrc on XFCE based systems
+  copy:
+    src: "{{ z_dot_dir }}/.xsessionrc"
+    dest: "{{ home }}/.xsessionrc"
+  when: ansible_distribution == 'Kali'
+
 - name: ZSH as default shell
   user:
     name: "{{ ansible_user_id }}"
