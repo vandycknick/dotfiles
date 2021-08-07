@@ -18,6 +18,11 @@
     path: "{{ z_dot_dir }}"
     state: directory
 
+- name: Create dir for shell history files
+  file:
+    path: "{{ shell_cache_dir }}"
+    state: directory
+
 - name: Install Oh My ZSH
   git:
     repo: https://github.com/ohmyzsh/ohmyzsh.git
@@ -78,7 +83,7 @@
 # https://askubuntu.com/questions/1127990/profile-not-working-on-xfce4
 - name: Create .xsessionrc on XFCE based systems
   copy:
-    src: "{{ z_dot_dir }}/.xsessionrc"
+    src: .xsessionrc
     dest: "{{ home }}/.xsessionrc"
   when: ansible_distribution == 'Kali'
 
