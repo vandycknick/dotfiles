@@ -1,4 +1,4 @@
-source $HOME/.profie
+source $HOME/.profile
 
 # Zsh
 ZDOTDIR="$HOME/.config/shell"
