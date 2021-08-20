@@ -3,6 +3,11 @@
   apt:
     name: tmux
   become: true
+  when: ansible_system == "Linux"
+
+- name: Install tmux
+  shell: brew install tmux
+  when: ansible_os_family == "Darwin"
 
 - name: Detect if TPM is already installed
   stat: path="{{ tmux_config_dir }}/tmux/plugins/tpm"

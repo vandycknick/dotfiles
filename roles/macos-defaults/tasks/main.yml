@@ -14,29 +14,19 @@
 
 - include_tasks: photos.yml
 
-###############################################################################
-# Kill affected applications                                                  #
-###############################################################################
-# for app in "Activity Monitor" \
-#     "Address Book" \
-#     "Calendar" \
-#     "cfprefsd" \
-#     "Contacts" \
-#     "Dock" \
-#     "Finder" \
-#     "Google Chrome Canary" \
-#     "Google Chrome" \
-#     "Mail" \
-#     "Messages" \
-#     "Opera" \
-#     "Photos" \
-#     "Safari" \
-#     "SizeUp" \
-#     "Spectacle" \
-#     "SystemUIServer" \
-#     "Terminal" \
-#     "Transmission" \
-#     "Twitter" \
-#     "iCal"; do
-#     killall "${app}" &>/dev/null
-# done
+- name: Restart apps
+  shell: |
+    for app in "Activity Monitor" \
+        "Address Book" \
+        "Calendar" \
+        "cfprefsd" \
+        "Contacts" \
+        "Dock" \
+        "Finder" \
+        "Photos" \
+        "Safari" \
+        "SystemUIServer" \
+        "iCal"; do
+        killall "${app}" &>/dev/null
+    done
+    exit 0

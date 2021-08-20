@@ -3,6 +3,11 @@
   apt:
     name: neovim
   become: true
+  when: ansible_os_family == "Linux"
+
+- name: Install nvim
+  shell: brew install nvim
+  when: ansible_os_family == "Darwin"
 
 - name: Create directory
   file:

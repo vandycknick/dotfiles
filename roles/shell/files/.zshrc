@@ -1,4 +1,4 @@
-source $HOME/.profile
+# source $HOME/.profile
 
 # Zsh
 ZDOTDIR="$HOME/.config/shell"
@@ -39,6 +39,11 @@ lfcd () {
     fi
 }
 bindkey -s '^o' 'lfcd\n'
+
+# MacOS specific
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    export PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+fi
 
 # Exports
 export FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT="true"

@@ -4,11 +4,11 @@
     path: "{{ home }}/.ssh"
     state: directory
 
-- include_tasks: macos.yml
-  when: ansible_system == "Darwin"
-
 - include_tasks: linux.yml
   when: ansible_system == "Linux"
+
+- include_tasks: macos-apps.yml
+  when: ansible_os_family == "Darwin"
 
 - name: Copy git config
   copy:

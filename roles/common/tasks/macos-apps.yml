@@ -1,0 +1,29 @@
+- name: "Install GNU coreutils"
+  shell: brew install coreutils
+
+- name: "Install cli utilities"
+  shell: brew install htop jq
+
+- name: "Install firefox"
+  shell: brew install firefox
+
+- name: "Install amethyst"
+  shell: brew install amethyst
+
+- name: "Defaults amethyst"
+  shell: |
+    defaults write com.amethyst.Amethyst window-margin-size -int 8
+
+- name: "Install 1password"
+  shell: brew install 1password 1password-cli
+
+- name: "Install Keybase"
+  shell: brew install --cask keybase
+
+- name: "Install pgp"
+  shell: |
+    brew install gpg gnupg pinentry-mac 
+    mkdir -p ~/.local/share/gnupg
+    find ~/.local/share/gnupg -type d -exec chmod 700 {} \;
+    find ~/.local/share/gnupg -type f -exec chmod 600 {} \;
+

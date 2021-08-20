@@ -1,8 +1,0 @@
----
-- name: Brew update registry
-  shell: brew update
-  register: update
-  when: ansible_os_family == "Darwin"
-
-- name: Brew update stdout
-  debug: msg="{{ update.stdout }}"

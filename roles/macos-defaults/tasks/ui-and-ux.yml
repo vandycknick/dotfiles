@@ -3,6 +3,10 @@
   shell: nvram SystemAudioVolume=" "
   become: true
 
+- name: Enable dark mode
+  shell: |
+    osascript -l JavaScript -e "Application('System Events').appearancePreferences.darkMode = true"
+
 - name: Enable F1,F2, F3, ... function keys
   shell: defaults write -g com.apple.keyboard.fnState -bool true
 

@@ -1,3 +1,6 @@
+- include_tasks: iterm2.yml
+  when: ansible_os_family == "Darwin"
+
 - name: Install ZSH
   apt:
     name: zsh

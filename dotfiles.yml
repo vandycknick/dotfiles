@@ -5,7 +5,7 @@
     - role: common
     - role: shell
     - role: python
-    - role: kubectl
+    # - role: kubectl
     - role: tmux
     - role: docker
     - role: nvim

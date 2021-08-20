@@ -1,0 +1,7 @@
+- name: Install iterm2
+  shell: brew install iterm2
+
+- name: Defaults iterm2
+  shell: |
+    defaults write com.googlecode.iterm2 TerminalMargin -int 12
+    defaults write com.googlecode.iterm2 TerminalVMargin -int 12
