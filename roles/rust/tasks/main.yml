@@ -1,0 +1,15 @@
+- name: Create Tmp Dir For Installer
+  tempfile:
+    state: directory
+    suffix: rust
+  register: tmp_dir
+
+- name: Download Rust Installer
+  get_url:
+    url: https://sh.rustup.rs
+    dest: "{{tmp_dir.path}}/rustup-init"
+    mode: "0500"
+
+- name: Install Rust
+  shell: |
+    {{tmp_dir.path}}/rustup-init -y --no-modify-path --profile default

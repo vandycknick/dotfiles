@@ -5,9 +5,16 @@
     - role: common
     - role: shell
     - role: python
-    # - role: kubectl
+      tags:
+        - programming
+        - python
+    - role: rust
+      tags:
+        - programming
+        - rust
     - role: tmux
-    - role: docker
     - role: nvim
+    - role: kubectl
+    - role: docker
     - role: macos-defaults
       when: ansible_os_family == "Darwin"

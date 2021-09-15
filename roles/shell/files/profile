@@ -38,6 +38,11 @@ export TMUX_TMPDIR="$XDG_RUNTIME_DIR"
 export GOPATH="${XDG_DATA_HOME:-$HOME/.local/share}/go"
 export PATH="$PATH:/usr/local/go/bin:$GOPATH/bin"
 
+# Rust:
+export CARGO_HOME="$XDG_DATA_HOME"/cargo
+export RUSTUP_HOME="$XDG_DATA_HOME"/rustup
+export PATH="$PATH:$CARGO_HOME/bin"
+
 # Dotnet:
 # TODO: Move this out of $HOME at some point
 # The following allows relocating some of it, but dotnet will still put files in .dotnet
