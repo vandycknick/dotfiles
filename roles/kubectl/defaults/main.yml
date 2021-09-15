@@ -1,5 +1,5 @@
 # Kubectl version to install
-kubectl_version: "v1.21.3"
+kubectl_version: "v1.21.4"
 
 # Kubectl binary checksum
 kubectl_checksum: "sha512:4b9c4c08e871de7d7ab6a671b3cbc50719fe559a112b5c118d0ee1fc7dd0c7a1edb29c9caf0a971d07e2dc4fe1021a890406281ccd0d15f2f58cb4b8f9ed59b7"
