@@ -1,0 +1,7 @@
+- name: Install vscode extensions
+  shell: |
+    code --user-data-dir {{ xdg_data_home }}/vscode \
+      --extensions-dir {{ xdg_data_home }}/vscode/extensions \
+      --install-extension {{ item }} \
+      --force
+  with_items: "{{ vscode_extensions }}"

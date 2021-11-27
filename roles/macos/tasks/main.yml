@@ -4,15 +4,19 @@
   # settings we’re about to change
   shell: osascript -e 'tell application "System Preferences" to quit'
 
-- include_tasks: ui-and-ux.yml
+- include_tasks: defaults/ui-and-ux.yml
 
-- include_tasks: screen.yml
+- include_tasks: defaults/screen.yml
 
-- include_tasks: finder.yml
+- include_tasks: defaults/finder.yml
 
-- include_tasks: dock-and-dash.yml
+- include_tasks: defaults/dock-and-dash.yml
 
-- include_tasks: photos.yml
+- include_tasks: defaults/photos.yml
+
+- include_tasks: defaults/iterm2.yml
+
+- include_tasks: defaults/amethyst.yml
 
 - name: Restart apps
   shell: |

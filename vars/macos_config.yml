@@ -1,0 +1,19 @@
+macos_homebrew_applications:
+  - coreutils
+  - zsh
+  - tmux
+  - nvim
+
+  - htop
+  - jq
+
+  - iterm2
+  - firefox
+  - amethyst
+  - 1password
+  - 1password-cli
+  - keybase
+
+  - gpg
+  - gnipg
+  - pinentry-mac

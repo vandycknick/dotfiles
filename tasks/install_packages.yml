@@ -1,0 +1,10 @@
+- name: Apt Update registry
+  apt:
+    update_cache: yes
+  become: true
+
+- name: Install packages
+  apt:
+    name: "{{ item }}"
+  become: true
+  with_items: "{{ packages }}"

@@ -1,0 +1,24 @@
+- name: Set tmux config directory
+  set_fact:
+    tmux_config_dir: "{{ xdg_config_home }}/tmux"
+
+- name: Detect if TPM is already installed
+  stat: path="{{ tmux_config_dir }}/plugins/tpm"
+  register: p
+
+- name: Install TPM (Tmux Plugin Manager)
+  git:
+    repo: https://github.com/tmux-plugins/tpm.git
+    dest: "{{ tmux_config_dir }}/plugins/tpm"
+    clone: yes
+    update: yes
+
+- name: Install tmux plugins
+  shell: |
+    /bin/zsh --login -c "{{ tmux_config_dir }}/plugins/tpm/bin/install_plugins"
+  when: not p.stat.exists
+
+- name: Update tmux plugins
+  shell: |
+    /bin/zsh --login -c "{{ tmux_config_dir }}/plugins/tpm/bin/update_plugins all"
+  when: p.stat.exists
