@@ -1,3 +1,0 @@
-- name: "Defaults amethyst"
-  shell: |
-    defaults write com.amethyst.Amethyst window-margin-size -int 8

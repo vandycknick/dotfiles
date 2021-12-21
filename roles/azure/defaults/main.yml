@@ -1,9 +1,0 @@
----
-azure_package_name: azure-cli
-
-repo_key_url: https://packages.microsoft.com/keys/microsoft.asc
-
-apt_key_server: packages.microsoft.com
-
-# https://docs.microsoft.com/en-us/windows-server/administration/linux-package-repository-for-microsoft-software#manual-configuration
-apt_key_id: BC528686B50D79E339D3721CEB3E94ADBE1229CF
