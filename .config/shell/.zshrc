@@ -1,5 +1,3 @@
-# source $HOME/.profile
-
 # Zsh
 ZDOTDIR="$HOME/.config/shell"
 
