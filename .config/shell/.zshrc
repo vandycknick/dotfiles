@@ -1,3 +1,12 @@
+# Only run in TMUX on MacOS
+# Tmux uses a login causing it to reload /etc/profile again on macos. This contains a utility called path_helper on macos and which reorders my whole path: https://superuser.com/questions/544989/does-tmux-sort-the-path-variable
+# Hence on macos every shell tmux spawns will reset the path reload /etc/profile and source my .profile again to get back to a pristine setup!
+if [[ "$OSTYPE" == "darwin"* ]] && [ -n "$TMUX" ] && [ -f /etc/profile ]; then
+    PATH=""
+    source /etc/profile
+    source $HOME/.profile
+fi
+
 # Zsh
 ZDOTDIR="$HOME/.config/shell"
 
