@@ -82,3 +82,6 @@ export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 
 # Z
 export _Z_DATA="$XDG_CACHE_HOME/z"
+
+# Indicate profile loaded
+export PROFILE_LOADED=1
