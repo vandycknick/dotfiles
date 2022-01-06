@@ -21,9 +21,4 @@ alias tfs="tfswitch -b /home/nickvd/.local/bin/terraform"
 # Utilities
 alias myip="dig txt ch +short whoami.cloudflare @1.1.1.1"
 alias myip6="dig txt ch +short whoami.cloudflare @2606:4700:4700::1111"
-
-body() {
-    IFS= read -r header
-    printf '%s\n' "$header"
-    "$@"
-}
+alias path="echo \$PATH | sed 's/:/\n/g'"
