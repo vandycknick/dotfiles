@@ -1,7 +1,7 @@
 {
-  "workbench.colorTheme": "Monokai Pro (Filter Machine)",
+  "workbench.colorTheme": "One Dark Pro",
   "workbench.iconTheme": "vscode-icon-theme",
-  "editor.fontFamily": "'Fira Code'",
+  "editor.fontFamily": "'JetBrains Mono'",
   "editor.fontLigatures": true,
   "editor.formatOnSave": true,
   "workbench.editorAssociations": {
