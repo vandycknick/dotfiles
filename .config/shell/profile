@@ -77,6 +77,9 @@ export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME/npm/npmrc"
 # NVM
 export NVM_DIR="$XDG_DATA_HOME/nvm"
 
+# Deno
+export DENO_INSTALL_ROOT="$XDG_BIN_HOME/.."
+
 # Pyenv
 export PYENV_ROOT="$XDG_DATA_HOME/pyenv"
 export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
