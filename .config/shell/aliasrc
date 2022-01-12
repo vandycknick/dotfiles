@@ -14,8 +14,8 @@ alias \
     mkd="mkdir -pv" \
     ip="ip --color=auto"
 
+alias cat=bat
 alias open=xdg-open
-
 alias tfs="tfswitch -b /home/nickvd/.local/bin/terraform"
 
 # Utilities
