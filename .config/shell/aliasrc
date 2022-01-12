@@ -22,3 +22,9 @@ alias tfs="tfswitch -b /home/nickvd/.local/bin/terraform"
 alias myip="dig txt ch +short whoami.cloudflare @1.1.1.1"
 alias myip6="dig txt ch +short whoami.cloudflare @2606:4700:4700::1111"
 alias path="echo \$PATH | sed 's/:/\n/g'"
+
+# MacOS alias overrides
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    alias clip="pbcopy"
+    unalias open
+fi
