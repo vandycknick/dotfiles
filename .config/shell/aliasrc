@@ -3,7 +3,6 @@
 # Use neovim for vim if present.
 [ -x "$(command -v nvim)" ] && alias vim="nvim" vimdiff="nvim -d"
 
-alias clip="xclip -selection clipboard"
 alias code="code --user-data-dir $XDG_DATA_HOME/vscode --extensions-dir $XDG_DATA_HOME/vscode/extensions"
 
 alias \
@@ -14,8 +13,6 @@ alias \
     mkd="mkdir -pv" \
     ip="ip --color=auto"
 
-alias cat=bat
-alias open=xdg-open
 alias tfs="tfswitch -b /home/nickvd/.local/bin/terraform"
 
 # Utilities
@@ -26,5 +23,9 @@ alias path="echo \$PATH | sed 's/:/\n/g'"
 # MacOS alias overrides
 if [[ "$OSTYPE" == "darwin"* ]]; then
     alias clip="pbcopy"
-    unalias open
+    alias cat=bat
+else
+    alias clip="xclip -selection clipboard"
+    alias cat=batcat
+    alias open=xdg-open
 fi
