@@ -7,6 +7,11 @@ if [[ "$OSTYPE" == "darwin"* ]] && [ -n "$TMUX" ] && [ -f /etc/profile ]; then
     source $HOME/.profile
 fi
 
+# Load current distro information on Linux when present
+if [ -f /etc/os-release ]; then
+    source /etc/os-release
+if
+
 # Zsh
 ZDOTDIR="$HOME/.config/shell"
 
@@ -17,8 +22,8 @@ HISTFILE=~/.cache/shell/history
 
 # Oh my zsh
 ZSH="$ZDOTDIR/oh-my-zsh"
-ZSH_THEME="robbyrussell"
 ZSH_CUSTOM="$ZDOTDIR/custom"
+ZSH_THEME=$([ "$ID" == "kali" ] && echo "kali-linux" || echo "nickvd")
 
 plugins=(
     colored-man-pages
