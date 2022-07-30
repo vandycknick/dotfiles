@@ -10,7 +10,7 @@ fi
 # Load current distro information on Linux when present
 if [ -f /etc/os-release ]; then
     source /etc/os-release
-if
+fi
 
 # Zsh
 ZDOTDIR="$HOME/.config/shell"
@@ -23,7 +23,7 @@ HISTFILE=~/.cache/shell/history
 # Oh my zsh
 ZSH="$ZDOTDIR/oh-my-zsh"
 ZSH_CUSTOM="$ZDOTDIR/custom"
-ZSH_THEME=$([ "$ID" == "kali" ] && echo "kali-linux" || echo "nickvd")
+ZSH_THEME=$([[ "$ID" == "kali" ]] && echo "kali-linux" || echo "nickvd")
 
 plugins=(
     colored-man-pages
