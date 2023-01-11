@@ -51,14 +51,24 @@ return require('packer').startup(function(use)
     })
 
     use({
+        "j-hui/fidget.nvim",
+        config = function()
+            require("fidget").setup({})
+        end
+    })
+
+    use({
+        'numToStr/Comment.nvim',
+        config = function ()
+            require('Comment').setup()
+        end
+    })
+
+    use({
         "folke/trouble.nvim",
         requires = "nvim-tree/nvim-web-devicons",
         config = function()
-            require("trouble").setup({
-                -- your configuration comes here
-                -- or leave it empty to use the default settings
-                -- refer to the configuration section below
-            })
+            require("trouble").setup({})
         end
     })
 
