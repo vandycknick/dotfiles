@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+# Stop script on NZEC
+set -e
+# Stop script if unbound variable found (use ${var:-} if intentional)
+set -u
+# By default cmd1 | cmd2 returns exit code of cmd2 regardless of cmd1 success
+# This is causing it to fail
+set -o pipefail
+
+usage() {
+  echo "Usage: tmux-sessionizer [OPTION]
+Start a tmux session from a 'git' project folder.
+  -h|--help         Show command line help.
+  -w|--workspace    A list of folders that contain projects."
+}
+
+tmux-sessionizer() {
+    selected="$1"
+    tmux="${TMUX:-}"
+
+    if [[ -z "$selected" ]]; then
+        selected=$(find ~/Projects ~/Work -mindepth 1 -maxdepth 1 -type d | fzf)
+    fi
+
+    if [[ -z $selected ]]; then
+        return 0
+    fi
+
+    selected_name=$(basename "$selected" | tr . _)
+    tmux_running=$(pgrep tmux)
+
+    if [[ -z "$tmux" ]] && [[ -z "$tmux_running" ]]; then
+        tmux new-session -s $selected_name -c $selected
+        return 0
+    fi
+
+    if ! tmux has-session -t=$selected_name 2> /dev/null; then
+        tmux new-session -ds $selected_name -c $selected
+    fi
+
+    if [[ -z "$tmux" ]]; then
+        tmux attach -t "$selected_name"
+    else
+        tmux switch-client -t "$selected_name"
+    fi
+}
+
+main() {
+    argc="$#"
+    argv=$(getopt --options w:,h --longoptions workspace:,help -- "$@")
+    result="$?" # Capture getopt exit code.
+
+    if [ "$result" -ne 0 ]; then
+        exit "$result"
+    fi
+
+   eval set -- "$argv"
+
+    workspace=""
+    help=false
+
+    while true; do
+       case "$1" in
+            -h | --help) help=true ; shift ;;
+            -w | --workspace) workspace="$2" ; shift 2;;
+            --) shift; break ;;
+            *) log-err "Unexpected option: $1. This should not happen."; usage; exit 1 ;;
+        esac
+    done
+
+    if [ "$help" = true ]; then
+        usage
+        exit 0
+    fi
+
+    tmux-sessionizer "$workspace"
+    result="$?"
+
+    exit $result
+}
+
+[[ "${BASH_SOURCE[0]}" != "$0" ]] || main "$@"
