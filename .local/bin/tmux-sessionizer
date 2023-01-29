@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 
-# Stop script on NZEC
-set -e
-# Stop script if unbound variable found (use ${var:-} if intentional)
-set -u
-# By default cmd1 | cmd2 returns exit code of cmd2 regardless of cmd1 success
-# This is causing it to fail
-set -o pipefail
+# -e Stop script on None Zero Exit Code (NZEC)
+# -u Stop script if unbound variable found (use ${var:-} if intentional)
+# -o By default cmd1 | cmd2 returns exit code of cmd2 regardless of cmd1 success
+set -euo pipefail
+IFS=$'\n\t'
 
 usage() {
   echo "Usage: tmux-sessionizer [OPTION]
@@ -20,7 +18,9 @@ tmux-sessionizer() {
     tmux="${TMUX:-}"
 
     if [[ -z "$selected" ]]; then
-        selected=$(find ~/Projects ~/Work -mindepth 1 -maxdepth 1 -type d | fzf)
+        set +e # Disable failing on NZEC, if a directory doesn't exist find returns a NZEC. We just don't care about it.
+        selected=$(find ~/Projects ~/Work -mindepth 1 -maxdepth 1 -type d 2> /dev/null | fzf)
+        set -e
     fi
 
     if [[ -z $selected ]]; then
