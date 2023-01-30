@@ -1,21 +1,28 @@
 #!/usr/bin/env bash
-
-# -e Stop script on None Zero Exit Code (NZEC)
-# -u Stop script if unbound variable found (use ${var:-} if intentional)
-# -o By default cmd1 | cmd2 returns exit code of cmd2 regardless of cmd1 success
+# -e : Stop script on None Zero Exit Code (NZEC)
+# -u : Stop script if unbound variable found (use ${var:-} if intentional)
+# -o pipefail : By default cmd1 | cmd2 returns exit code of cmd2 regardless of cmd1 success
 set -euo pipefail
 IFS=$'\n\t'
 
 usage() {
-  echo "Usage: tmux-sessionizer [OPTION]
-Start a tmux session from a 'git' project folder.
-  -h|--help         Show command line help.
-  -w|--workspace    A list of folders that contain projects."
+    cat 1>&2 <<EOF
+tmux-sessionizer [OPTION]
+Start a tmux session from a project or folder.
+
+USAGE: tmux-sessionizer [FLAGS] [OPTIONS]
+
+FLAGS:
+    -h|--help         Show command line help.
+
+OPTIONS:
+    -w|--workspace    A list of folders that contain projects.
+EOF
 }
 
 tmux-sessionizer() {
-    selected="$1"
-    tmux="${TMUX:-}"
+    local selected="${1:-}"
+    local tmux="${TMUX:-}"
 
     if [[ -z "$selected" ]]; then
         set +e # Disable failing on NZEC, if a directory doesn't exist find returns a NZEC. We just don't care about it.
@@ -27,16 +34,19 @@ tmux-sessionizer() {
         return 0
     fi
 
+    local selected_name
+    local tmux_running
+
     selected_name=$(basename "$selected" | tr . _)
     tmux_running=$(pgrep tmux)
 
     if [[ -z "$tmux" ]] && [[ -z "$tmux_running" ]]; then
-        tmux new-session -s $selected_name -c $selected
+        tmux new-session -s "$selected_name" -c "$selected"
         return 0
     fi
 
-    if ! tmux has-session -t=$selected_name 2> /dev/null; then
-        tmux new-session -ds $selected_name -c $selected
+    if ! tmux has-session -t="$selected_name" 2> /dev/null; then
+        tmux new-session -ds "$selected_name" -c "$selected"
     fi
 
     if [[ -z "$tmux" ]]; then
@@ -44,21 +54,33 @@ tmux-sessionizer() {
     else
         tmux switch-client -t "$selected_name"
     fi
+
+    return 0
+}
+
+needs_cmd() {
+    if ! check_cmd "$1"; then
+        err "need '$1' (command not found)"
+    fi
+}
+
+check_cmd() {
+    command -v "$1" > /dev/null 2>&1
 }
 
 main() {
+    needs_cmd getopt
+
+    local argc
+    local argv
+
+    # shellcheck disable=SC2034
     argc="$#"
     argv=$(getopt --options w:,h --longoptions workspace:,help -- "$@")
-    result="$?" # Capture getopt exit code.
+    eval set -- "$argv"
 
-    if [ "$result" -ne 0 ]; then
-        exit "$result"
-    fi
-
-   eval set -- "$argv"
-
-    workspace=""
-    help=false
+    local workspace=""
+    local help=false
 
     while true; do
        case "$1" in
@@ -75,9 +97,8 @@ main() {
     fi
 
     tmux-sessionizer "$workspace"
-    result="$?"
-
+    local result="$?"
     exit $result
 }
 
-[[ "${BASH_SOURCE[0]}" != "$0" ]] || main "$@"
+main "$@"
