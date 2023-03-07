@@ -38,7 +38,7 @@ tmux-sessionizer() {
     local tmux_running
 
     selected_name=$(basename "$selected" | tr . _)
-    tmux_running=$(pgrep tmux)
+    tmux_running=$(pgrep tmux || true)
 
     if [[ -z "$tmux" ]] && [[ -z "$tmux_running" ]]; then
         tmux new-session -s "$selected_name" -c "$selected"
