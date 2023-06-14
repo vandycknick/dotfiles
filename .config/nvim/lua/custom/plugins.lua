@@ -12,14 +12,15 @@ local plugins = {
         "ruff",
 
         -- Lua
-        "lua_ls",
+        "lua-language-server",
 
         -- Astro
         "astro-language-server",
 
         -- Typescript/javascript
-        "tsserver",
-        "eslint",
+        "typescript-language-server",
+        "eslint-lsp",
+        "prettier",
 
         -- Rust
         "rust-analyzer",
