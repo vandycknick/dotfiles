@@ -166,3 +166,5 @@ bindsym $mod+p exec flameshot gui
 
 # Map capslock to escape
 exec setxkbmap -option caps:escape
+
+exec spice-vdagent
