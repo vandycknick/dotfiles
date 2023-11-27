@@ -1,0 +1,11 @@
+#!/bin/bash
+
+xrandr --output Virtual-1 --auto;
+~/.fehbg
+
+xev -root -event randr \
+  | grep --line-buffered 'subtype XRROutputChangeNotifyEvent' \
+  | while read _; do
+      xrandr --output Virtual-1 --auto;
+      ~/.fehbg;
+  done
