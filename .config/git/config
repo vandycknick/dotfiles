@@ -1,7 +1,7 @@
 [user]
 	name = Nick Van Dyck
 	email = vandyck.nick@outlook.com
-	signingkey = 05B48F7FBCDCC54E
+	signingkey = E742877FB4B706FC
 
 [commit]
 	gpgsign = true
