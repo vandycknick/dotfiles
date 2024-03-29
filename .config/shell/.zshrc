@@ -14,7 +14,7 @@ fi
 
 # MacOS specific
 if [[ "$OSTYPE" == "darwin"* ]]; then
-    export PATH="/opt/homebrew/bin:/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+    export PATH="/opt/homebrew/bin:/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
 fi
 
 # Zsh
