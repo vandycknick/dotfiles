@@ -43,9 +43,13 @@ foreground = "0xc8c093"
 
 [keyboard]
 bindings = [
+    { key = "v",     mods = "Alt",     action = "Paste" },
+    { key = "c",     mods = "Alt",     action = "Copy" },
     { key = "h",     mods = "Alt",     chars = "\u001bh"},
+    
     { key = "Right", mods = "Alt",     chars = "\u001bf" },
     { key = "Left",  mods = "Alt",     chars = "\u001bb" },
+
     { key = "Left",  mods = "Command", chars = "\u001bOH", mode = "AppCursor" },
     { key = "Right", mods = "Command", chars = "\u001bOF", mode = "AppCursor" },
 ]
