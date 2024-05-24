@@ -21,6 +21,8 @@ alias myip6="dig txt ch +short whoami.cloudflare @2606:4700:4700::1111"
 alias tun0="ip -o -4 addr list tun0 | awk -F ' *|/' '{print \$4}' | clip"
 alias path="echo \$PATH | sed 's/:/\n/g'"
 alias tms="tmux-sessionizer"
+alias ls="eza --git"
+alias tree="eza --tree --long --ignore-glob .git"
 
 # MacOS alias overrides
 if [[ "$OSTYPE" == "darwin"* ]]; then
