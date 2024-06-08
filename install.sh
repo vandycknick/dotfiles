@@ -10,8 +10,8 @@ fi
 
 pushd $DOTFILES > /dev/null
 
-# branch=$(git rev-parse --abbrev-ref HEAD)
-# git fetch --all && git rebase $branch
+# TODO: silently fail here
+git pull --rebase
 
 stow .
 popd > /dev/null
