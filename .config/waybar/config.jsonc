@@ -18,13 +18,13 @@
     "active-only": false,
     "all-outputs": false,
     "format": "{icon}",
-    "format-icons": {
-      "1": "",
-      "active": "<span font='10'></span>",
-      "default": ""
-    },
+    // "format-icons": {
+    //   "1": "",
+    //   "active": "<span font='10'></span>",
+    //   "default": ""
+    // },
     "persistent-workspaces": {
-      "*": 5
+      "*": 3
     }
   },
 

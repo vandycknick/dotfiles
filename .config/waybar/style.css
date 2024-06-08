@@ -61,17 +61,16 @@ tooltip {
 }
 
 #workspaces button label {
-    font-size: 9px;
+    font-size: 12px;
 }
 
-/* #workspaces button.active { */
-/*     font-size: 20px; */
-/*     color: #A4B9EF; */
-/* } */
-/**/
-/* #workspaces button.urgent { */
-/*     color: #F9C096; */
-/* } */
+#workspaces button.active {
+    color: @dragonBlue;
+}
+
+#workspaces button.urgent {
+    color: #F9C096;
+}
 
 #workspaces button:hover {
     background: @sumiInk0;
