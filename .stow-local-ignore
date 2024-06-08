@@ -24,4 +24,4 @@ _darcs
 
 # Custom
 \.editorconfig
-setup.sh
+install.sh
