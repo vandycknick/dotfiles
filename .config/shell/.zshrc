@@ -19,6 +19,7 @@ fi
 
 # Zsh
 ZDOTDIR="$HOME/.config/shell"
+export ZSH_COMPDUMP="$HOME/.cache/shell/.zcompdump-${HOST/.*/}-${ZSH_VERSION}"
 
 # History in cache directory:
 HISTSIZE=10000000
