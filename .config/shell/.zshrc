@@ -27,7 +27,7 @@ SAVEHIST=10000000
 HISTFILE=~/.cache/shell/history
 
 # Oh my zsh
-ZSH="$ZDOTDIR/oh-my-zsh"
+ZSH="$HOME/.config/ohmyzsh"
 ZSH_CUSTOM="$ZDOTDIR/custom"
 ZSH_THEME=$([[ "$ID" == "kali" ]] && echo "kali-linux" || echo "nickvd")
 
@@ -45,7 +45,8 @@ plugins=(
 )
 
 source $ZSH/oh-my-zsh.sh
-
+# Not sure if this is something I like yet.
+# eval "$(starship init zsh)"
 
 # Exports
 export FUNCTIONS_CORE_TOOLS_TELEMETRY_OPTOUT="true"
