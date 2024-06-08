@@ -1,0 +1,105 @@
+{
+  "mode": "dock",
+  "margin": "0 0 5px 0",
+  "modules-left": ["custom/arch", "hyprland/workspaces"],
+  "modules-center": ["hyprland/window"],
+  "modules-right": [
+    "network",
+    "pulseaudio",
+    "backlight",
+    "cpu",
+    "battery",
+    "clock",
+    "custom/exit"
+  ],
+
+  "hyprland/workspaces": {
+    "on-click": "activate",
+    "active-only": false,
+    "all-outputs": false,
+    "format": "{icon}",
+    "format-icons": {
+      "1": "",
+      "active": "<span font='10'></span>",
+      "default": ""
+    },
+    "persistent-workspaces": {
+      "*": 5
+    }
+  },
+
+  "hyprland/window": {
+    "rewrite": {
+      "(.*) - Brave": "$1",
+      "(.*) - Chromium": "$1",
+      "(.*) - Brave Search": "$1",
+      "(.*) - Outlook": "$1",
+      "(.*) Microsoft Teams": "$1"
+    },
+    "separate-outputs": true
+  },
+
+  "custom/arch": {
+    "format": "",
+    "tooltip": false
+  },
+
+  "custom/exit": {
+    "format": "",
+    "on-click": "wlogout",
+    "tooltip": false
+  },
+
+  "cpu": {
+    "interval": 10,
+    "format": " {usage}%",
+    "max-length": 10
+  },
+
+  "clock": {
+    "format": " {:%H:%M}",
+    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+  },
+  "backlight": {
+    "device": "intel_backlight",
+    "format": "{icon} {percent}%",
+    "format-icons": ["", ""]
+  },
+  "battery": {
+    "states": {
+      "warning": 30,
+      "critical": 15
+    },
+    "format": "<span foreground='#B1E3AD'>{icon}</span> {capacity}%",
+    "format-warning": "<span foreground='#B1E3AD'>{icon}</span> {capacity}%",
+    "format-critical": "<span foreground='#E38C8F'>{icon}</span> {capacity}%",
+    "format-charging": "<span foreground='#B1E3AD'> </span>{capacity}%",
+    "format-plugged": "<span foreground='#B1E3AD'> </span>{capacity}%",
+    "format-alt": "<span foreground='#B1E3AD'>{icon}</span> {time}",
+    "format-full": "<span foreground='#B1E3AD'> </span>{capacity}%",
+    "format-icons": ["", "", "", "", ""],
+    "tooltip-format": "{time}"
+  },
+  "network": {
+    "format-wifi": " {signalStrength}%",
+    "format-ethernet": "󰤭 ToDo",
+    "format-linked": "{ifname} (No IP) ",
+    "format-disconnected": "󰤭",
+    "tooltip-format-wifi": "{essid}",
+    "tooltip-format-disconnected": "Disconnected"
+  },
+  "pulseaudio": {
+    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+    "format": "{icon} {volume}%",
+    "format-muted": " Muted",
+    "format-icons": {
+      "headphone": "",
+      "hands-free": "",
+      "headset": "",
+      "phone": "",
+      "portable": "",
+      "car": "",
+      "default": ["", ""]
+    }
+  }
+}

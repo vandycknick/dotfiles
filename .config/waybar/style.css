@@ -1,0 +1,102 @@
+@define-color fujiWhite  #DCD7BA;
+@define-color sumiInk0   #16161D;
+
+@define-color winterRed  #43242B;
+
+@define-color dragonBlue #658594;
+@define-color lightBlue  #A3D4D5;
+
+* {
+    font-family: "JetBrainsMono Nerd Font Propo", FontAwesome, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    border-radius: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+}
+
+window#waybar {
+    background: @sumiInk0;
+    opacity: 0.90;
+    color: @fujiWhite;
+
+    border-radius: 0 0 5px 5px;
+    /* border-radius: 10px; */
+}
+
+tooltip {
+    background: #1E1E28;
+    border-radius: 10px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #a4b9ef;
+    padding: 5px;
+}
+
+#workspaces {
+    /* background: #332E41; */
+    /* margin-left: 5px; */
+    /* margin-top: 3px; */
+    /* margin-bottom: 3px; */
+}
+
+#custom-arch {
+    margin: 5px 0 5px 20px;
+    /* padding-left: 5px; */
+    font-size: 16px;
+    color: @dragonBlue;
+}
+
+/* #custom-exit { */
+/*     color: @winterRed; */
+/*     font-size: 24px; */
+/*     font-weight: bold; */
+/* } */
+
+#workspaces button {
+    padding-left: 6px;
+    padding-right: 6px;
+    min-width: 0;
+    color: @fujiWhite;
+}
+
+#workspaces button label {
+    font-size: 9px;
+}
+
+/* #workspaces button.active { */
+/*     font-size: 20px; */
+/*     color: #A4B9EF; */
+/* } */
+/**/
+/* #workspaces button.urgent { */
+/*     color: #F9C096; */
+/* } */
+
+#workspaces button:hover {
+    background: @sumiInk0;
+    border-color: @sumiInk0;
+    color: @lightBlue;
+}
+
+#clock, #battery, #pulseaudio, #backlight, #cpu, #workspaces, #mpd, #custom-exit {
+    color: @fujiWhite;
+    padding: 3px 10px;
+    /* background: #332E41; */
+    /* margin-top: 3px; */
+    /* margin-bottom: 3px; */
+}
+
+#network {
+    padding-left: 15px;
+    padding-right: 3px;
+    /* background: #332E41; */
+    /* border-radius: 15px 0px 0px 15px; */
+    /* margin-top: 3px; */
+    /* margin-bottom: 3px; */
+}
+
+#custom-exit {
+    padding-right: 20px;
+    margin-right: 5px;
+}
