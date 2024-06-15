@@ -26,7 +26,7 @@ tmux-sessionizer() {
 
     if [[ -z "$selected" ]]; then
         set +e # Disable failing on NZEC, if a directory doesn't exist find returns a NZEC. We just don't care about it.
-        selected=$(find ~/Projects ~/Work -mindepth 1 -maxdepth 1 -type d 2> /dev/null | fzf)
+        selected=$(find ~/Projects ~/Work -mindepth 1 -maxdepth 1 -type d 2> /dev/null | (cat;echo "$HOME/dotfiles") | fzf)
         set -e
     fi
 
