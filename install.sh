@@ -26,7 +26,7 @@ pacman -S linux-headers
 # Utilities
 pacman -S brightnessctl loginctl
 
-pacman -S hyprland hypridle hyprlock waybar wofi
+pacman -S hyprland hypridle hyprlock hyprpaper waybar wofi
 
 # systemctl --user enable --now hypridle.service
 
@@ -39,7 +39,7 @@ pacman -S less openssh ripgrep fzf fd rsync eza bat tokei
 pacman -S wireplumber xdg-desktop-portal-hyprland
 
 # Applications
-pacman -S thunar firefox
+pacman -S thunar firefox nautilus
 
 pacman -S nfs-utils
 
@@ -59,7 +59,7 @@ systemctl start libvirtd.service
 
 ## Infinitybook from Tuxedo Computers
 yay -Syu
-yay -S tuxedo-control-center-bin tuxedo-drivers-dkms
+yay -S tuxedo-drivers-dkms tuxedo-control-center-bin
 
 chsh nickvd -s /usr/bin/zsh
 
