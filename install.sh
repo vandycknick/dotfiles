@@ -2,7 +2,7 @@
 set -eou pipefail
 
 DOTFILES="${VARIABLE:-$HOME/dotfiles}"
-REPO_URL="git@github.com:vandycknick/dotfiles.git"
+REPO_URL="https://github.com/vandycknick/dotfiles.git"
 
 if [ ! -d $DOTFILES ]; then
   git clone --recursive "$REPO_URL" $DOTFILES
