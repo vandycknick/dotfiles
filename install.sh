@@ -32,6 +32,7 @@ pacman -S hyprland hypridle hyprlock hyprpaper waybar wofi
 
 # Fonts
 pacman -S ttf-jetbrains-mono-nerd
+pacman -S jq
 
 # Tools
 pacman -S zsh tmux
