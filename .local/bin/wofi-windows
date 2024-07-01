@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+windows=$(hyprctl clients -j)
+
+# echo "$windows" | jq '.[] | .class + ": " + .title + " (" + .address + ")"' | wofi -S dmenu
+selected=$(echo "$windows" | jq -r '.[] | "img:/home/nickvd/.icons/Kanagawa/categories/32/" +.class + ".svg:text:" + .title' | wofi -S dmenu)
+
+to_focus=$(echo "$windows" | jq -r ".[$selected].address")
+echo $to_focus
+
+hyprctl dispatch focuswindow "address:$to_focus"

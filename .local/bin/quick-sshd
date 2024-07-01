@@ -3,7 +3,7 @@
 # Create a separate user for tunneling
 # sudo adduser tunnel
 #
-# Then tweak the passwd ever so slightly to
+# Then tweak /etc/passwd ever so slightly to
 # tunnel:x:1001:1001:,,,:/home/tunnel:/usr/sbin/nologin
 
 sshd_config=$(cat <<EOF
