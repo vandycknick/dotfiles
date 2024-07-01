@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 enable_battery=false
 battery_charging=false
@@ -20,9 +20,6 @@ if [[ $enable_battery == true ]]; then
     printf " "
   fi
   printf "%s%%" "$(cat /sys/class/power_supply/*/capacity | head -1)"
-  # if [[ $battery_charging == false ]]; then
-  #   echo -n " "
-  # fi
 fi
 
 echo ''
