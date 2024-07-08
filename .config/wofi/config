@@ -1,4 +1,4 @@
-width=600
+width=700
 height=300
 location=center
 show=drun
@@ -14,3 +14,4 @@ allow_images=true
 image_size=40
 gtk_dark=true
 dynamic_lines=true
+dmenu-print_line_num=true
