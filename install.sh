@@ -61,6 +61,7 @@ systemctl start libvirtd.service
 ## Infinitybook from Tuxedo Computers
 yay -Syu
 yay -S tuxedo-drivers-dkms tuxedo-control-center-bin
+yay -S mise
 
 chsh nickvd -s /usr/bin/zsh
 
