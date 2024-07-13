@@ -28,6 +28,8 @@ pacman -S brightnessctl loginctl
 
 pacman -S hyprland hypridle hyprlock hyprpaper waybar wofi
 
+pacman -S atuin
+
 # systemctl --user enable --now hypridle.service
 
 # Fonts
