@@ -59,8 +59,6 @@ zinit light zsh-users/zsh-autosuggestions
 zinit snippet OMZP::colored-man-pages
 zinit snippet OMZP::git
 zinit snippet OMZP::gpg-agent
-zinit snippet OMZP::nvm
-zinit snippet OMZP::pyenv
 zinit snippet OMZP::ssh-agent
 
 # Not sure if this is something I like yet.
@@ -77,4 +75,5 @@ export LESS=" -R "
 
 # Shell integrations
 # eval "$(fzf --zsh)"
+eval "$(mise activate zsh)"
 eval "$(zoxide init zsh)"
