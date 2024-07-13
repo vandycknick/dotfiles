@@ -75,5 +75,6 @@ export LESS=" -R "
 
 # Shell integrations
 # eval "$(fzf --zsh)"
+eval "$(atuin init zsh)"
 eval "$(mise activate zsh)"
 eval "$(zoxide init zsh)"
