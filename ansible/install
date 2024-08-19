@@ -10,6 +10,6 @@ function have {
 have ansible || sudo pacman -S ansible
 
 # Run Ansible
+pushd ansible
 ansible-playbook -i ./hosts ./linux.yml --ask-become-pass
-
-# vim: ft=sh
+popd

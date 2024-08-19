@@ -1,0 +1,39 @@
+- name: Setup Linux Workstation
+  hosts: local
+  tasks:
+  - name: Update cache
+    community.general.pacman:
+      update_cache: true
+    become: true
+
+  - package:
+      name: "{{ item }}"
+      state: present
+    become: true
+    with_items:
+      - linux-headers
+
+      # Utilities
+      - brightnessctl
+
+      - hyprland
+      - hypridle
+      - hyprlock
+      - hyprpaper
+      - waybar
+      - wofi
+
+      - atuin
+      - jq
+      - yq
+      - zsh
+      - tmux
+      - ripgrep
+      - fzf
+      - fd
+      - bat
+      - eza
+      - tokei
+      - rsync
+      - less
+      - openssh
