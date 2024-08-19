@@ -5,7 +5,7 @@
   "margin": "0 0 5px 0",
   "exclusive": true,
   "modules-left": ["custom/arch", "hyprland/workspaces"],
-  "modules-center": ["hyprland/window"],
+  "modules-center": ["clock"],
   "modules-right": [
     "idle_inhibitor",
     "network",
@@ -13,7 +13,6 @@
     "backlight",
     "cpu",
     "battery",
-    "clock",
     "custom/exit",
   ],
 
