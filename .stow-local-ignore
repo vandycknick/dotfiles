@@ -25,3 +25,4 @@ _darcs
 # Custom
 \.editorconfig
 install.sh
+ansible
