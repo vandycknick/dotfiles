@@ -128,7 +128,7 @@ local terminal_defaults = {
   height = 15,
 }
 local terminal = nil
-vim.keymap.set({ 'n' }, '<M-h>', function()
+vim.keymap.set({ 'n' }, '<M-;>', function()
   if terminal == nil then
     vim.cmd 'split'
     vim.cmd 'terminal'
@@ -1066,26 +1066,6 @@ require('lazy').setup({
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
   },
-
-  -- I don't think I need this anymore
-  -- {
-  --   'willothy/nvim-cokeline',
-  --   dependencies = {
-  --     'nvim-lua/plenary.nvim', -- Required for v0.4.0+
-  --     'nvim-tree/nvim-web-devicons', -- If you want devicons
-  --   },
-  --   opts = {
-  --     sidebar = {
-  --       filetype = { 'NvimTree' },
-  --       components = {
-  --         {
-  --           text = '',
-  --           bg = 'TabLineFill',
-  --         },
-  --       },
-  --     },
-  --   },
-  -- },
 
   -- Config for nice nvim sql integration
   { 'tpope/vim-dadbod' },

@@ -52,7 +52,7 @@ bindings = [
     { key = "-",     mods = "Alt",     action = "DecreaseFontSize" },
     { key = "0",     mods = "Alt",     action = "ResetFontSize" },
 
-    { key = "h",     mods = "Alt",     chars = "\u001bh"},
+    { key = ";",     mods = "Alt",     chars = "\u001b;"},
     
     { key = "Right", mods = "Alt",     chars = "\u001bf" },
     { key = "Left",  mods = "Alt",     chars = "\u001bb" },
