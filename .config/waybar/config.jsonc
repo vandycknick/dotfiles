@@ -81,13 +81,13 @@
     },
     "rewrite": {
       "Firefox Web Browser": "Firefox",
-      "Foot Server": "Terminal",
     },
   },
 
   "clock": {
     "format": "{:%a %d %b %H:%M}",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "timezone": "Europe/Brussels",
     "on-click": "echo 'clock'",
     "exec": "echo 'clock'",
   },
