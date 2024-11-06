@@ -78,6 +78,12 @@ vim.opt.termguicolors = true
 
 vim.wo.relativenumber = true
 
+vim.opt.foldmethod = 'expr'
+vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.opt.foldenable = false
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 1
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
