@@ -22,6 +22,7 @@ alias tms="tmux-sessionizer"
 alias ls="eza --git"
 alias tree="eza --tree --long --ignore-glob .git"
 alias cat="bat"
+alias k="kubectl"
 
 # MacOS alias overrides
 if [[ "$OSTYPE" == "darwin"* ]]; then
