@@ -572,7 +572,7 @@ require('lazy').setup({
         pyright = {},
         rust_analyzer = {},
 
-        tsserver = {
+        ts_ls = {
           root_dir = util.root_pattern 'package.json',
           single_file_support = false,
           settings = {
