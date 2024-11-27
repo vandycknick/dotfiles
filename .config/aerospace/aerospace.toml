@@ -43,8 +43,8 @@ key-mapping.preset = 'qwerty'
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 [workspace-to-monitor-force-assignment]
-1 = ['pl2730h', 'DELL S2722QC', 'main']
-2 = ['pl2730h', 'DELL S2722QC', 'main']
+1 = ['pl2730h', 'DELL S2722QC', 'DELL S2722DC', 'main']
+2 = ['pl2730h', 'DELL S2722QC', 'DELL S2722DC', 'main']
 3 = ['ple2482h', 'Sidecar Display', 'main']
 4 = ['main']
 
@@ -82,6 +82,7 @@ alt-shift-l = 'move right'
 
 alt-f = 'fullscreen'
 
+alt-x = 'layout h_tiles'
 alt-s = 'layout v_accordion' # 'layout stacking' in i3
 alt-w = 'layout h_accordion' # 'layout tabbed' in i3
 alt-e = 'layout tiles horizontal vertical' # 'layout toggle split' in i3

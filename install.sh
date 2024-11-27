@@ -68,6 +68,6 @@ yay -S mise
 chsh nickvd -s /usr/bin/zsh
 
 # Install ohmyzsh plugins
-git clone git@github.com:ohmyzsh/ohmyzsh.git ~/.config/ohmyzsh
-git clone https://github.com/zsh-users/zsh-autosuggestions ~/.config/shell/custom/plugins/zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting ~/.config/shell/custom/plugins/zsh-syntax-highlighting
+# git clone git@github.com:ohmyzsh/ohmyzsh.git ~/.config/ohmyzsh
+# git clone https://github.com/zsh-users/zsh-autosuggestions ~/.config/shell/custom/plugins/zsh-autosuggestions
+# git clone https://github.com/zsh-users/zsh-syntax-highlighting ~/.config/shell/custom/plugins/zsh-syntax-highlighting
