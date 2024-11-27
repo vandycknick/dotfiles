@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+set -eo pipefail
+
+sel_context=$(kubectl config get-contexts --no-headers=true --output=name | gum choose)
+
+kubectl config use-context "$sel_context"
