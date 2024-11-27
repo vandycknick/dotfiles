@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [ "$#" -eq 0 ]; then
+    printf '\e[31m' >&2
+    printf "No arguments provided, use --help for more information \n" >&2
+    printf '\e[0m' >&2
+    exit 1
+fi
+
+CONTEXT=""
+NODE_NAME=""
+HELP=false
+
+set +u
+AWS_PROFILE="$AWS_PROFILE"
+set -u
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -p|--profile)
+      AWS_PROFILE="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    --context)
+      CONTEXT="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -n|--node)
+      NODE_NAME="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    -h|--help)
+      HELP=true
+      shift # past argument
+      ;;
+    -*|--*)
+      echo "Unknown option $1"
+      exit 1
+      ;;
+    *)
+      POSITIONAL_ARGS+=("$1") # save positional arg
+      shift # past argument
+      ;;
+  esac
+done
+
+if [ "$HELP" = true ]; then
+        cat <<EOF
+kubectl-ec2:
+  Utility to login to an AWS managed node based on the Kubernetes node name.
+  Requires that the aws cli and the session manager plugin is installed.
+
+Usage:
+  kubectl-ec2 [options]
+  kubectl ec2 [options]
+
+Options:
+  --context                      The name of the kubeconfig context to use.
+  -p, --profile                  The name of the AWS profile to use.
+  -n, --node                     The name of the node to connect to.
+  -h, --help                     Show help and usage information.
+EOF
+    exit 0
+fi
+
+if ! command -v aws 2>&1 >/dev/null; then
+    printf '\e[3 aws' >&2
+    printf 'aws cli not installed!\n\n' >&2
+    printf 'Run `brew install awscli` or check https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html.\n' >&2
+    printf '\e[0m' >&2
+    exit 1
+fi
+
+if ! command -v session-manager-plugin 2>&1 >/dev/null; then
+    printf '\e[31m' >&2
+    printf 'session-manager-plugin not installed!\n\n' >&2
+    printf 'Run `brew install session-manager-plugin` or check https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html.\n' >&2
+    printf '\e[0m' >&2
+    exit 1
+fi
+
+if [ -z "$NODE_NAME" ]; then
+    printf '\e[31m' >&2
+    printf -- '--node is required\n' >&2
+    printf '\e[0m' >&2
+    exit 1
+fi
+
+node_provider_id=$(kubectl --context="${CONTEXT:-$(kubectl config current-context)}" get node "$NODE_NAME" -o yaml | yq '.spec.providerID')
+
+if [[ "$node_provider_id" =~ ^aws:\/\/ ]]; then
+  instance_id=$(echo "$node_provider_id" | awk -F/ '$NF ~ /^i-/ { printf "%s ", $NF }' | tr -d '\n ')
+
+  if [ -n "$instance_id" ]; then
+    AWS_PROFILE="$AWS_PROFILE" aws ssm start-session --target "$instance_id"
+  else
+    echo "Node is not an EC2 instance!"
+    exit 1
+  fi
+else
+  echo "Node is not running on AWS!" 1>&2;
+  exit 1
+fi
