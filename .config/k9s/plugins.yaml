@@ -1,0 +1,30 @@
+plugins:
+
+  ec2-shell:
+    shortCut: s
+    confirm: false
+    description: "Shell <node>"
+    scopes:
+      - node
+    command: bash
+    background: false
+    args:
+      - -c
+      - >-
+        PROFILE=$(CONTEXT="$CONTEXT" yq '.clusters[] | select(.name == (strenv(CONTEXT) | trim)) | .awsProfile' ~/.kube/aws-config-map);
+        kubectl-ec2 --context $CONTEXT --profile "${PROFILE:-$AWS_PROFILE}" --node $NAME
+
+  #--- Create debug container for selected pod in current namespace
+  # See https://kubernetes.io/docs/tasks/debug/debug-application/debug-running-pod/#ephemeral-container
+  debug:
+    shortCut: Shift-D
+    description: Add debug container
+    dangerous: true
+    scopes:
+      - containers
+    command: bash
+    background: false
+    confirm: true
+    args:
+      - -c
+      - "kubectl --kubeconfig=$KUBECONFIG debug -it --context $CONTEXT -n=$NAMESPACE $POD --target=$NAME --image=nicolaka/netshoot:v0.13 --share-processes -- bash"
