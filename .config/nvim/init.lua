@@ -217,7 +217,7 @@ vim.opt.rtp:prepend(lazypath)
 --  To update plugins you can run
 --    :Lazy update
 --
--- NOTE: Here is where you install your plugins.
+-- NOTE: This is where plugins get installed and configured
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
@@ -249,6 +249,60 @@ require('lazy').setup({
         topdelete = { text = '‾' },
         changedelete = { text = '~' },
       },
+      -- I use custom signs for new changes, when they are staged I fall back to the default
+      -- iconography. Just trying this out, and see what it does.
+      -- signs_staged = {},
+      signs_staged_enable = true,
+      on_attach = function(bufnr)
+        local gitsigns = require 'gitsigns'
+
+        local function map(mode, l, r, opts)
+          opts = opts or {}
+          opts.buffer = bufnr
+          vim.keymap.set(mode, l, r, opts)
+        end
+
+        -- Navigation
+        map('n', ']c', function()
+          if vim.wo.diff then
+            vim.cmd.normal { ']c', bang = true }
+          else
+            gitsigns.nav_hunk 'next'
+          end
+        end, { desc = 'Jump to next git [c]hange' })
+
+        map('n', '[c', function()
+          if vim.wo.diff then
+            vim.cmd.normal { '[c', bang = true }
+          else
+            gitsigns.nav_hunk 'prev'
+          end
+        end, { desc = 'Jump to previous git [c]hange' })
+
+        -- Actions
+        -- visual mode
+        map('v', '<leader>hs', function()
+          gitsigns.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
+        end, { desc = 'stage git hunk' })
+        map('v', '<leader>hr', function()
+          gitsigns.reset_hunk { vim.fn.line '.', vim.fn.line 'v' }
+        end, { desc = 'reset git hunk' })
+        -- normal mode
+        map('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'git [s]tage hunk' })
+        map('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'git [r]eset hunk' })
+        map('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'git [S]tage buffer' })
+        map('n', '<leader>hu', gitsigns.undo_stage_hunk, { desc = 'git [u]ndo stage hunk' })
+        map('n', '<leader>hR', gitsigns.reset_buffer, { desc = 'git [R]eset buffer' })
+        map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'git [p]review hunk' })
+        map('n', '<leader>hb', gitsigns.blame_line, { desc = 'git [b]lame line' })
+        map('n', '<leader>hd', gitsigns.diffthis, { desc = 'git [d]iff against index' })
+        map('n', '<leader>hD', function()
+          gitsigns.diffthis '@'
+        end, { desc = 'git [D]iff against last commit' })
+        -- Toggles
+        map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line' })
+        map('n', '<leader>tD', gitsigns.toggle_deleted, { desc = '[T]oggle git show [D]eleted' })
+      end,
     },
   },
   {
@@ -1096,6 +1150,18 @@ require('lazy').setup({
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup(opts)
 
+      local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
+      parser_config.log_insights_query = {
+        install_info = {
+          url = '/Users/nickvd/Projects/tree-sitter-log-insights-query', -- local path or git repo
+          files = { 'src/parser.c' }, -- note that some parsers also require src/scanner.c or src/scanner.cc
+          -- optional entries:
+          -- branch = 'main', -- default branch in case of git repo if different from master
+          generate_requires_npm = false, -- if stand-alone parser without npm dependencies
+          requires_generate_from_grammar = false, -- if folder contains pre-generated src/parser.c
+        },
+        filetype = 'lq', -- if filetype does not match the parser name
+      }
       -- There are additional nvim-treesitter modules that you can use to interact
       -- with nvim-treesitter. You should go explore a few and see what interests you:
       --
@@ -1161,29 +1227,6 @@ require('lazy').setup({
       require('dashboard').setup(opts)
     end,
   },
-
-  -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
-  -- init.lua. If you want these files, they are in the repository, so you can just download them and
-  -- place them in the correct locations.
-
-  -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
-  --
-  --  Here are some example plugins that I've included in the Kickstart repository.
-  --  Uncomment any of the lines below to enable them (you will need to restart nvim).
-  --
-  -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
-  -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
-
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    This is the easiest way to modularize your config.
-  --
-  --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
