@@ -4,9 +4,6 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = true
-
 -- [[ Setting options ]]
 -- See `:help vim.opt`
 -- NOTE: You can change these options as you wish!
@@ -78,6 +75,7 @@ vim.opt.termguicolors = true
 
 vim.wo.relativenumber = true
 
+-- This does exactly what I want. But I have no idea what it does anymore nor do I know where I found this little trick.
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.opt.foldenable = false
@@ -105,7 +103,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
--- TIP: Disable arrow keys in normal mode
+-- Disable arrow keys in normal mode
 vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
 vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
@@ -133,6 +131,7 @@ vim.keymap.set('n', '<leader>tr', '<cmd> set rnu! <CR>', { desc = 'Toggle relati
 local terminal_defaults = {
   height = 15,
 }
+
 local terminal = nil
 vim.keymap.set({ 'n' }, '<M-;>', function()
   if terminal == nil then
@@ -218,7 +217,7 @@ vim.opt.rtp:prepend(lazypath)
 --    :Lazy update
 --
 -- NOTE: This is where plugins get installed and configured
-require('lazy').setup({
+require('lazy').setup {
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
@@ -325,21 +324,16 @@ require('lazy').setup({
   { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
-    config = function() -- This is the function that runs, AFTER loading
-      require('which-key').setup()
-
-      -- Document existing key chains
-      require('which-key').add {
-        { '<leader>c', group = '[C]ode' },
-        { '<leader>d', group = '[D]ocument' },
-        { '<leader>h', group = 'Git [H]unk' },
-        { '<leader>r', group = '[R]ename' },
-        { '<leader>s', group = '[S]earch' },
-        { '<leader>t', group = '[T]oggle' },
-        { '<leader>w', group = '[W]orkspace' },
-        { '<leader>h', desc = 'Git [H]unk', mode = 'v' },
-      }
-    end,
+    -- Document existing key chains
+    spec = {
+      { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
+      { '<leader>d', group = '[D]ocument' },
+      { '<leader>r', group = '[R]ename' },
+      { '<leader>s', group = '[S]earch' },
+      { '<leader>w', group = '[W]orkspace' },
+      { '<leader>t', group = '[T]oggle' },
+      { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+    },
   },
 
   -- NOTE: Plugins can specify dependencies.
@@ -371,7 +365,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons', enabled = true },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -500,8 +494,9 @@ require('lazy').setup({
           --
           -- In this case, we create a function that lets us more easily define mappings specific
           -- for LSP related items. It sets the mode, buffer and description for us each time.
-          local map = function(keys, func, desc)
-            vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+          local map = function(keys, func, desc, mode)
+            mode = mode or 'n'
+            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
 
           -- Jump to the definition of the word under your cursor.
@@ -535,7 +530,7 @@ require('lazy').setup({
 
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
-          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
 
           -- Opens a popup that displays documentation about the word under your cursor
           --  See `:help K` for why this keymap.
@@ -551,7 +546,7 @@ require('lazy').setup({
           --
           -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client.server_capabilities.documentHighlightProvider then
+          if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight) then
             local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
               buffer = event.buf,
@@ -578,13 +573,21 @@ require('lazy').setup({
           -- code, if the language server you are using supports them
           --
           -- This may be unwanted, since they displace some of your code
-          if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+          if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
             map('<leader>th', function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, '[T]oggle Inlay [H]ints')
           end
         end,
       })
+
+      -- Change diagnostic symbols in the sign column (gutter)
+      local signs = { ERROR = '', WARN = '', INFO = '', HINT = '' }
+      local diagnostic_signs = {}
+      for type, icon in pairs(signs) do
+        diagnostic_signs[vim.diagnostic.severity[type]] = icon
+      end
+      vim.diagnostic.config { signs = { text = diagnostic_signs } }
 
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
@@ -732,23 +735,6 @@ require('lazy').setup({
     end,
   },
 
-  -- {
-  --   'linux-cultist/venv-selector.nvim',
-  --   dependencies = { 'neovim/nvim-lspconfig', 'nvim-telescope/telescope.nvim' },
-  --   opts = {
-  --     -- Your options go here
-  --     -- name = "venv",
-  --     -- auto_refresh = false
-  --   },
-  --   event = 'VeryLazy', -- Optional: needed only if you want to type `:VenvSelect` without a keymapping
-  --   keys = {
-  --     -- Keymap to open VenvSelector to pick a venv.
-  --     { '<leader>vs', '<cmd>VenvSelect<cr>' },
-  --     -- Keymap to retrieve the venv from a cache (the one previously used for the same project directory).
-  --     { '<leader>vc', '<cmd>VenvSelectCached<cr>' },
-  --   },
-  -- },
-
   { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -757,22 +743,28 @@ require('lazy').setup({
       {
         '<leader>f',
         function()
-          require('conform').format { async = true, lsp_fallback = true }
+          require('conform').format { async = true, lsp_format = 'fallback' }
         end,
         mode = '',
         desc = '[F]ormat buffer',
       },
     },
     opts = {
-      notify_on_error = false,
+      notify_on_error = true,
       format_on_save = function(bufnr)
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = true, cpp = true }
+        local lsp_format_opt
+        if disable_filetypes[vim.bo[bufnr].filetype] then
+          lsp_format_opt = 'never'
+        else
+          lsp_format_opt = 'fallback'
+        end
         return {
           timeout_ms = 500,
-          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+          lsp_format = lsp_format_opt,
         }
       end,
       formatters_by_ft = {
@@ -785,11 +777,11 @@ require('lazy').setup({
 
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        markdown = { 'prettierd', 'prettier' },
-        jsonc = { 'prettierd', 'prettier' },
-        javascript = { 'prettierd', 'prettier' },
-        typescript = { 'prettierd', 'prettier' },
-        typescriptreact = { 'prettierd', 'prettier' },
+        markdown = { 'prettierd', 'prettier', stop_after_first = true },
+        jsonc = { 'prettierd', 'prettier', stop_after_first = true },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
       },
     },
   },
@@ -935,9 +927,43 @@ require('lazy').setup({
       },
       overrides = function(colors)
         local theme = colors.theme
+        local makeDiagnosticColor = function(color)
+          local c = require 'kanagawa.lib.color'
+          return { fg = color, bg = c(color):blend(theme.ui.bg, 0.95):to_hex() }
+        end
         return {
+          NormalFloat = { bg = theme.ui.bg_dim },
+          FloatBorder = { bg = theme.ui.bg_dim },
+          -- Save an hlgroup with dark background and dimmed foreground
+          -- so that you can use it where your still want darker windows.
+          -- E.g.: autocmd TermOpen * setlocal winhighlight=Normal:NormalDark
+          NormalDark = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m3 },
+
+          -- -- Popular plugins that open floats will link to NormalFloat by default;
+          -- -- set their background accordingly if you wish to keep them dark and borderless
+          LazyNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
+          MasonNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
+
           TabLine = { bg = theme.ui.bg_m3, fg = theme.ui.special },
           TabLineFill = { bg = theme.ui.bg_m1 },
+
+          TelescopeTitle = { fg = theme.ui.special, bold = true },
+          TelescopePromptNormal = { bg = theme.ui.bg_p1 },
+          TelescopePromptBorder = { fg = theme.ui.bg_p1, bg = theme.ui.bg_p1 },
+          TelescopeResultsNormal = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m1 },
+          TelescopeResultsBorder = { fg = theme.ui.bg_m1, bg = theme.ui.bg_m1 },
+          TelescopePreviewNormal = { bg = theme.ui.bg_dim },
+          TelescopePreviewBorder = { bg = theme.ui.bg_dim, fg = theme.ui.bg_dim },
+
+          Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 },
+          PmenuSel = { fg = 'NONE', bg = theme.ui.bg_p2 },
+          PmenuSbar = { bg = theme.ui.bg_m1 },
+          PmenuThumb = { bg = theme.ui.bg_p2 },
+
+          DiagnosticVirtualTextHint = makeDiagnosticColor(theme.diag.hint),
+          DiagnosticVirtualTextInfo = makeDiagnosticColor(theme.diag.info),
+          DiagnosticVirtualTextWarn = makeDiagnosticColor(theme.diag.warning),
+          DiagnosticVirtualTextError = makeDiagnosticColor(theme.diag.error),
         }
       end,
     },
@@ -1078,7 +1104,7 @@ require('lazy').setup({
 
       local statusline = require 'mini.statusline'
       statusline.setup {
-        use_icons = vim.g.have_nerd_font,
+        use_icons = true,
         content = {
           -- Default active content: https://github.com/echasnovski/mini.nvim/blob/a8185957febe7dae31556dbd7326cfa597b812f1/lua/mini/statusline.lua#L606
           active = function()
@@ -1162,11 +1188,26 @@ require('lazy').setup({
   {
     'MeanderingProgrammer/render-markdown.nvim',
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
+    ft = { 'markdown' },
     opts = {
+      file_types = { 'markdown' },
       heading = {
         enabled = true,
         sign = true,
         icons = {},
+      },
+      overrides = {
+        buftype = {
+          nofile = {
+            code = {
+              style = 'full',
+              left_pad = 0,
+              right_pad = 0,
+              disable_background = true,
+              border = 'none',
+            },
+          },
+        },
       },
     },
   },
@@ -1177,78 +1218,56 @@ require('lazy').setup({
   { 'kristijanhusak/vim-dadbod-ui' },
 
   {
-    'nvimdev/dashboard-nvim',
-    -- event = 'VimEnter',
-    -- TODO investigate if I can reuse Vimenter at some point
-    -- Using vim enter currently breaks opening stuff from stdin eg:
-    -- ls -alh | vim -
-    lazy = false,
+    'folke/snacks.nvim',
     priority = 1000,
+    lazy = false,
     opts = {
-      theme = 'hyper',
-      config = {
-        shortcut = {
-          { desc = '󰊳 Update', group = '@property', action = 'Lazy update', key = 'u' },
-          {
-            icon = ' ',
-            icon_hl = '@variable',
-            desc = 'Files',
-            group = 'Label',
-            action = 'Telescope find_files',
-            key = 'f',
-          },
-          {
-            desc = ' Apps',
-            group = 'DiagnosticHint',
-            action = 'Telescope app',
-            key = 'a',
-          },
-          {
-            desc = ' dotfiles',
-            group = 'Number',
-            action = 'Telescope dotfiles',
-            key = 'd',
-          },
+      -- https://github.com/folke/snacks.nvim/blob/main/docs/dashboard.md
+      dashboard = {
+        enabled = true,
+        preset = {
+          pick = 'telescope.nvim',
+          header = [[
+  ███╗   ██╗██╗   ██╗██████╗
+    ████╗  ██║██║   ██║██╔══██╗
+    ██╔██╗ ██║██║   ██║██║  ██║
+    ██║╚██╗██║╚██╗ ██╔╝██║  ██║
+    ██║ ╚████║ ╚████╔╝ ██████╔╝
+  ╚═╝  ╚═══╝  ╚═══╝  ╚═════╝
+            ]],
         },
       },
+
+      lazygit = {
+        enabled = true,
+        configure = true,
+      },
     },
-    config = function(_, opts)
-      local logo = [[
-      ███╗   ██╗██╗   ██╗██████╗
-      ████╗  ██║██║   ██║██╔══██╗
-      ██╔██╗ ██║██║   ██║██║  ██║
-      ██║╚██╗██║╚██╗ ██╔╝██║  ██║
-      ██║ ╚████║ ╚████╔╝ ██████╔╝
-      ╚═╝  ╚═══╝  ╚═══╝  ╚═════╝
-      ]]
-
-      logo = string.rep('\n', 8) .. logo .. '\n\n'
-
-      opts.config.header = vim.split(logo, '\n')
-      require('dashboard').setup(opts)
-    end,
-  },
-}, {
-  ui = {
-    -- If you are using a Nerd Font: set icons to an empty table which will use the
-    -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
-    icons = vim.g.have_nerd_font and {} or {
-      cmd = '⌘',
-      config = '🛠',
-      event = '📅',
-      ft = '📂',
-      init = '⚙',
-      keys = '🗝',
-      plugin = '🔌',
-      runtime = '💻',
-      require = '🌙',
-      source = '📄',
-      start = '🚀',
-      task = '📌',
-      lazy = '💤 ',
+    keys = {
+      {
+        '<leader>gf',
+        function()
+          Snacks.lazygit.log_file()
+        end,
+        desc = 'Lazygit Current File History',
+      },
+      {
+        '<leader>gg',
+        function()
+          Snacks.lazygit()
+        end,
+        desc = 'Lazygit',
+      },
+      {
+        '<leader>gl',
+        function()
+          Snacks.lazygit.log()
+        end,
+        desc = 'Lazygit Log (cwd)',
+      },
     },
   },
-})
+}
 
 -- Use a single status line
 -- It's the last vim.opt config because adding in the same place the other options are defined didn't work.
