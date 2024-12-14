@@ -11,9 +11,9 @@ vim.g.maplocalleader = ' '
 
 -- Make line numbers default
 vim.opt.number = true
--- You can also add relative line numbers, to help with jumping.
---  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+
+-- Relative line numbers, to help with jumping.
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -72,8 +72,6 @@ vim.opt.scrolloff = 10
 vim.opt.cmdheight = 0
 
 vim.opt.termguicolors = true
-
-vim.wo.relativenumber = true
 
 -- This does exactly what I want. But I have no idea what it does anymore nor do I know where I found this little trick.
 vim.opt.foldmethod = 'expr'
