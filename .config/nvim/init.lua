@@ -93,10 +93,7 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagn
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
--- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
--- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
--- is not what someone will guess without a bit more experience.
---
+-- INFO: Better terminal escaping.
 -- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
@@ -126,41 +123,53 @@ vim.keymap.set('n', '<C-s>', '<cmd> w <CR>', { desc = 'Save file.' })
 vim.keymap.set('n', '<leader>tr', '<cmd> set rnu! <CR>', { desc = 'Toggle relative number' })
 
 -- Open Terminal Window
-local terminal_defaults = {
-  height = 15,
+local terminal = {
+  tabs = {},
+  buf = nil,
+  height = 10,
 }
 
-local terminal = nil
 vim.keymap.set({ 'n' }, '<M-;>', function()
-  if terminal == nil then
-    vim.cmd 'split'
-    vim.cmd 'terminal'
-    terminal = {
-      visible = false,
-      win = vim.api.nvim_get_current_win(),
-      buf = vim.api.nvim_get_current_buf(),
-      height = terminal_defaults.height,
-    }
-  end
+  local current_tab = vim.api.nvim_get_current_tabpage()
+  -- local id = vim.v.count1
 
-  if terminal.win ~= nil and vim.api.nvim_win_is_valid(terminal.win) == false then
-    terminal.win = nil
-    terminal.visible = false
-  end
+  if terminal.tabs[current_tab] == nil then
+    vim.cmd.split()
+    local current_win = vim.api.nvim_get_current_win()
 
-  if terminal.visible == true then
-    terminal.height = vim.api.nvim_win_get_height(terminal.win)
-    vim.api.nvim_win_close(terminal.win, false)
-    terminal.win = nil
-    terminal.visible = false
-  else
-    if terminal.win == nil then
-      vim.cmd 'split'
-      terminal.win = vim.api.nvim_get_current_win()
+    if terminal.buf == nil then
+      vim.cmd.terminal()
+      terminal.buf = vim.api.nvim_get_current_buf()
+    else
+      vim.api.nvim_win_set_buf(current_win, terminal.buf)
     end
-    vim.api.nvim_win_set_height(terminal.win, terminal.height)
-    vim.api.nvim_win_set_buf(terminal.win, terminal.buf)
-    terminal.visible = true
+
+    -- vim.wo.winbar = id .. ': %{b:term_title}'
+    terminal.tabs[current_tab] = {
+      visible = true,
+      win = current_win,
+    }
+    return
+  end
+
+  local terminal_tab = terminal.tabs[current_tab]
+
+  -- CTRL-W_c closes a window, I could attach a listener for this
+  -- but I thought this was less lines of code. I just check if the window handle
+  -- that I have is still valid. If it isn't I just clear it and create a new window later.
+  if terminal_tab.win ~= nil and vim.api.nvim_win_is_valid(terminal_tab.win) == false then
+    terminal_tab.win = nil
+  end
+
+  if terminal_tab.win ~= nil then
+    terminal_tab.height = vim.api.nvim_win_get_height(terminal_tab.win)
+    vim.api.nvim_win_close(terminal_tab.win, false)
+    terminal_tab.win = nil
+  else
+    vim.cmd.split()
+    terminal_tab.win = vim.api.nvim_get_current_win()
+    vim.api.nvim_win_set_height(terminal_tab.win, terminal_tab.height)
+    vim.api.nvim_win_set_buf(terminal_tab.win, terminal.buf)
   end
 end, { desc = 'Toggle Terminal Window.' })
 
@@ -180,18 +189,23 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 vim.api.nvim_create_autocmd('TermOpen', {
   desc = 'remove line numbers in terminal',
-  group = vim.api.nvim_create_augroup('kickstart-term-open', { clear = true }),
+  group = vim.api.nvim_create_augroup('nvd-term-open', { clear = true }),
   callback = function()
-    vim.wo.relativenumber = false
     vim.wo.number = false
+    vim.wo.relativenumber = false
+    vim.wo.statuscolumn = ''
+    -- vim.wo.signcolumn = 'no'
+    ---@diagnostic disable-next-line: missing-fields
+    vim.opt.listchars = { space = ' ' }
   end,
 })
 
 vim.api.nvim_create_autocmd('TermClose', {
   desc = 'Close window when terminal job ends',
-  group = vim.api.nvim_create_augroup('kickstart-term-close', { clear = true }),
+  group = vim.api.nvim_create_augroup('nvd-term-close', { clear = true }),
   callback = function()
-    terminal = nil
+    terminal.tabs = {}
+    terminal.buf = nil
   end,
 })
 
@@ -215,6 +229,7 @@ vim.opt.rtp:prepend(lazypath)
 --    :Lazy update
 --
 -- NOTE: This is where plugins get installed and configured
+---@diagnostic disable-next-line: missing-fields
 require('lazy').setup {
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
