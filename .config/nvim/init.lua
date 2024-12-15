@@ -1220,6 +1220,11 @@ require('lazy').setup {
     priority = 1000,
     lazy = false,
     opts = {
+      bigfile = {
+        enabled = true,
+        notify = true, -- show notification when big file detected
+        size = 1.5 * 1024 * 1024, -- 1.5MB
+      },
       -- https://github.com/folke/snacks.nvim/blob/main/docs/dashboard.md
       dashboard = {
         enabled = true,
