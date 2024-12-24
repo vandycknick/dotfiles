@@ -195,9 +195,6 @@ vim.api.nvim_create_autocmd('TermOpen', {
     vim.wo.number = false
     vim.wo.relativenumber = false
     vim.wo.statuscolumn = ''
-    -- vim.wo.signcolumn = 'no'
-    ---@diagnostic disable-next-line: missing-fields
-    vim.opt.listchars = { space = ' ' }
   end,
 })
 
@@ -245,7 +242,7 @@ require('lazy').setup {
   --    require('Comment').setup({})
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  { 'numToStr/Comment.nvim' },
 
   -- Github: https://github.com/lewis6991/gitsigns.nvim
   -- See `:help gitsigns` to understand what the configuration keys do
