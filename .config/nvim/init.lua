@@ -79,6 +79,8 @@ vim.opt.foldenable = false
 vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 1
 
+vim.opt.laststatus = 3
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -1285,10 +1287,6 @@ require('lazy').setup {
     },
   },
 }
-
--- Use a single status line
--- It's the last vim.opt config because adding in the same place the other options are defined didn't work.
-vim.opt.laststatus = 3 -- global statusline
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
