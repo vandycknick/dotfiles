@@ -461,7 +461,7 @@ require('lazy').setup {
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim', opts = {} },
+      -- { 'j-hui/fidget.nvim', opts = {} },
 
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
@@ -955,6 +955,8 @@ require('lazy').setup {
           LazyNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
           MasonNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
 
+          NoiceCmdlinePopup = { bg = theme.ui.bg_dim },
+
           TabLine = { bg = theme.ui.bg_m3, fg = theme.ui.special },
           TabLineFill = { bg = theme.ui.bg_m1 },
 
@@ -1194,6 +1196,21 @@ require('lazy').setup {
       --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
       --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
     end,
+  },
+
+  {
+    'folke/noice.nvim',
+    event = 'VeryLazy',
+    opts = {
+      cmdline = {
+        enabled = true,
+        view = 'cmdline_popup', -- cmdline: classic bottom noice themed command line, cmdline_popup: commandline popup
+      },
+    },
+    -- INFO: Not using nvim-notify here, this makes noice fallback to mini. I prefer the mini style notifications, they are less intrusive.
+    dependencies = {
+      'MunifTanjim/nui.nvim',
+    },
   },
 
   {
