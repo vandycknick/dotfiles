@@ -1,0 +1,9 @@
+font-family = "JetBrainsMono Nerd Font"
+theme = "Kanagawa Wave"
+window-decoration = "false"
+background-opacity = 0.97
+
+keybind = alt+v=paste_from_clipboard
+keybind = alt+c=copy_to_clipboard
+keybind = alt+right=text:\x1bf
+keybind = alt+left=text:\x1bb
