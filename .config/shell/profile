@@ -27,7 +27,7 @@ export LC_ALL=en_US.UTF-8
 # Default programs:
 export EDITOR="nvim"
 export TERMINAL="alacritty"
-export BROWSER="firefox"
+export BROWSER="Zen"
 
 # XDG Configuration
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -49,14 +49,6 @@ export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
 export PATH="$PATH:$CARGO_HOME/bin"
 
 # Dotnet:
-# TODO: Move this out of $HOME at some point
-# The following allows relocating some of it, but dotnet will still put files in .dotnet
-# https://github.com/dotnet/sdk/blob/870254bacc3f169789b679e6e39420875b5d9b56/src/Cli/Microsoft.DotNet.Configurer/CliFolderPathCalculator.cs#L14
-# export DOTNET_CLI_HOME="$DOTNET_INSTALL_DIR"
-export DOTNET_INSTALL_DIR="$HOME/.dotnet"
-export DOTNET_ROOT="$DOTNET_INSTALL_DIR"
-export PATH="$PATH:$DOTNET_INSTALL_DIR:$DOTNET_INSTALL_DIR/tools"
-
 export NUGET_PACKAGES="$XDG_CACHE_HOME/NuGet/packages"
 export NUGET_PLUGINS_CACHE_PATH="$XDG_CACHE_HOME/NuGet/plugins-cache"
 
@@ -80,6 +72,3 @@ export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME/npm/npmrc"
 
 # Deno
 export DENO_INSTALL_ROOT="$XDG_BIN_HOME/.."
-
-# Indicate profile loaded
-export PROFILE_LOADED=1

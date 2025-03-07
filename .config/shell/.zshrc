@@ -20,18 +20,6 @@ fi
 # Zsh
 ZDOTDIR="$HOME/.config/shell"
 
-# Set the directory we want to store zinit and plugins
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-
-# Download Zinit, if it's not there yet
-if [ ! -d "$ZINIT_HOME" ]; then
-  mkdir -p "$(dirname $ZINIT_HOME)"
-  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-fi
-
-# Source/Load zinit
-source "${ZINIT_HOME}/zinit.zsh"
-
 # History in cache directory:
 HISTSIZE=10000000
 SAVEHIST=10000000
@@ -43,38 +31,47 @@ fi
 
 # ZSH="$HOME/.config/ohmyzsh"
 ZSH_CUSTOM="$ZDOTDIR/custom"
-ZSH_THEME=$([[ "$ID" == "kali" ]] && echo "kali-linux" || echo "nickvd")
 
-# Load completions
-autoload -Uz compinit && compinit
-zinit cdreplay -q
-
-export ZSH_COMPDUMP="$HOME/.cache/shell/.zcompdump-${HOST/.*/}-${ZSH_VERSION}"
-
-zinit light ohmyzsh/ohmyzsh
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-autosuggestions
-
-zinit snippet OMZP::colored-man-pages
-zinit snippet OMZP::git
-zinit snippet OMZP::gpg-agent
-zinit snippet OMZP::ssh-agent
-
-# Not sure if this is something I like yet.
-# eval "$(starship init zsh)"
+# Colors
+autoload -Uz colors && colors
+PROMPT="%{$fg[cyan]%}%c%{$reset_color%} %(?:%{$fg_bold[green]%}❱ :%{$fg_bold[red]%}❱ )%{$reset_color%}"
 
 # Settings
 export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s"
 export LESS=" -R "
 
-# Load aliases and shortcuts if existent.
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/shortcutrc" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/shortcutrc"
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliasrc" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/aliasrc"
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}/shell/zshnameddirrc" ] && source "${XDG_CONFIG_HOME:-$HOME/.config}/shell/zshnameddirrc"
+# Aliases
+[ -x "$(command -v nvim)" ] && alias vim="nvim" vimdiff="nvim -d"
+
+alias \
+    cp="cp -iv" \
+    mv="mv -iv" \
+    rm="rm -vI" \
+    bc="bc -ql" \
+    mkd="mkdir -pv" \
+    ip="ip --color=auto"
+
+alias tfs="tfswitch -b /home/nickvd/.local/bin/terraform"
+
+alias myip="dig txt ch +short whoami.cloudflare @1.1.1.1"
+alias myip6="dig txt ch +short whoami.cloudflare @2606:4700:4700::1111"
+alias tun0="ip -o -4 addr list tun0 | awk -F ' *|/' '{print \$4}'"
+alias path="echo \$PATH | sed 's/:/\n/g'"
+alias tms="tmux-sessionizer"
+alias ls="eza --git"
+alias tree="eza --tree --long --ignore-glob .git"
+alias cat="bat"
+alias k="kubectl"
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    alias clip="pbcopy"
+else
+    alias clip="xclip -selection clipboard"
+    alias clip="wl-copy"
+    alias open=xdg-open
+fi
 
 # Shell integrations
-# eval "$(fzf --zsh)"
 eval "$(atuin init zsh)"
 eval "$(mise activate zsh)"
 eval "$(zoxide init zsh)"
