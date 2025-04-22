@@ -60,7 +60,7 @@
 
 ## which style to use
 ## possible values: auto, full, compact
-# style = "auto"
+style = "full"
 
 ## the maximum number of lines the interface should take up
 ## set it to 0 to always go full screen
@@ -123,7 +123,7 @@
 # show_help = true
 
 ## Configure whether or not to show tabs for search and inspect
-# show_tabs = true
+show_tabs = true
 
 ## Defaults to true. This matches history against a set of default regex, and will not save it if we get a match. Defaults include
 ## 1. AWS key id
@@ -131,7 +131,7 @@
 ## 3. Slack oauth tokens (bot, user)
 ## 4. Slack webhooks
 ## 5. Stripe live/test keys
-# secrets_filter = true
+secrets_filter = true
 
 ## Defaults to true. If enabled, upon hitting enter Atuin will immediately execute the command. Press tab to return to the shell and edit.
 # This applies for new installs. Old installs will keep the old behaviour unless configured otherwise.
@@ -209,7 +209,7 @@ records = true
 ## possible values: auto, static
 ## auto: length of the selected command.
 ## static: length of the longest command stored in the history.
-# strategy = "auto"
+strategy = "auto"
 
 [daemon]
 ## Enables using the daemon to sync. Requires the daemon to be running in the background. Start it with `atuin daemon`
