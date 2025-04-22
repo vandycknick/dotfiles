@@ -1,0 +1,39 @@
+packages:
+  - ansible
+  - awscli
+  - session-manager-plugin # AWS Session Manager Plugin
+
+  - neovim
+  - atuin
+  - bat
+  - coreutils
+  - jq
+  - yq
+  - zsh
+  - tmux
+  - ripgrep
+  - fzf
+  - fd
+  - bat
+  - eza
+  - tokei
+  - rsync
+  - kubectl
+  - helm
+  - helmfile
+  # - k9s Running my own custom one at the moment 
+  - watch
+  - websocat
+
+  - google-cloud-sdk
+
+  # Casks
+  - bartender
+  - burp-suite
+  - discord
+  - orbstack
+  - obsidian
+  - spotify
+  - synology-drive
+  - whatsapp
+  - grammarly-desktop

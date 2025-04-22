@@ -1,0 +1,44 @@
+- name: Crafting The Perfect Workstation
+  hosts: local
+  connection: local
+  gather_facts: true
+
+  pre_tasks:
+  - include_vars: "{{ item }}"
+    with_first_found:
+      - "packages_{{ ansible_os_family | lower }}.yml"
+      - "packages_default.yml"
+
+  tasks:
+  - name: Update Arch package cache
+    community.general.pacman:
+      update_cache: true
+    become: true
+    when: ansible_os_family == "ArchLinux" # https://github.com/ansible/ansible/blob/520fa688ba232ed165fc2dbd3b2be2ebde365ba1/lib/ansible/module_utils/facts/system/distribution.py#L511
+
+  - name: Update homebrew package cache
+    community.general.homebrew:
+      update_homebrew: true
+    when: ansible_os_family == "Darwin" # https://github.com/ansible/ansible/blob/520fa688ba232ed165fc2dbd3b2be2ebde365ba1/lib/ansible/module_utils/facts/system/distribution.py#L511
+
+  - name: Stow dotfiles
+    # shell: "stow . --target {{ ansible_env.HOME }} --verbose=2" # Should I go with this one instead?
+    shell:
+      cmd: "stow . --verbose=2"
+      chdir: ../
+    register: result
+    changed_when: 'result.stderr is search("LINK: ")'
+
+  - package:
+      name: "{{ item }}"
+      state: present
+    become: "{{ true if ansible_pkg_mgr != 'homebrew' else false }}" # https://github.com/ansible/ansible/blob/520fa688ba232ed165fc2dbd3b2be2ebde365ba1/lib/ansible/module_utils/facts/system/pkg_mgr.py#L36
+    with_items: "{{ packages }}"
+
+  - name: Group windows by application to improve aerospace # defaults write com.apple.dock expose-group-apps -bool true && killall Dock
+    community.general.osx_defaults:
+      domain: com.apple.dock
+      key: expose-group-apps
+      type: bool
+      value: true
+      state: present

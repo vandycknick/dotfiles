@@ -11,5 +11,5 @@ have ansible || sudo pacman -S ansible
 
 # Run Ansible
 pushd ansible
-ansible-playbook -i ./hosts ./linux.yml --ask-become-pass
+ansible-playbook -i ./hosts ./main.yml --ask-become-pass
 popd

@@ -1,0 +1,30 @@
+packages:
+  - linux-headers
+
+  # Fonts
+  - ttf-jetbrains-mono-nerd
+
+  # Utilities
+  - brightnessctl
+
+  - hyprland
+  - hypridle
+  - hyprlock
+  - hyprpaper
+  - waybar
+  - wofi
+
+  - atuin
+  - jq
+  - yq
+  - zsh
+  - tmux
+  - ripgrep
+  - fzf
+  - fd
+  - bat
+  - eza
+  - tokei
+  - rsync
+  - less
+  - openssh
