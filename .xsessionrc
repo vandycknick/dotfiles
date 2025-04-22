@@ -1,8 +1,6 @@
 # XFCE sytems don't load .profile by default. It will however load this file
-if [ -z "$PROFILE_LOADED" ]; then
-    source /etc/profile
-    source $HOME/.profile
-fi
+source /etc/profile
+source $HOME/.profile
 
 systemctl --user import-environment PATH DBUS_SESSION_BUS_ADDRESS
 systemctl --no-block --user start xsession.target
