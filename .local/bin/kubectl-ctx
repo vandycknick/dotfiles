@@ -2,6 +2,7 @@
 
 set -eo pipefail
 
-sel_context=$(kubectl config get-contexts --no-headers=true --output=name | gum choose)
+current=$(kubectl config current-context)
+sel_context=$(kubectl config get-contexts --no-headers=true --output=name | grep "$1" | gum filter --selected ="$current" --header "Change current kubeconfig context" --select-if-one --no-fuzzy)
 
 kubectl config use-context "$sel_context"
