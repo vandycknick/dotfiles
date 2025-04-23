@@ -20,6 +20,89 @@ local check_macro_recording = function()
 end
 
 return {
+  -- file managing , picker etc
+  {
+    'nvim-tree/nvim-tree.lua',
+    cmd = { 'NvimTreeToggle', 'NvimTreeFocus' },
+    init = function()
+      vim.api.nvim_set_keymap('n', '<C-n>', ':NvimTreeToggle<cr>', { silent = true, noremap = true })
+    end,
+    opts = {
+      filters = {
+        dotfiles = false,
+        exclude = { vim.fn.stdpath 'config' .. '/lua/custom' },
+      },
+      disable_netrw = true,
+      hijack_netrw = true,
+      hijack_cursor = true,
+      hijack_unnamed_buffer_when_opening = false,
+      sync_root_with_cwd = true,
+      update_focused_file = {
+        enable = true,
+        update_root = false,
+      },
+      view = {
+        adaptive_size = false,
+        side = 'left',
+        width = 35,
+        preserve_window_proportions = true,
+      },
+      git = {
+        enable = false,
+        ignore = true,
+      },
+      filesystem_watchers = {
+        enable = true,
+      },
+      actions = {
+        open_file = {
+          resize_window = true,
+        },
+      },
+      renderer = {
+        root_folder_label = false,
+        highlight_git = false,
+        highlight_opened_files = 'none',
+
+        indent_markers = {
+          enable = true,
+        },
+
+        icons = {
+          show = {
+            file = true,
+            folder = true,
+            folder_arrow = true,
+            git = false,
+          },
+
+          glyphs = {
+            default = '󰈚',
+            symlink = '',
+            folder = {
+              default = '',
+              empty = '',
+              empty_open = '',
+              open = '',
+              symlink = '',
+              symlink_open = '',
+              arrow_open = '',
+              arrow_closed = '',
+            },
+            git = {
+              unstaged = '✗',
+              staged = '✓',
+              unmerged = '',
+              renamed = '➜',
+              untracked = '★',
+              deleted = '',
+              ignored = '◌',
+            },
+          },
+        },
+      },
+    },
+  },
 
   -- Which Key
   {
@@ -166,5 +249,40 @@ return {
         return '%2l:%-2v'
       end
     end,
+  },
+
+  -- Diffview
+  {
+    'sindrets/diffview.nvim',
+    event = 'VeryLazy',
+    enabled = true,
+    keys = {
+      { '<leader>do', '<cmd>DiffviewOpen<cr>', desc = 'Diffview open' },
+      { '<leader>dc', '<cmd>DiffviewClose<cr>', desc = 'Diffview close' },
+      { '<leader>dh', '<cmd>DiffviewFileHistory %<cr>', desc = 'Diffview file history current file.' },
+      { '<leader>dh', [[:'<,'>DiffviewFileHistory<cr>]], desc = 'Diffview file history current selection.', mode = 'v' },
+    },
+  },
+
+  -- SQL editor integration
+  {
+    'kristijanhusak/vim-dadbod-ui',
+    dependencies = {
+      { 'tpope/vim-dadbod', lazy = true },
+      { 'kristijanhusak/vim-dadbod-completion', ft = { 'sql', 'mysql', 'plsql' }, lazy = true }, -- Optional
+    },
+    cmd = {
+      'DBUI',
+      'DBUIToggle',
+      'DBUIAddConnection',
+      'DBUIFindBuffer',
+    },
+    init = function()
+      -- Your DBUI configuration
+      vim.g.db_ui_use_nerd_fonts = 1
+    end,
+    keys = {
+      { '<leader>db', '<cmd>tabnew<cr><cmd>DBUI<cr>', desc = 'DBUI open' },
+    },
   },
 }

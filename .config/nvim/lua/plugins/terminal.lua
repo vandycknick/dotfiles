@@ -6,7 +6,6 @@ local terminal = {
 
 local toggle_terminal = function()
   local current_tab = vim.api.nvim_get_current_tabpage()
-  -- local id = vim.v.count1
 
   if terminal.tabs[current_tab] == nil then
     vim.cmd.split()

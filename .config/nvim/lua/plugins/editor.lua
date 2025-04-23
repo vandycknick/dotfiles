@@ -81,6 +81,34 @@ return {
     opts = { signs = false },
   },
 
+  -- Render markdown documents within my nvim editor
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
+    ft = { 'markdown' },
+    opts = {
+      file_types = { 'markdown' },
+      heading = {
+        enabled = true,
+        sign = true,
+        icons = {},
+      },
+      overrides = {
+        buftype = {
+          nofile = {
+            code = {
+              style = 'full',
+              left_pad = 0,
+              right_pad = 0,
+              disable_background = true,
+              border = 'none',
+            },
+          },
+        },
+      },
+    },
+  },
+
   -- Better Around/Inside textobjects
   --
   -- Examples:

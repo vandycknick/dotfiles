@@ -18,7 +18,7 @@ vim.opt.relativenumber = true
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
 
--- Don't show the mode, since it's already in the status line
+-- Don't show the mode, since it's already in my the status line
 vim.opt.showmode = false
 
 -- Sync clipboard between OS and Neovim.
@@ -56,7 +56,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = '»·', trail = '·', nbsp = '·', space = '·' }
+vim.opt.listchars = 'tab:»·,trail:·,nbsp:·,space:·'
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
