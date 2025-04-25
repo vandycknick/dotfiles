@@ -7,10 +7,6 @@ local theme = {
   tail = 'TabLine', -- tail element highlight
 }
 
-local cwd = function()
-  return ' ' .. vim.fn.fnamemodify(vim.fn.getcwd(), ':t') .. ' '
-end
-
 local check_macro_recording = function()
   if vim.fn.reg_recording() ~= '' then
     return 'Recording @' .. vim.fn.reg_recording()
@@ -159,7 +155,7 @@ return {
       line = function(line)
         return {
           {
-            { cwd(), hl = theme.head },
+            { '  ', hl = theme.head },
             line.sep('', theme.head, theme.fill),
           },
           line.tabs().foreach(function(tab)
@@ -262,6 +258,11 @@ return {
       { '<leader>dh', '<cmd>DiffviewFileHistory %<cr>', desc = 'Diffview file history current file.' },
       { '<leader>dh', [[:'<,'>DiffviewFileHistory<cr>]], desc = 'Diffview file history current selection.', mode = 'v' },
     },
+  },
+
+  {
+    'tpope/vim-fugitive',
+    cmd = { 'G' },
   },
 
   -- SQL editor integration
