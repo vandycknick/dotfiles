@@ -1,0 +1,99 @@
+#! /usr/bin/env sh
+set -eou pipefail
+
+function has {
+  command -v "$1" &>/dev/null
+}
+
+function fatal {
+    echo "$*" >&2
+}
+
+function ensure_installed {
+  if [[ $# -ne 1 ]]; then
+    fatal "Usage: $0 <package_name>"
+  fi
+
+  PACKAGE_NAME="$1"
+  OS="$(uname -s)"
+
+  if has "$PACKAGE_NAME"; then
+    return
+  fi
+
+  if [[ "$OS" == "Darwin" ]]; then
+    # echo "Detected macOS"
+    if has brew; then
+      # echo "Homebrew not found. Installing Homebrew first..."
+      /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    fi
+    brew install "$PACKAGE_NAME"
+  elif [[ "$OS" == "Linux" ]]; then
+    # echo "Detected Linux"
+    if [[ -f /etc/os-release ]]; then
+      source /etc/os-release
+      DISTRO_ID="${ID,,}"  # Lowercase
+    else
+      fatal "Cannot detect Linux distribution."
+    fi
+
+    case "$DISTRO_ID" in
+      arch | manjaro)
+        # echo "Detected Arch-based distro: $DISTRO_ID"
+        sudo pacman -Sy --noconfirm "$PACKAGE_NAME"
+        ;;
+      debian | ubuntu | pop | linuxmint)
+        # echo "Detected Debian/Ubuntu-based distro: $DISTRO_ID"
+        sudo apt update
+        sudo apt install -y "$PACKAGE_NAME"
+        ;;
+      *)
+        fatal "Unsupported Linux distribution: $DISTRO_ID"
+        ;;
+    esac
+  else
+    fatal "Unsupported operating system: $OS"
+  fi
+}
+
+function main {
+  HELP=0
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      -h|--help)
+        HELP=1
+        shift # past argument
+        ;;
+      -*|--*)
+        fatal "Unknown option $1"
+        ;;
+      *)
+        POSITIONAL_ARGS+=("$1") # save positional arg
+        shift # past argument
+        ;;
+    esac
+  done
+
+  if [[ "$HELP" -eq 1 ]]; then
+          cat <<EOF
+dot:
+  Dotfiles manager, this program will ensure dotfiles are correctly installed and all
+  required programs are up to date.
+
+Usage:
+  dot [options]
+
+Options:
+  -h, --help                     Show help and usage information.
+EOF
+      exit 0
+  fi
+
+  ensure_installed ansible
+
+  pushd ~/.dotfiles/ansible > /dev/null || exit 1
+  ansible-playbook -i ./hosts ./main.yml --ask-become-pass
+  popd
+}
+
+main "$*"

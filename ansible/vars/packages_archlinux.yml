@@ -16,8 +16,8 @@ packages:
 
   - atuin
   - jq
-  - yq
-  - zsh
+  - go-yq
+  - lazygit
   - tmux
   - ripgrep
   - fzf

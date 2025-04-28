@@ -1,15 +1,4 @@
 #!/usr/bin/env sh
-
 set -eou pipefail
 
-function have {
-  command -v "$1" &>/dev/null
-}
-
-# install ansible
-have ansible || sudo pacman -S ansible
-
-# Run Ansible
-pushd ansible
-ansible-playbook -i ./hosts ./main.yml --ask-become-pass
-popd
+~/.dotfiles/.local/bin/dot
