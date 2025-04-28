@@ -1,10 +1,13 @@
-local terminal = {
+local M = {}
+
+M.terminal = {
   tabs = {},
   buf = nil,
   height = 10,
 }
 
-local toggle_terminal = function()
+M.toggle = function()
+  local terminal = M.terminal
   local current_tab = vim.api.nvim_get_current_tabpage()
 
   if terminal.tabs[current_tab] == nil then
@@ -47,12 +50,17 @@ local toggle_terminal = function()
   end
 end
 
+M.close = function()
+  M.terminal.tabs = {}
+  M.terminal.buf = nil
+end
+
 return {
   name = 'terminal',
   dir = '.',
   lazy = false,
   config = function()
-    vim.keymap.set({ 'n' }, '<M-;>', toggle_terminal, { desc = 'Toggle Terminal Window.' })
+    vim.keymap.set({ 'n' }, '<M-;>', M.toggle, { desc = 'Toggle Terminal Window.' })
 
     vim.api.nvim_create_autocmd('TermOpen', {
       desc = 'remove line numbers in terminal',
@@ -67,10 +75,7 @@ return {
     vim.api.nvim_create_autocmd('TermClose', {
       desc = 'Close window when terminal job ends',
       group = vim.api.nvim_create_augroup('nvd-term-close', { clear = true }),
-      callback = function()
-        terminal.tabs = {}
-        terminal.buf = nil
-      end,
+      callback = M.close,
     })
   end,
 }
