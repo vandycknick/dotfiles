@@ -8,6 +8,7 @@ fish_add_path "/opt/homebrew/bin"
 fish_add_path "/opt/homebrew/opt/coreutils/libexec/gnubin"
 
 if status is-interactive
+  direnv hook fish | source
   mise activate fish | source
   zoxide init fish | source
   atuin init fish | source
