@@ -1,7 +1,64 @@
 [user]
 	name = Nick Van Dyck
 	email = vandyck.nick@outlook.com
-	signingkey = E742877FB4B706FC
+  signingkey = E742877FB4B706FC
+
+[core]
+  autocrlf = input  # keep newlines as in input
+  compression = 9  # trade cpu for network
+  fsync = none
+  whitespace = error  # threat incorrect whitespace as errors
+
+[init]
+  defaultBranch = main
 
 [commit]
-	gpgsign = true
+  gpgsign = true
+
+[status]
+  branch = true
+  short = true
+  showStash = true
+  showUntrackedFiles = all
+
+[diff]
+  context = 3
+  renames = copies
+  interHunkContext = 10
+  ; external = difft
+
+[interactive]
+  singleKey = true
+
+[push]
+  autoSetupRemote = true
+  default = current
+  followTags = true
+
+[pull]
+  default = current
+  rebase = true
+
+[rebase]
+  autoStash = true
+  missingCommitsCheck = warn
+
+# Colors
+[color "blame"]
+    highlightRecent = black bold,1 year ago,white,1 month ago,default,7 days ago,blue
+
+[color "branch"]
+    current  = magenta
+    local    = default
+    remote   = yellow
+    upstream = green
+    plain    = blue
+
+[color "diff"]
+    meta       = white bold
+    frag       = magenta
+    context    = white
+    whitespace = yellow reverse
+
+[url "git@github.com"]
+  insteadOf = "gh:"
