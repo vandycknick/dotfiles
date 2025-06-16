@@ -1,4 +1,5 @@
 alias gri 'git rebase -i $(git log --oneline --color=always | fzf --ansi | awk '"'"'{print $1}'"'"')'
+alias gs 'git show $(git log --oneline --color=always | fzf --ansi | awk '"'"'{print $1}'"'"')'
 
 # Outputs the name of the current branch
 # Usage example: git pull origin $(git_current_branch)
@@ -35,7 +36,7 @@ alias ggpur='ggu'
 alias g='git'
 alias ga='git add'
 alias gaa='git add --all'
-alias gapa='git add --patch'
+alias gap='git add --patch'
 alias gau='git add --update'
 alias gav='git add --verbose'
 alias gwip='git add -A; git rm $(git ls-files --deleted) 2> /dev/null; git commit --no-verify --no-gpg-sign --message "--wip-- [skip ci]"'
@@ -44,7 +45,7 @@ alias gama='git am --abort'
 alias gamc='git am --continue'
 alias gamscp='git am --show-current-patch'
 alias gams='git am --skip'
-alias gap='git apply'
+alias gapl='git apply'
 alias gapt='git apply --3way'
 alias gbs='git bisect'
 alias gbsb='git bisect bad'
