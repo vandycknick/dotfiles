@@ -3,10 +3,6 @@ set -g fish_key_bindings fish_vi_key_bindings
 
 set -g hydro_color_prompt green
 
-fish_add_path $XDG_BIN_HOME
-fish_add_path "/opt/homebrew/bin"
-fish_add_path "/opt/homebrew/opt/coreutils/libexec/gnubin"
-
 if status is-interactive
   direnv hook fish | source
   mise activate fish | source
