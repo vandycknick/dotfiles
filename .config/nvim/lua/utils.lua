@@ -18,17 +18,25 @@ function M.strip_archive_subpath(path)
 end
 
 function M.root_pattern(...)
+  vim.print 'hello'
   local patterns = M.tbl_flatten { ... }
   return function(startpath)
+    vim.validate('startpath', startpath, 'string')
+    vim.print('startpath', vim.inspect(startpath))
     startpath = M.strip_archive_subpath(startpath)
+    vim.print('startpath2', startpath)
     for _, pattern in ipairs(patterns) do
+      vim.print(pattern)
       local match = M.search_ancestors(startpath, function(path)
         for _, p in ipairs(vim.fn.glob(table.concat({ escape_wildcards(path), pattern }, '/'), true, true)) do
+          vim.print('for', path)
           if vim.uv.fs_stat(p) then
+            vim.print('fs_stat', path)
             return path
           end
         end
       end)
+      vim.print('match', match)
 
       if match ~= nil then
         return match

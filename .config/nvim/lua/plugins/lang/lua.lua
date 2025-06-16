@@ -2,7 +2,7 @@ return {
   {
     'neovim/nvim-lspconfig',
     dependencies = {
-      { 'folke/neodev.nvim', opts = {} },
+      { 'folke/lazydev.nvim', opts = {} },
     },
     opts = {
       ensure_installed = { lua = { 'stylua' } },

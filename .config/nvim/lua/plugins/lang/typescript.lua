@@ -4,11 +4,14 @@ return {
   {
     'neovim/nvim-lspconfig',
     opts = {
-
       servers = {
         ts_ls = {
-          root_dir = utils.root_pattern 'package.json',
-          single_file_support = false,
+          -- root_dir = function(bufnr)
+          --   local startpath = vim.api.nvim_buf_get_name(bufnr)
+          --   require('lspconfig.util').root_pattern('tsconfig.json', 'jsconfig.json', 'package.json')(startpath)
+          -- end,
+          workspace_required = true,
+          root_markers = { 'tsconfig.json', 'jsconfig.json', 'package.json' },
           settings = {
             typescriptreact = {
               -- https://github.com/typescript-language-server/typescript-language-server?tab=readme-ov-file#inlay-hints-textdocumentinlayhint
@@ -53,7 +56,8 @@ return {
         },
 
         denols = {
-          root_dir = utils.root_pattern('deno.json', 'deno.jsonc'),
+          workspace_required = true,
+          root_markers = { 'deno.json', 'deno.jsonc' },
         },
 
         eslint = {},
