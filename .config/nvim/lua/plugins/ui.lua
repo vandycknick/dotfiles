@@ -286,4 +286,14 @@ return {
       { '<leader>db', '<cmd>tabnew<cr><cmd>DBUI<cr>', desc = 'DBUI open' },
     },
   },
+
+  {
+    'sphamba/smear-cursor.nvim',
+    opts = {
+      smear_between_buffers = false,
+      stiffness = 0.5,
+      trailing_stiffness = 0.49,
+      legacy_computing_symbols_support = true,
+    },
+  },
 }
