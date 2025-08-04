@@ -1,0 +1,18 @@
+#!/bin/sh
+set -euo pipefail
+
+case "$(uname -s)" in
+  Darwin)
+    PINENTRY="/opt/homebrew/bin/pinentry-mac"
+    ;;
+  Linux)
+    PINENTRY="/usr/bin/pinentry-gnome3"
+    ;;
+  *)
+    echo "Unsupported OS: $(uname -s)" >&2
+    exit 1
+    ;;
+esac
+
+exec "$PINENTRY" "$@"
+# vim: ft=sh
