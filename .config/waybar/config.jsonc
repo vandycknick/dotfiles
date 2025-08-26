@@ -1,10 +1,10 @@
 {
   "mode": "dock",
-  "height": "32",
+  "height": "34",
   "position": "top",
   "margin": "0 0 5px 0",
   "exclusive": true,
-  "modules-left": ["custom/arch", "hyprland/workspaces"],
+  "modules-left": ["custom/arch", "hyprland/workspaces", "hyprland/window"],
   "modules-center": ["clock"],
   "modules-right": [
     "idle_inhibitor",
@@ -22,14 +22,13 @@
     "all-outputs": true,
     "on-click": "activate",
     "format": "{icon}",
-    // "format-icons": {
-    //   "1": "",
-    //   "active": "<span font='10'></span>",
-    //   "default": ""
-    // },
-    "persistent-workspaces": {
-      "*": 3,
+    "format-icons": {
+      "active": "",
+      "default": "",
     },
+    // "persistent-workspaces": {
+    //   "*": 3,
+    // },
   },
 
   "idle_inhibitor": {
@@ -41,12 +40,12 @@
   },
 
   "hyprland/window": {
+    "format": "󰣆 {class}",
+    "icon": false,
     "rewrite": {
-      "(.*) - Brave": "$1",
-      "(.*) - Chromium": "$1",
-      "(.*) - Brave Search": "$1",
-      "(.*) - Outlook": "$1",
-      "(.*) Microsoft Teams": "$1",
+      "(.*) brave-browser": "󰖟 Brave",
+      "(.*) zen": " Zen Browser",
+      "(.*) com.mitchellh.ghostty": "󰊠 Ghostty",
     },
     "separate-outputs": true,
   },
