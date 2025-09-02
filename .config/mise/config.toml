@@ -3,6 +3,7 @@ usage = "latest"
 node = "latest"
 python = "3.12"
 deno = "latest"
+uv = "latest"
 
 [settings]
 # whether to prompt to install plugins and runtimes if they're not already installed
@@ -29,4 +30,5 @@ raw = false         # set to true to directly pipe plugins to stdin/stdout/stder
 disable_default_shorthands = false                # disable the default shorthands, see `RTX_DISABLE_DEFAULT_SHORTHANDS`
 
 experimental = true# enable experimental features such as shims
+idiomatic_version_file_enable_tools = []
 # shims_dir = '~/.local/share/rtx/shims' # [experimental] directory where shims are stored
