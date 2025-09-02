@@ -34,3 +34,6 @@ set -Ux NPM_CONFIG_USERCONFIG "$XDG_CONFIG_HOME/npm/npmrc"
 set -Ux CARGO_HOME "$XDG_DATA_HOME/cargo"
 set -Ux RUSTUP_HOME "$XDG_DATA_HOME/rustup"
 fish_add_path "$CARGO_HOME/bin"
+
+# Password Store
+set -Ux PASSWORD_STORE_DIR "$XDG_DATA_HOME/password-store"
