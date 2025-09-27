@@ -26,3 +26,4 @@ _darcs
 \.editorconfig
 install
 ansible
+.config/nvim/result

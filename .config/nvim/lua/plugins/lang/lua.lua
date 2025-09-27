@@ -5,8 +5,6 @@ return {
       { 'folke/lazydev.nvim', opts = {} },
     },
     opts = {
-      ensure_installed = { lua = { 'stylua' } },
-
       servers = {
         lua_ls = {
           -- cmd = {...},

@@ -2,7 +2,6 @@ return {
   {
     'neovim/nvim-lspconfig',
     opts = {
-      ensure_installed = { astro = { 'prettierd' } },
       servers = {
         astro = {},
       },
@@ -13,7 +12,7 @@ return {
     'stevearc/conform.nvim',
     opts = {
       formatters_by_ft = {
-        astro = { 'prettierd', 'prettier', stop_after_first = true },
+        astro = { 'prettierd' },
       },
     },
   },

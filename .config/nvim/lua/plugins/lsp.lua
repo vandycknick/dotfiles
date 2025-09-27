@@ -1,9 +1,12 @@
+local binz = require 'binz'
+
 local astro = require 'plugins.lang.astro'
 local csharp = require 'plugins.lang.csharp'
 local go = require 'plugins.lang.go'
 local helm = require 'plugins.lang.helm'
 local json = require 'plugins.lang.json'
 local lua = require 'plugins.lang.lua'
+local nix = require 'plugins.lang.nix'
 local python = require 'plugins.lang.python'
 local rust = require 'plugins.lang.rust'
 local terraform = require 'plugins.lang.terraform'
@@ -16,6 +19,7 @@ return {
   helm,
   json,
   lua,
+  nix,
   python,
   rust,
   terraform,
@@ -25,7 +29,7 @@ return {
     dependencies = {
       { 'mason-org/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
       'mason-org/mason-lspconfig.nvim',
-      'WhoIsSethDaniel/mason-tool-installer.nvim',
+      -- 'WhoIsSethDaniel/mason-tool-installer.nvim',
       { 'saghen/blink.cmp' },
     },
     config = function(_, opts)
@@ -149,7 +153,7 @@ return {
         vim.list_extend(ensure_installed, value)
       end
 
-      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
+      -- require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
         automatic_enable = vim.tbl_keys(servers or {}),
@@ -159,6 +163,7 @@ return {
 
       for server_name, config in pairs(servers) do
         vim.lsp.config(server_name, config)
+        vim.lsp.enable 'nixd'
       end
     end,
   },
@@ -179,6 +184,12 @@ return {
     },
     opts = {
       notify_on_error = true,
+      formatters = {
+        goimports = { command = binz.get_bin 'goimports' },
+        gofumpt = { command = binz.get_bin 'gofumpt' },
+        prettierd = { command = binz.get_bin 'prettierd' },
+        stylua = { command = binz.get_bin 'stylua' },
+      },
       format_on_save = function(bufnr)
         if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
           return
@@ -200,8 +211,8 @@ return {
         }
       end,
       formatters_by_ft = {
-        markdown = { 'prettierd', 'prettier', stop_after_first = true },
-        jsonc = { 'prettierd', 'prettier', stop_after_first = true },
+        markdown = { 'prettierd' },
+        jsonc = { 'prettierd' },
       },
     },
     config = function(_, opts)
