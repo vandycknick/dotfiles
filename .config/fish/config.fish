@@ -13,3 +13,9 @@ end
 bind -M insert \cp up-or-search
 bind -M insert \cn down-or-search
 bind -M insert \cy accept-autosuggestion
+
+if test (uname) = Linux; and test (tty) = /dev/tty1
+  if uwsm check may-start; and uwsm select
+    exec uwsm start default
+  end
+end
