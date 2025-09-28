@@ -1,9 +1,12 @@
+local binz = require 'binz'
 return {
   {
     'neovim/nvim-lspconfig',
     opts = {
       servers = {
-        terraformls = {},
+        terraformls = {
+          cmd = { binz.get_bin 'terraformls', 'serve' },
+        },
       },
     },
   },

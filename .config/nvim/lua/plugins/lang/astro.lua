@@ -1,9 +1,13 @@
+local binz = require 'binz'
+
 return {
   {
     'neovim/nvim-lspconfig',
     opts = {
       servers = {
-        astro = {},
+        astro = {
+          cmd = { binz.get_bin 'astro' },
+        },
       },
     },
   },

@@ -1,9 +1,12 @@
+local binz = require 'binz'
 return {
   {
     'neovim/nvim-lspconfig',
     opts = {
       servers = {
-        pyright = {},
+        pyright = {
+          cmd = { binz.get_bin 'pyright', '--stdio' },
+        },
       },
     },
   },

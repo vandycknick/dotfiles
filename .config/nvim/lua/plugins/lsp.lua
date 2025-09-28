@@ -27,9 +27,6 @@ return {
   {
     'neovim/nvim-lspconfig',
     dependencies = {
-      { 'mason-org/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
-      'mason-org/mason-lspconfig.nvim',
-      -- 'WhoIsSethDaniel/mason-tool-installer.nvim',
       { 'saghen/blink.cmp' },
     },
     config = function(_, opts)
@@ -145,25 +142,10 @@ return {
       end
       vim.diagnostic.config { signs = { text = diagnostic_signs } }
 
-      require('mason').setup()
-
       local servers = opts.servers
-      local ensure_installed = vim.tbl_keys(servers or {})
-      for _, value in pairs(opts.ensure_installed) do
-        vim.list_extend(ensure_installed, value)
-      end
-
-      -- require('mason-tool-installer').setup { ensure_installed = ensure_installed }
-
-      require('mason-lspconfig').setup {
-        automatic_enable = vim.tbl_keys(servers or {}),
-        ensure_installed = {},
-        automatic_installation = false,
-      }
-
       for server_name, config in pairs(servers) do
         vim.lsp.config(server_name, config)
-        vim.lsp.enable 'nixd'
+        vim.lsp.enable(server_name)
       end
     end,
   },
@@ -185,8 +167,10 @@ return {
     opts = {
       notify_on_error = true,
       formatters = {
+        black = { command = binz.get_bin 'black' },
         goimports = { command = binz.get_bin 'goimports' },
         gofumpt = { command = binz.get_bin 'gofumpt' },
+        isort = { command = binz.get_bin 'isort' },
         prettierd = { command = binz.get_bin 'prettierd' },
         stylua = { command = binz.get_bin 'stylua' },
       },
