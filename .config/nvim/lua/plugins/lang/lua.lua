@@ -1,5 +1,3 @@
-local binz = require 'binz'
-
 return {
   {
     'neovim/nvim-lspconfig',
@@ -9,9 +7,6 @@ return {
     opts = {
       servers = {
         lua_ls = {
-          cmd = { binz.get_bin 'lua_ls' },
-          -- filetypes = { ...},
-          -- capabilities = {},
           settings = {
             Lua = {
               completion = {

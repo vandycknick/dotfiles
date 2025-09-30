@@ -1,12 +1,9 @@
-local binz = require 'binz'
-
 return {
   {
     'neovim/nvim-lspconfig',
     opts = {
       servers = {
         vtsls = {
-          cmd = { binz.get_bin 'vtsls', '--stdio' },
           root_dir = function(bufnr, on_dir)
             -- The project root is where the LSP can be started from
             -- As stated in the documentation above, this LSP supports monorepos and simple projects.
@@ -49,7 +46,7 @@ return {
         },
 
         eslint = {
-          cmd = { binz.get_bin 'eslint', '--stdio' },
+          cmd = { 'eslint', '--stdio' },
         },
       },
     },

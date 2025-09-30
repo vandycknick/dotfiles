@@ -1,5 +1,3 @@
-local binz = require 'binz'
-
 local astro = require 'plugins.lang.astro'
 local csharp = require 'plugins.lang.csharp'
 local go = require 'plugins.lang.go'
@@ -166,14 +164,6 @@ return {
     },
     opts = {
       notify_on_error = true,
-      formatters = {
-        black = { command = binz.get_bin 'black' },
-        goimports = { command = binz.get_bin 'goimports' },
-        gofumpt = { command = binz.get_bin 'gofumpt' },
-        isort = { command = binz.get_bin 'isort' },
-        prettierd = { command = binz.get_bin 'prettierd' },
-        stylua = { command = binz.get_bin 'stylua' },
-      },
       format_on_save = function(bufnr)
         if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
           return

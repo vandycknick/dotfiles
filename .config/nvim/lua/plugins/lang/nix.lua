@@ -1,5 +1,3 @@
-local binz = require 'binz'
-
 return {
   {
     'neovim/nvim-lspconfig',
@@ -7,11 +5,11 @@ return {
       servers = {
         nixd = {
           mason_install = false,
-          cmd = { binz.get_bin 'nixd' },
+          cmd = { 'nixd' },
           settings = {
             nixd = {
               formatting = {
-                command = { binz.get_bin 'nixfmt' },
+                command = { 'nixfmt' },
               },
             },
           },

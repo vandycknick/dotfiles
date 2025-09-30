@@ -1,12 +1,9 @@
-local binz = require 'binz'
-
 return {
   {
     'neovim/nvim-lspconfig',
     opts = {
       servers = {
         gopls = {
-          cmd = { binz.get_bin 'gopls' },
           filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
           settings = {
             gopls = {
