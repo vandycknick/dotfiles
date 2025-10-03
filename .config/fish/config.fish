@@ -5,7 +5,6 @@ set -g hydro_color_prompt green
 
 if status is-interactive
   direnv hook fish | source
-  mise activate fish | source
   zoxide init fish | source
   atuin init fish | source
 end
