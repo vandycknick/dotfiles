@@ -1,5 +1,5 @@
 close_when_open = true
-theme = "nvd"
+# theme = "nvd"
 # theme_base = []
 # theme_location = ["~/.local/share/omarchy/default/walker/themes/"]
 hotreload_theme = false
@@ -21,7 +21,7 @@ path = "~/.config/hypr/hyprland.conf"
 hidden = true
 
 [keybinds]
-close = "esc"
+# close = "esc"
 next = "ctrl n"
 previous = "ctrl p"
 toggle_exact = "ctrl e"
