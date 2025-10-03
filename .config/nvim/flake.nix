@@ -26,6 +26,7 @@
               pkgs.gofumpt
               pkgs.helm-ls
               pkgs.isort
+              pkgs.oxlint
               pkgs.pyright
               pkgs.rust-analyzer
               pkgs.nixd
