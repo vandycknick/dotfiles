@@ -37,3 +37,6 @@ fish_add_path "$CARGO_HOME/bin"
 
 # Password Store
 set -Ux PASSWORD_STORE_DIR "$XDG_DATA_HOME/password-store"
+
+# Nix profile
+fish_add_path $XDG_STATE_HOME/nix/profile/bin/
