@@ -25,7 +25,9 @@ packages:
   - watch
   - websocat
 
-  - google-cloud-sdk
+  - pinentry-mac
+
+  - gcloud-cli
 
   # Casks
   - bartender

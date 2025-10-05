@@ -7,6 +7,7 @@ function has {
 
 function fatal {
     echo "$*" >&2
+    exit 1
 }
 
 function ensure_installed {
@@ -22,14 +23,12 @@ function ensure_installed {
   fi
 
   if [[ "$OS" == "Darwin" ]]; then
-    # echo "Detected macOS"
     if has brew; then
-      # echo "Homebrew not found. Installing Homebrew first..."
+      echo "Homebrew not found. Installing Homebrew first..."
       /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
     brew install "$PACKAGE_NAME"
   elif [[ "$OS" == "Linux" ]]; then
-    # echo "Detected Linux"
     if [[ -f /etc/os-release ]]; then
       source /etc/os-release
       DISTRO_ID="${ID,,}"  # Lowercase
@@ -39,11 +38,9 @@ function ensure_installed {
 
     case "$DISTRO_ID" in
       arch | manjaro)
-        # echo "Detected Arch-based distro: $DISTRO_ID"
         sudo pacman -Sy --noconfirm "$PACKAGE_NAME"
         ;;
       debian | ubuntu | pop | linuxmint)
-        # echo "Detected Debian/Ubuntu-based distro: $DISTRO_ID"
         sudo apt update
         sudo apt install -y "$PACKAGE_NAME"
         ;;
