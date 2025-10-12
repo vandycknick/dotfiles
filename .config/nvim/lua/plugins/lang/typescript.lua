@@ -36,7 +36,6 @@ return {
                 enumMemberValues = { enabled = true },
               },
             },
-            -- vtsls = {},
           },
         },
 
