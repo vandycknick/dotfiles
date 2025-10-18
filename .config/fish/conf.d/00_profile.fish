@@ -14,6 +14,7 @@ switch (uname)
 case Darwin
   fish_add_path $XDG_BIN_HOME
   fish_add_path "/opt/homebrew/bin"
+  fish_add_path "/opt/homebrew/sbin"
   fish_add_path "/opt/homebrew/opt/coreutils/libexec/gnubin"
 end
 
