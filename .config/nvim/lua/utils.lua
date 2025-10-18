@@ -64,4 +64,23 @@ function M.search_ancestors(startpath, func)
   end
 end
 
+function M.create_proxy(target, defaults)
+  return setmetatable({}, {
+    __index = function(_, key)
+      -- Return a callable function for any key accessed
+      return function(_, ...)
+        local fn = target[key]
+        if type(fn) ~= 'function' then
+          error("Target has no function named '" .. key .. "'")
+        end
+
+        -- You can merge default args, override them, etc.
+        local args = { ... }
+        local opts = vim.tbl_deep_extend('force', defaults or {}, args[1] or {})
+        return fn(opts)
+      end
+    end,
+  })
+end
+
 return M
