@@ -1,9 +1,27 @@
 return {
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    branch = 'master',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'fish',
+        'git_config',
+        'git_rebase',
+        'gitattributes',
+        'gitcommit',
+        'gitignore',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'rust',
+        'vim',
+        'vimdoc',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -12,29 +30,27 @@ return {
       indent = { enable = true },
     },
     config = function(_, opts)
-      -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-      -- Prefer git instead of curl in order to improve connectivity in some environments
       require('nvim-treesitter.install').prefer_git = true
       require('nvim-treesitter.configs').setup(opts)
 
       local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
+      ---@diagnostic disable-next-line: inject-field
       parser_config.log_insights_query = {
         install_info = {
-          url = '~/Projects/tree-sitter-log-insights-query', -- local path or git repo
-          files = { 'src/parser.c' }, -- note that some parsers also require src/scanner.c or src/scanner.cc
-          -- optional entries:
-          -- branch = 'main', -- default branch in case of git repo if different from master
+          url = 'https://github.com/vandycknick/tree-sitter-log-insights-query.git',
+          files = { 'src/parser.c' },
+          branch = 'main',
           generate_requires_npm = false, -- if stand-alone parser without npm dependencies
           requires_generate_from_grammar = false, -- if folder contains pre-generated src/parser.c
         },
         filetype = 'lq', -- if filetype does not match the parser name
       }
-      -- There are additional nvim-treesitter modules that you can use to interact
-      -- with nvim-treesitter. You should go explore a few and see what interests you:
-      --
-      --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-      --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-      --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+
+      vim.filetype.add {
+        extension = {
+          lq = 'log_insights_query',
+        },
+      }
     end,
   },
 
