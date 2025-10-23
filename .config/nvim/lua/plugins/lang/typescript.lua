@@ -16,6 +16,9 @@ return {
             end
           end,
           settings = {
+            vtsls = {
+              autoUseWorkspaceTsdk = true,
+            },
             typescript = {
               inlayHints = {
                 parameterNames = { enabled = 'literals' },
