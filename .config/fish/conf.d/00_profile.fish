@@ -2,7 +2,6 @@ status is-login || exit
 
 set -Ux EDITOR nvim
 set -Ux TERMINAL ghostty
-set -Ux BROWSER Zen.app
 
 set -Ux XDG_CONFIG_HOME "$HOME/.config"
 set -Ux XDG_DATA_HOME "$HOME/.local/share"
@@ -10,8 +9,11 @@ set -Ux XDG_BIN_HOME "$HOME/.local/bin"
 set -Ux XDG_CACHE_HOME "$HOME/.cache"
 
 switch (uname)
-# case Linux
+case Linux
+  set -Ux BROWSER=""
 case Darwin
+  set -Ux BROWSER="/Applications/Zen.app/Contents/MacOS/zen"
+
   fish_add_path $XDG_BIN_HOME
   fish_add_path "/opt/homebrew/bin"
   fish_add_path "/opt/homebrew/sbin"

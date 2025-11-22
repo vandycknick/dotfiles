@@ -27,10 +27,8 @@ alias gri 'git rebase -i $(git log --oneline --color=always | fzf --ansi | awk '
 
 switch (uname)
 case Linux
-  alias clip "xclip -selection clipboard"
   alias clip "wl-copy"
 case Darwin
   alias clip "pbcopy"
-#case '*'
-#    echo Catch All
+  alias uuid 'uuidgen | tr "[:upper:]" "[:lower:]"'
 end
