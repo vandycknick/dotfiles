@@ -1,7 +1,7 @@
 {
   description = "nvim";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   inputs.systems.url = "github:nix-systems/default";
 
   outputs = { self, nixpkgs, systems }:
@@ -24,17 +24,20 @@
               pkgs.gopls
               pkgs.gotools
               pkgs.gofumpt
+              pkgs.harper
               pkgs.helm-ls
               pkgs.isort
               pkgs.oxlint
               pkgs.pyright
               pkgs.rust-analyzer
               pkgs.nixd
-              pkgs.nixfmt-classic
+              pkgs.nixfmt
               pkgs.prettierd
               pkgs.terraform-ls
               pkgs.vtsls
               pkgs.vscode-langservers-extracted
+            ] ++ lib.optionals pkgs.stdenv.isLinux [
+              pkgs.inotify-tools # Lsp file watching requires inotify tools to be installed on Linux: https://gitlab.b-data.ch/neovim/neovim/-/blob/master/runtime/lua/vim/lsp/_watchfiles.lua?ref_type=heads#L11
             ];
           };
         in {

@@ -4,6 +4,7 @@ return {
   require 'plugins.lang.astro',
   require 'plugins.lang.csharp',
   require 'plugins.lang.go',
+  require 'plugins.lang.harper',
   require 'plugins.lang.helm',
   require 'plugins.lang.html',
   require 'plugins.lang.json',

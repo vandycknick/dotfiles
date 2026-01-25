@@ -49,7 +49,9 @@ return {
 
         eslint = {},
 
-        oxlint = {},
+        oxlint = {
+          cmd = { 'oxlint', '--lsp' },
+        },
       },
     },
   },
