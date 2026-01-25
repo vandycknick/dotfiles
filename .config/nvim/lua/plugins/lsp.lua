@@ -2,6 +2,7 @@ local utils = require 'utils'
 
 return {
   require 'plugins.lang.astro',
+  require 'plugins.lang.bash',
   require 'plugins.lang.csharp',
   require 'plugins.lang.go',
   require 'plugins.lang.harper',
