@@ -12,7 +12,7 @@ switch (uname)
 case Linux
   set -Ux BROWSER=""
 case Darwin
-  set -Ux BROWSER="/Applications/Zen.app/Contents/MacOS/zen"
+  set -Ux BROWSER "/Applications/Zen.app/Contents/MacOS/zen"
 
   fish_add_path $XDG_BIN_HOME
   fish_add_path "/opt/homebrew/bin"
@@ -32,6 +32,7 @@ set -Ux AWS_SHARED_CREDENTIALS_FILE "$XDG_CONFIG_HOME/aws/credentials"
 
 # NPM
 set -Ux NPM_CONFIG_USERCONFIG "$XDG_CONFIG_HOME/npm/npmrc"
+fish_add_path "$XDG_CACHE_HOME/npm/bin"
 
 # Rust:
 set -Ux CARGO_HOME "$XDG_DATA_HOME/cargo"
