@@ -21,7 +21,6 @@ M.toggle = function()
       vim.api.nvim_win_set_buf(current_win, terminal.buf)
     end
 
-    -- vim.wo.winbar = id .. ': %{b:term_title}'
     terminal.tabs[current_tab] = {
       visible = true,
       win = current_win,
