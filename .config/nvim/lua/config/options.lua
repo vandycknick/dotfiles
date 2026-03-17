@@ -70,6 +70,22 @@ vim.opt.scrolloff = 10
 -- Hide the cmdline and have it collapse into the statusline.
 vim.opt.cmdheight = 0
 
+local grp = vim.api.nvim_create_augroup('CmdheightOnCmdline', { clear = true })
+
+vim.api.nvim_create_autocmd('CmdlineEnter', {
+  group = grp,
+  callback = function()
+    vim.opt.cmdheight = 1
+  end,
+})
+
+vim.api.nvim_create_autocmd('CmdlineLeave', {
+  group = grp,
+  callback = function()
+    vim.opt.cmdheight = 0
+  end,
+})
+
 vim.opt.termguicolors = true
 
 -- This does exactly what I want. But I have no idea what it does anymore nor do I know where I found this little trick.

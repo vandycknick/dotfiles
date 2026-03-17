@@ -16,89 +16,34 @@ local check_macro_recording = function()
 end
 
 return {
-  -- file managing , picker etc
   {
-    'nvim-tree/nvim-tree.lua',
-    cmd = { 'NvimTreeToggle', 'NvimTreeFocus' },
-    init = function()
-      vim.api.nvim_set_keymap('n', '<C-n>', ':NvimTreeToggle<cr>', { silent = true, noremap = true })
-    end,
+    'stevearc/oil.nvim',
+    ---@module 'oil'
+    ---@type oil.SetupOpts
     opts = {
-      filters = {
-        dotfiles = false,
-        exclude = { vim.fn.stdpath 'config' .. '/lua/custom' },
+      keymaps = {
+        ['q'] = { 'actions.close', mode = 'n' },
       },
-      disable_netrw = true,
-      hijack_netrw = true,
-      hijack_cursor = true,
-      hijack_unnamed_buffer_when_opening = false,
-      sync_root_with_cwd = true,
-      update_focused_file = {
-        enable = true,
-        update_root = false,
+      view_options = {
+        -- Show files and directories that start with "."
+        show_hidden = true,
       },
-      view = {
-        adaptive_size = false,
-        side = 'left',
-        width = 35,
-        preserve_window_proportions = true,
-      },
-      git = {
-        enable = false,
-        ignore = true,
-      },
-      filesystem_watchers = {
-        enable = true,
-      },
-      actions = {
-        open_file = {
-          resize_window = true,
-        },
-      },
-      renderer = {
-        root_folder_label = false,
-        highlight_git = false,
-        highlight_opened_files = 'none',
-
-        indent_markers = {
-          enable = true,
-        },
-
-        icons = {
-          show = {
-            file = true,
-            folder = true,
-            folder_arrow = true,
-            git = false,
-          },
-
-          glyphs = {
-            default = '󰈚',
-            symlink = '',
-            folder = {
-              default = '',
-              empty = '',
-              empty_open = '',
-              open = '',
-              symlink = '',
-              symlink_open = '',
-              arrow_open = '',
-              arrow_closed = '',
-            },
-            git = {
-              unstaged = '✗',
-              staged = '✓',
-              unmerged = '',
-              renamed = '➜',
-              untracked = '★',
-              deleted = '',
-              ignored = '◌',
-            },
-          },
-        },
+    },
+    -- Optional dependencies
+    -- dependencies = { { 'nvim-mini/mini.icons', opts = {} } },
+    dependencies = { 'nvim-tree/nvim-web-devicons' }, -- use if you prefer nvim-web-devicons
+    -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
+    lazy = false,
+    keys = {
+      {
+        '<C-n>',
+        '<CMD>Oil<CR>',
+        { desc = 'Open parent directory' },
       },
     },
   },
+
+  { 'shortcuts/no-neck-pain.nvim', version = '*' },
 
   -- Which Key
   {
@@ -119,14 +64,30 @@ return {
     'folke/noice.nvim',
     event = 'VeryLazy',
     opts = {
-      cmdline = {
+      -- Don't touch the cmdline UI or popupmenu
+      cmdline = { enabled = false },
+      popupmenu = { enabled = false },
+
+      -- Don't replace :messages / cmd output UI
+      messages = { enabled = false },
+
+      -- But DO replace vim.notify (LSP warnings, etc.)
+      notify = {
         enabled = true,
-        view = 'cmdline_popup',
+        view = 'notify',
       },
-    },
-    -- INFO: Not using nvim-notify here, this makes noice fallback to mini. I prefer the mini style notifications, they are less intrusive.
-    dependencies = {
-      'MunifTanjim/nui.nvim',
+
+      presets = {
+        long_message_to_split = true,
+      },
+
+      -- Optional: send very long notifications to a split instead of spammy popups
+      -- routes = {
+      --   {
+      --     filter = { event = 'notify', min_height = 15 },
+      --     view = 'split',
+      --   },
+      -- },
     },
     keys = {
       {
@@ -143,6 +104,10 @@ return {
         end,
         desc = 'shows the message history',
       },
+    },
+    dependencies = {
+      'MunifTanjim/nui.nvim',
+      -- 'rcarriga/nvim-notify', -- recommended for the notify view
     },
   },
 
