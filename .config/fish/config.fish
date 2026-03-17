@@ -1,7 +1,7 @@
 set fish_greeting ""
 set -g fish_key_bindings fish_vi_key_bindings
 
-set -g hydro_color_prompt green
+set -g my_prompt_color_prompt green
 
 if status is-interactive
   direnv hook fish | source
