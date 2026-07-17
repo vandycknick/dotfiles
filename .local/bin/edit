@@ -1,0 +1,48 @@
+#!/bin/sh
+
+#
+# edit(1) - Pipe in and out of $EDITOR
+#
+# version
+
+VERSION="0.1.1"
+
+# usage
+
+if [ "${1}" ]; then
+  case "${1}" in
+  "-h")
+    echo "usage: ed [-hV]"
+    exit 0 ;;
+  "-V")
+    echo "$VERSION"
+    exit 0 ;;
+  *)
+    echo "unknown option: \"${1}\""
+    echo "usage: ed [-hV]"
+    exit 1
+  esac
+fi
+
+# temp file
+
+t=/tmp/edit.$$.txt
+touch $t
+
+# read from stdin
+
+if [ ! -t 0 ]; then
+  cat > $t
+fi
+
+# spawn editor with stdio connected
+
+${EDITOR} $t < /dev/tty > /dev/tty || exit $?
+
+# write to stdout
+
+cat $t
+
+# cleanup
+
+rm $t

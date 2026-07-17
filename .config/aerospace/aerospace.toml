@@ -43,9 +43,9 @@ key-mapping.preset = 'qwerty'
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 [workspace-to-monitor-force-assignment]
-1 = ['pl2730h', 'DELL S2722QC', 'DELL S2722DC', 'main']
-2 = ['pl2730h', 'DELL S2722QC', 'DELL S2722DC', 'main']
-3 = ['ple2482h', 'Sidecar Display', 'main']
+1 = ['main']
+2 = ['main']
+3 = ['main']
 4 = ['main']
 
 

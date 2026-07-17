@@ -47,6 +47,8 @@ return {
           PmenuSbar = { bg = theme.ui.bg_m1 },
           PmenuThumb = { bg = theme.ui.bg_p2 },
 
+          WinSeparator = { fg = theme.ui.bg_m3, bg = 'NONE' },
+
           DiagnosticVirtualTextHint = makeDiagnosticColor(theme.diag.hint),
           DiagnosticVirtualTextInfo = makeDiagnosticColor(theme.diag.info),
           DiagnosticVirtualTextWarn = makeDiagnosticColor(theme.diag.warning),

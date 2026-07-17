@@ -8,6 +8,7 @@
   compression = 9  # trade cpu for network
   fsync = none
   whitespace = error  # threat incorrect whitespace as errors
+  pager = hunk pager
 
 [init]
   defaultBranch = main

@@ -107,3 +107,13 @@ vim.opt.hlsearch = true
 vim.opt.showtabline = 2
 
 vim.opt.smoothscroll = true
+
+vim.opt.fillchars = {
+  horiz     = '━',
+  horizup   = '┻',
+  horizdown = '┳',
+  vert      = '┃',
+  vertleft  = '┫',
+  vertright = '┣',
+  verthoriz = '╋',
+}

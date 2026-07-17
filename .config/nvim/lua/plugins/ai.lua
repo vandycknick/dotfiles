@@ -8,12 +8,28 @@ return {
       { 'folke/snacks.nvim', opts = { input = {}, picker = {}, terminal = {} } },
     },
     config = function()
-      vim.g.opencode_opts = {
-        -- Your configuration, if any — see `lua/opencode/config.lua`, or "goto definition" on the type or field.
+      local opencode_cmd = 'opencode --port'
+      ---@type snacks.terminal.Opts
+      local snacks_terminal_opts = {
+        win = {
+          position = 'right',
+          enter = false,
+        },
       }
 
-      -- Required for `opts.events.reload`.
-      vim.o.autoread = true
+      ---@type opencode.Opts
+      vim.g.opencode_opts = {
+        server = {
+          start = function()
+            require('snacks.terminal').open(opencode_cmd, snacks_terminal_opts)
+          end,
+        },
+      }
+
+      -- Can also leverage toggle functionality
+      vim.keymap.set({ 'n', 't' }, '<C-.>', function()
+        require('snacks.terminal').toggle(opencode_cmd, snacks_terminal_opts)
+      end, { desc = 'Toggle opencode' })
 
       -- Recommended/example keymaps.
       vim.keymap.set({ 'n', 'x' }, '<C-a>', function()
@@ -22,9 +38,6 @@ return {
       vim.keymap.set({ 'n', 'x' }, '<C-x>', function()
         require('opencode').select()
       end, { desc = 'Execute opencode action…' })
-      vim.keymap.set({ 'n', 't' }, '<C-.>', function()
-        require('opencode').toggle()
-      end, { desc = 'Toggle opencode' })
 
       vim.keymap.set({ 'n', 'x' }, 'go', function()
         return require('opencode').operator '@this '
