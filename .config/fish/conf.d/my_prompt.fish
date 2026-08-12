@@ -13,37 +13,42 @@ set -g blue (set_color -o blue)
 set -g green (set_color -o green)
 set -g normal (set_color normal)
 
-function _my_prompt_detect_vm --description "Cache VM status for this fish session"
-    if set --query _my_prompt_vm_checked
+function _my_prompt_detect_environment --description "Cache VM and SSH status for this fish session"
+    if set --query _my_prompt_environment_checked
         return
     end
 
-    set --global _my_prompt_vm_checked 1
-    set --global _my_prompt_vm_host
+    set --global _my_prompt_environment_checked 1
+    set --global _my_prompt_environment
+    set --local is_vm false
 
     if command -q systemd-detect-virt
-        if systemd-detect-virt --quiet
-            set --local host (prompt_hostname)
-            set --global _my_prompt_vm_host " "(set_color brblack)"[$host]"$normal
-            return
+        if systemd-detect-virt --vm --quiet
+            set is_vm true
         end
     end
 
-    switch (uname)
-    case Linux
+    if test $is_vm = false; and test (uname) = Linux
         if test -r /sys/class/dmi/id/product_name
             read --local --line product_name </sys/class/dmi/id/product_name
             set product_name (string lower (string trim $product_name))
 
             if string match -rq 'virtual|vmware|kvm|qemu|virtualbox|hyper-v|bochs|parallels' -- $product_name
-                set --local host (prompt_hostname)
-                set --global _my_prompt_vm_host " "(set_color brblack)"[$host]"$normal
+                set is_vm true
             end
         end
     end
+
+    set --local indicators
+    test $is_vm = true; and set --append indicators "☁️"
+    set --query SSH_CONNECTION[1]; or set --query SSH_TTY[1]; and set --append indicators "🔑"
+
+    if set --query indicators[1]
+        set --global _my_prompt_environment (string join " " $indicators)"  "
+    end
 end
 
-_my_prompt_detect_vm
+_my_prompt_detect_environment
 
 function _my_prompt_pwd --on-variable PWD --on-variable my_prompt_ignored_git_paths --on-variable fish_prompt_pwd_dir_length
     set --local git_root (command git --no-optional-locks rev-parse --show-toplevel 2>/dev/null)
