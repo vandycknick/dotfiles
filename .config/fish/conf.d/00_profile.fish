@@ -10,7 +10,7 @@ set -Ux XDG_CACHE_HOME "$HOME/.cache"
 
 switch (uname)
 case Linux
-  set -Ux BROWSER=""
+  set -Ux BROWSER ""
 case Darwin
   set -Ux BROWSER "/Applications/Zen.app/Contents/MacOS/zen"
 
