@@ -1,0 +1,92 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  // Primary model and agent.
+  "model": "openai/gpt-5.6-sol",
+  "default_agent": "plan",
+
+  // Used for lightweight internal work such as session titles
+  // and per-message summaries.
+  "small_model": "openai/gpt-5.6-luna",
+
+  // Prevent accidental publication through /share.
+  "share": "disabled",
+
+  "provider": {
+    "openai": {
+      "options": {
+        // Allow long-running Sol operations to complete.
+        "timeout": 900000,
+
+        // Abort a stalled stream, while leaving enough room for
+        // long reasoning periods without visible output.
+        "chunkTimeout": 120000,
+      },
+    },
+  },
+
+  "agent": {
+    // Main implementation agent.
+    "build": {
+      "model": "openai/gpt-5.6-sol",
+      "reasoningEffort": "high",
+      "reasoningSummary": "auto",
+      "textVerbosity": "medium",
+    },
+
+    // Architecture, planning and read-only analysis remain on Sol.
+    "plan": {
+      "model": "openai/gpt-5.6-sol",
+      "reasoningEffort": "high",
+      "reasoningSummary": "auto",
+      "textVerbosity": "medium",
+    },
+
+    // General-purpose delegated implementation.
+    "general": {
+      "model": "openai/gpt-5.6-terra",
+      "reasoningEffort": "high",
+      "reasoningSummary": "auto",
+      "textVerbosity": "low",
+    },
+
+    // Local codebase discovery is usually straightforward enough
+    // for medium reasoning.
+    "explore": {
+      "model": "openai/gpt-5.6-terra",
+      "reasoningEffort": "medium",
+      "reasoningSummary": "auto",
+      "textVerbosity": "low",
+    },
+
+    // External dependency and upstream source research.
+    "scout": {
+      "model": "openai/gpt-5.6-terra",
+      "reasoningEffort": "medium",
+      "reasoningSummary": "auto",
+      "textVerbosity": "low",
+    },
+
+    // Explicit overrides protect this routing from fallback behaviour.
+    "title": {
+      "model": "openai/gpt-5.6-luna",
+      "reasoningEffort": "none",
+      "textVerbosity": "low",
+    },
+
+    "summary": {
+      "model": "openai/gpt-5.6-luna",
+      "reasoningEffort": "low",
+      "textVerbosity": "low",
+    },
+
+    // Compaction determines what the main agent remembers after a
+    // long session. Terra High is a good quality/cost compromise.
+    "compaction": {
+      "model": "openai/gpt-5.6-terra",
+      "reasoningEffort": "high",
+      "reasoningSummary": "auto",
+      "textVerbosity": "low",
+    },
+  },
+}

@@ -1,0 +1,19 @@
+{
+  "theme": {
+    "name": "kanagawa"
+  },
+  "attention": {
+    "enabled": true,
+    "notifications": true,
+    "sound": false
+  },
+  "diffs": {
+    "wrap": "word"
+  },
+  "session": {
+    "sidebar": "hide",
+    "scrollbar": false,
+    "thinking": "hide"
+  },
+  "animations": true
+}
