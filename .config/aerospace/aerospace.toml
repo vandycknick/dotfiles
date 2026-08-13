@@ -43,8 +43,8 @@ key-mapping.preset = 'qwerty'
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 [workspace-to-monitor-force-assignment]
-1 = ['main']
-2 = ['main']
+1 = ['DELL U3223QE', 'DELL U3225QE', 'main']
+2 = ['DELL U3223QE', 'DELL U3225QE', 'main']
 3 = ['main']
 4 = ['main']
 
