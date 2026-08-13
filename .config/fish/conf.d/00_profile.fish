@@ -7,6 +7,7 @@ set -Ux XDG_CONFIG_HOME "$HOME/.config"
 set -Ux XDG_DATA_HOME "$HOME/.local/share"
 set -Ux XDG_BIN_HOME "$HOME/.local/bin"
 set -Ux XDG_CACHE_HOME "$HOME/.cache"
+set -Ux XDG_STATE_HOME "$HOME/.local/state"
 
 switch (uname)
 case Linux
@@ -43,4 +44,4 @@ fish_add_path "$CARGO_HOME/bin"
 set -Ux PASSWORD_STORE_DIR "$XDG_DATA_HOME/password-store"
 
 # Nix profile
-fish_add_path $XDG_STATE_HOME/nix/profile/bin/
+fish_add_path --global --prepend --move "$XDG_STATE_HOME/nix/profiles/profile/bin"

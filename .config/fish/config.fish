@@ -7,6 +7,7 @@ if status is-interactive
   direnv hook fish | source
   zoxide init fish | source
   atuin init fish | source
+  wtp hook fish | source
 end
 
 bind -M insert \cp up-or-search
