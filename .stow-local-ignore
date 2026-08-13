@@ -27,3 +27,4 @@ _darcs
 install
 ansible
 .config/nvim/result
+.config/gcloud
