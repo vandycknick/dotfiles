@@ -31,4 +31,5 @@ case Linux
 case Darwin
   alias clip "pbcopy"
   alias uuid 'uuidgen | tr "[:upper:]" "[:lower:]"'
+  alias tailscale='/Applications/Tailscale.app/Contents/MacOS/Tailscale'
 end
