@@ -36,7 +36,7 @@
               pkgs.nixfmt
               pkgs.prettierd
               pkgs.terraform-ls
-              pkgs.vtsls
+              pkgs.typescript-go
               pkgs.vscode-langservers-extracted
             ] ++ lib.optionals pkgs.stdenv.isLinux [
               pkgs.inotify-tools # Lsp file watching requires inotify tools to be installed on Linux: https://gitlab.b-data.ch/neovim/neovim/-/blob/master/runtime/lua/vim/lsp/_watchfiles.lua?ref_type=heads#L11
