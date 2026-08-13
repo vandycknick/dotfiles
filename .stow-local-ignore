@@ -28,3 +28,4 @@ install
 ansible
 .config/nvim/result
 .config/gcloud
+.local/share/gnupg/pubring.kbx

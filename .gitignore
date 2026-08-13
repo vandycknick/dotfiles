@@ -3,4 +3,5 @@
 
 .ssh/config.d/private/*
 .ssh/known_hosts
+.local/share/gnupg/pubring.kbx
 .tmp
