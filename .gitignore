@@ -2,6 +2,7 @@
 .config/gcloud
 
 .ssh/config.d/private/*
-.ssh/known_hosts
+.ssh/known_hosts*
+!.ssh/known_hosts.services
 .local/share/gnupg/pubring.kbx
 .tmp
