@@ -10,6 +10,9 @@
   whitespace = error  # threat incorrect whitespace as errors
   pager = hunk pager
 
+[pager]
+  log = less
+
 [init]
   defaultBranch = main
 
@@ -62,4 +65,10 @@
     whitespace = yellow reverse
 
 [url "git@github.com"]
-  insteadOf = "gh:"
+insteadOf = "gh:"
+
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
