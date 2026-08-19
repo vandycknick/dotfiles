@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -ne 4 ]]; then
+    printf 'Invalid devbox session request.\n' >&2
+    exit 64
+fi
+
+readonly original_command=$1
+readonly terminal=$2
+readonly ssh_connection=$3
+readonly agent_socket=$4
+forwarded_agent_socket=
+
+if [[ "$agent_socket" != - ]]; then
+    case "$agent_socket" in
+        {{ devbox_home }}/.ssh/forwarded/ssh-agent.*) ;;
+        *)
+            printf 'Invalid forwarded SSH agent path.\n' >&2
+            exit 64
+            ;;
+    esac
+    [[ -S "$agent_socket" ]] || exit 1
+    forwarded_agent_socket=$agent_socket
+fi
+
+transport=--pipe
+if [[ -t 0 && -t 1 ]]; then
+    transport=--pty
+fi
+
+exec /usr/bin/systemd-run \
+    --quiet \
+    --wait \
+    --collect \
+    "$transport" \
+    --machine={{ devbox_name }} \
+    --uid={{ devbox_user }} \
+    --setenv=HOME={{ devbox_home }} \
+    --setenv=USER={{ devbox_user }} \
+    --setenv=LOGNAME={{ devbox_user }} \
+    --setenv=SHELL=/bin/bash \
+    --setenv="SSH_AUTH_SOCK=$forwarded_agent_socket" \
+    --setenv="SSH_ORIGINAL_COMMAND=$original_command" \
+    --setenv="TERM=$terminal" \
+    --setenv="SSH_CONNECTION=$ssh_connection" \
+    /usr/local/libexec/enter-devbox-session

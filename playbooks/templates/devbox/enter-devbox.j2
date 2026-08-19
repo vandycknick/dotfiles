@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly forwarded_directory="{{ devbox_home }}/.ssh/forwarded"
+agent_socket=-
+relay_pid=
+
+cleanup() {
+    if [[ -n "$relay_pid" ]]; then
+        kill "$relay_pid" 2>/dev/null || true
+        wait "$relay_pid" 2>/dev/null || true
+    fi
+    if [[ "$agent_socket" != - ]]; then
+        rm -f -- "$agent_socket"
+    fi
+}
+trap cleanup EXIT HUP INT TERM
+
+if [[ -n "${SSH_AUTH_SOCK:-}" && -S "$SSH_AUTH_SOCK" ]]; then
+    install -d -m 0700 -o {{ devbox_user }} -g {{ devbox_group }} "$forwarded_directory"
+    agent_socket="$forwarded_directory/ssh-agent.$$"
+    rm -f -- "$agent_socket"
+    /usr/bin/socat \
+        "UNIX-LISTEN:${agent_socket},fork,mode=0600" \
+        "UNIX-CONNECT:${SSH_AUTH_SOCK}" &
+    relay_pid=$!
+
+    for _ in {1..50}; do
+        [[ -S "$agent_socket" ]] && break
+        sleep 0.02
+    done
+    if [[ ! -S "$agent_socket" ]]; then
+        printf 'Unable to expose the forwarded SSH agent to devbox.\n' >&2
+        exit 1
+    fi
+fi
+
+set +e
+/usr/bin/sudo /usr/local/libexec/run-devbox-session \
+    "${SSH_ORIGINAL_COMMAND:-}" \
+    "${TERM:-}" \
+    "${SSH_CONNECTION:-}" \
+    "$agent_socket"
+status=$?
+set -e
+exit "$status"

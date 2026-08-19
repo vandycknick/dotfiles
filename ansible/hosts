@@ -1,6 +1,0 @@
-# vim: ft=toml
-[local]
-localhost
-
-[local:vars]
-ansible_connection=local

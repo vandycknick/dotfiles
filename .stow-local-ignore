@@ -25,7 +25,7 @@ _darcs
 # Custom
 \.editorconfig
 install
-ansible
+playbooks
 .config/nvim/result
 .config/gcloud
 .local/share/gnupg/pubring.kbx
