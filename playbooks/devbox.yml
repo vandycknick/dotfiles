@@ -14,7 +14,9 @@
     devbox_machine_path: "/var/lib/machines/{{ devbox_name }}"
     devbox_mkosi_directory: "/etc/mkosi/{{ devbox_name }}"
     devbox_arch_mirror: https://geo.mirror.pkgbuild.com
+    devbox_dns_probe: geo.mirror.pkgbuild.com
     devbox_required_image_packages:
+      - archlinux-keyring
       - base
       - sudo
       - git
@@ -26,6 +28,14 @@
       - openssh
       - socat
       - sudo
+    devbox_root_machine_argv:
+      - /usr/bin/systemd-run
+      - --quiet
+      - --wait
+      - --pipe
+      - --collect
+      - "--machine={{ devbox_name }}"
+      - --uid=root
 
     devbox_gpg_fingerprint: 59C1F0F1B11413BC59FFDF68E742877FB4B706FC
     devbox_gpg_public_key_url: >-
@@ -321,6 +331,18 @@
         mode: "0644"
       when: devbox_image_after_build.stat.exists
 
+    - name: Link the container resolver to systemd-resolved
+      ansible.builtin.file:
+        src: ../run/systemd/resolve/stub-resolv.conf
+        dest: "{{ devbox_image_path }}/etc/resolv.conf"
+        state: link
+        owner: root
+        group: root
+        force: true
+        follow: false
+      register: devbox_container_resolv_conf
+      when: devbox_image_after_build.stat.exists
+
     - name: Install the container account definition
       ansible.builtin.template:
         src: devbox/devbox.sysusers.j2
@@ -483,6 +505,7 @@
              if (devbox_nspawn_configuration.changed or
                  devbox_nspawn_service_override.changed or
                  devbox_image_build.changed | default(false) or
+                 devbox_container_resolv_conf.changed | default(false) or
                  devbox_container_session_helper.changed | default(false))
              else 'started' }}
       when: devbox_image_after_build.stat.exists
@@ -495,6 +518,86 @@
           - "systemd-nspawn@{{ devbox_name }}.service"
       changed_when: false
       when: devbox_image_after_build.stat.exists
+
+    - name: Inspect the container resolver link
+      ansible.builtin.command:
+        argv: >-
+          {{ devbox_root_machine_argv +
+             ['/usr/bin/readlink', '--canonicalize', '/etc/resolv.conf'] }}
+      register: devbox_container_resolv_conf_target
+      changed_when: false
+      when: devbox_image_after_build.stat.exists
+
+    - name: Require the systemd-resolved stub resolver
+      ansible.builtin.assert:
+        that:
+          - >-
+            devbox_container_resolv_conf_target.stdout | trim ==
+            '/run/systemd/resolve/stub-resolv.conf'
+        fail_msg: The container does not use the systemd-resolved DNS stub.
+      when: devbox_image_after_build.stat.exists
+
+    - name: Verify container DNS resolution
+      ansible.builtin.command:
+        argv: >-
+          {{ devbox_root_machine_argv +
+             ['/usr/bin/resolvectl', 'query', devbox_dns_probe] }}
+      changed_when: false
+      when: devbox_image_after_build.stat.exists
+
+    - name: Initialize the container pacman keyring
+      ansible.builtin.command:
+        argv: "{{ devbox_root_machine_argv + ['/usr/bin/pacman-key', '--init'] }}"
+      changed_when: false
+      when: devbox_image_after_build.stat.exists
+
+    - name: Populate the container pacman keyring
+      ansible.builtin.command:
+        argv: >-
+          {{ devbox_root_machine_argv +
+             ['/usr/bin/pacman-key', '--populate', 'archlinux'] }}
+      changed_when: false
+      when: devbox_image_after_build.stat.exists
+
+    - name: Update the container Arch keyring package
+      ansible.builtin.command:
+        argv: >-
+          {{ devbox_root_machine_argv +
+             ['--setenv=LC_ALL=C', '/usr/bin/pacman', '--sync', '--refresh',
+              '--needed', '--noconfirm', 'archlinux-keyring'] }}
+      register: devbox_keyring_update
+      changed_when: >-
+        'there is nothing to do' not in
+        ((devbox_keyring_update.stdout ~ devbox_keyring_update.stderr) | lower)
+      when: devbox_image_after_build.stat.exists
+
+    - name: Repopulate the updated container pacman keyring
+      ansible.builtin.command:
+        argv: >-
+          {{ devbox_root_machine_argv +
+             ['/usr/bin/pacman-key', '--populate', 'archlinux'] }}
+      changed_when: false
+      when: devbox_image_after_build.stat.exists
+
+    - name: Upgrade all container packages
+      ansible.builtin.command:
+        argv: >-
+          {{ devbox_root_machine_argv +
+             ['--setenv=LC_ALL=C', '/usr/bin/pacman', '--sync', '--sysupgrade',
+              '--noconfirm'] }}
+      register: devbox_package_upgrade
+      changed_when: >-
+        'there is nothing to do' not in
+        ((devbox_package_upgrade.stdout ~ devbox_package_upgrade.stderr) | lower)
+      when: devbox_image_after_build.stat.exists
+
+    - name: Restart the devbox after package upgrades
+      ansible.builtin.systemd_service:
+        name: "systemd-nspawn@{{ devbox_name }}.service"
+        state: restarted
+      when:
+        - devbox_image_after_build.stat.exists
+        - devbox_package_upgrade.changed
 
     - name: Verify the container account
       ansible.builtin.command:
