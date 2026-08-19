@@ -1,0 +1,14 @@
+[Unit]
+After=tailscale-online.target
+Wants=tailscale-online.target
+
+[Service]
+Type=simple
+User=coder
+
+ExecStartPre=+/usr/local/libexec/nvim-remote-firewall up
+ExecStart=/bin/sh -c 'exec "$SHELL" -l -c "exec nvim --headless --listen $(tailscale ip -4):4560"'
+ExecStopPost=+/usr/local/libexec/nvim-remote-firewall down
+
+Restart=on-failure
+RestartSec=1

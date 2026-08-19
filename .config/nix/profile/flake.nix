@@ -20,10 +20,18 @@
     }:
     let
       lib = nixpkgs.lib;
+      supportedSystems = builtins.filter (
+        system:
+        builtins.elem system [
+          "x86_64-linux"
+          "aarch64-linux"
+          "aarch64-darwin"
+        ]
+      ) (import systems);
 
       forEachSystem =
         f:
-        lib.genAttrs (import systems) (
+        lib.genAttrs supportedSystems (
           system:
           f system (
             import nixpkgs {
@@ -57,6 +65,7 @@
                 platform = "apple_universal";
                 extension = "pkg";
               };
+
             }
             .${system} or (throw "1Password CLI beta is not supported on ${system}");
 
@@ -73,7 +82,7 @@
               else
                 pkgs.fetchurl {
                   url = "https://cache.agilebits.com/dist/1P/op2/pkg/v${onePasswordVersion}/op_${onePasswordSource.platform}_v${onePasswordVersion}.pkg";
-                  hash = lib.fakeHash;
+                  hash = "sha256-af3G2rc4JsqN7fn9uitN4S5z1x/DVLadHbszCUQswz0=";
                 };
           });
         in
@@ -104,6 +113,8 @@
                 tokei
 
                 # Git
+                git
+                stow
                 lazygit
                 hunk
 

@@ -1,4 +1,235 @@
-#!/usr/bin/env sh
-set -eou pipefail
+#!/bin/sh
 
-~/.dotfiles/.local/bin/dot
+set -eu
+
+: "${HOME:?HOME is not set}"
+
+REPO_URL="https://github.com/vandycknick/dotfiles.git"
+REPO_BRANCH="main"
+DOTFILES_DIR="$HOME/.dotfiles"
+NIX_DAEMON_PROFILE="/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
+NIX_FEATURES="nix-command flakes"
+PROFILE_NAME=".config/nix/profile"
+PROFILE_FLAKE="$DOTFILES_DIR/$PROFILE_NAME"
+RESTORE_CHECKOUT=0
+
+info() {
+    printf '\n==> %s\n' "$1"
+}
+
+die() {
+    printf 'error: %s\n' "$1" >&2
+    exit 1
+}
+
+usage() {
+    cat <<EOF
+Usage: dot
+
+Install or update the dotfiles, Nix profile, and Stow links.
+EOF
+}
+
+run_as_root() {
+    command -v sudo >/dev/null 2>&1 || die "sudo is required to install system packages"
+    sudo "$@"
+}
+
+install_linux_dependencies() {
+    if command -v apt-get >/dev/null 2>&1; then
+        run_as_root apt-get update
+        run_as_root apt-get install -y ca-certificates curl git tar xz-utils
+    elif command -v pacman >/dev/null 2>&1; then
+        run_as_root pacman -S --needed --noconfirm ca-certificates curl git tar xz
+    elif command -v dnf >/dev/null 2>&1; then
+        run_as_root dnf install -y ca-certificates curl git tar xz
+    elif command -v yum >/dev/null 2>&1; then
+        run_as_root yum install -y ca-certificates curl git tar xz
+    elif command -v zypper >/dev/null 2>&1; then
+        run_as_root zypper --non-interactive install ca-certificates curl git tar xz
+    else
+        die "no supported package manager found; install curl, git, tar, and xz, then rerun"
+    fi
+}
+
+ensure_bootstrap_dependencies() {
+    os=$(uname -s)
+    arch=$(uname -m)
+
+    case "$os:$arch" in
+        Darwin:arm64 | Darwin:aarch64 | Linux:x86_64 | Linux:aarch64)
+            ;;
+        Darwin:*)
+            die "the personal Nix profile supports Apple Silicon macOS only"
+            ;;
+        Linux:*)
+            die "the personal Nix profile supports x86_64 and aarch64 Linux only"
+            ;;
+        *)
+            die "only Linux and macOS are supported"
+            ;;
+    esac
+
+    case "$os" in
+        Darwin)
+            if ! command -v git >/dev/null 2>&1 || ! git --version >/dev/null 2>&1; then
+                info "Installing the Xcode Command Line Tools"
+                xcode-select --install >/dev/null 2>&1 || true
+                die "finish installing the Xcode Command Line Tools, then rerun this command"
+            fi
+            ;;
+        Linux)
+            if ! command -v git >/dev/null 2>&1 \
+                || ! command -v curl >/dev/null 2>&1 \
+                || ! command -v tar >/dev/null 2>&1 \
+                || ! command -v xz >/dev/null 2>&1; then
+                info "Installing bootstrap dependencies"
+                install_linux_dependencies
+            fi
+            ;;
+    esac
+
+    command -v curl >/dev/null 2>&1 || die "curl is required"
+    git --version >/dev/null 2>&1 || die "git installation failed"
+}
+
+ensure_clean_checkout() {
+    if [ -n "$(git -C "$DOTFILES_DIR" status --porcelain --untracked-files=normal)" ]; then
+        git -C "$DOTFILES_DIR" status --short >&2
+        die "$DOTFILES_DIR has uncommitted changes; commit or remove them before updating"
+    fi
+}
+
+is_expected_origin() {
+    case "$1" in
+        https://github.com/vandycknick/dotfiles.git \
+            | https://github.com/vandycknick/dotfiles \
+            | git@github.com:vandycknick/dotfiles.git \
+            | ssh://git@github.com/vandycknick/dotfiles.git)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+update_dotfiles() {
+    if [ ! -e "$DOTFILES_DIR" ]; then
+        info "Cloning dotfiles"
+        git clone --branch "$REPO_BRANCH" --single-branch "$REPO_URL" "$DOTFILES_DIR"
+        return
+    fi
+
+    [ -d "$DOTFILES_DIR/.git" ] || die "$DOTFILES_DIR exists but is not a Git repository"
+
+    origin_url=$(git -C "$DOTFILES_DIR" remote get-url origin 2>/dev/null) \
+        || die "$DOTFILES_DIR has no origin remote"
+    is_expected_origin "$origin_url" \
+        || die "$DOTFILES_DIR has an unexpected origin: $origin_url"
+
+    current_branch=$(git -C "$DOTFILES_DIR" branch --show-current)
+    [ "$current_branch" = "$REPO_BRANCH" ] \
+        || die "$DOTFILES_DIR must be on the $REPO_BRANCH branch, not ${current_branch:-a detached HEAD}"
+
+    ensure_clean_checkout
+    info "Updating dotfiles"
+    git -C "$DOTFILES_DIR" pull --ff-only origin "$REPO_BRANCH"
+}
+
+load_nix() {
+    if [ -r "$NIX_DAEMON_PROFILE" ]; then
+        set +u
+        # shellcheck disable=SC1090
+        . "$NIX_DAEMON_PROFILE"
+        set -u
+    fi
+}
+
+ensure_nix() {
+    load_nix
+
+    if command -v nix >/dev/null 2>&1; then
+        [ -r "$NIX_DAEMON_PROFILE" ] \
+            || die "an existing non-daemon Nix installation was found; migrate it to multi-user Nix first"
+        return
+    fi
+
+    if [ "$(uname -s)" = "Linux" ] && [ ! -d /run/systemd/system ]; then
+        die "multi-user Nix on Linux requires systemd"
+    fi
+
+    info "Installing multi-user Nix"
+    curl -fsSL https://nixos.org/nix/install | sh -s -- --daemon
+    load_nix
+    command -v nix >/dev/null 2>&1 || die "Nix was installed but is unavailable in this shell"
+}
+
+update_nix_profile() {
+    profile_json=$(nix --extra-experimental-features "$NIX_FEATURES" profile list --json)
+
+    info "Building the personal Nix profile"
+    if printf '%s' "$profile_json" | grep -Fq "\"$PROFILE_NAME\":"; then
+        nix --extra-experimental-features "$NIX_FEATURES" \
+            profile upgrade --no-write-lock-file "$PROFILE_NAME"
+    else
+        nix --extra-experimental-features "$NIX_FEATURES" \
+            profile add --no-write-lock-file "$PROFILE_FLAKE"
+    fi
+}
+
+find_stow() {
+    STOW="$HOME/.local/state/nix/profiles/profile/bin/stow"
+    if [ ! -x "$STOW" ]; then
+        STOW="$HOME/.nix-profile/bin/stow"
+    fi
+    [ -x "$STOW" ] || die "GNU Stow was not installed by the personal Nix profile"
+}
+
+restore_checkout() {
+    if [ "$RESTORE_CHECKOUT" -eq 1 ]; then
+        git -C "$DOTFILES_DIR" restore --worktree -- . || true
+    fi
+}
+
+stow_dotfiles() {
+    find_stow
+    ensure_clean_checkout
+
+    info "Linking dotfiles"
+    trap restore_checkout 0
+    RESTORE_CHECKOUT=1
+    "$STOW" --dir="$DOTFILES_DIR" --target="$HOME" --adopt --restow .
+    git -C "$DOTFILES_DIR" restore --worktree -- .
+    RESTORE_CHECKOUT=0
+    trap - 0
+
+    ensure_clean_checkout
+}
+
+main() {
+    case "${1:-}" in
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        "")
+            ;;
+        *)
+            usage >&2
+            exit 2
+            ;;
+    esac
+
+    [ "$(id -u)" -ne 0 ] || die "run this command as your regular user, not root"
+    ensure_bootstrap_dependencies
+    update_dotfiles
+    ensure_nix
+    update_nix_profile
+    stow_dotfiles
+
+    info "Dotfiles are up to date"
+    printf 'Open a new shell to load the updated environment.\n'
+}
+
+main "$@"

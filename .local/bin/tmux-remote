@@ -1,0 +1,59 @@
+#!/bin/bash
+
+set -euo pipefail
+
+uri="${TMUX_PANE_PATH:-${1:-}}"
+
+host=$(tmux display-message -p -t "${TMUX_PANE:?}" \
+    'coder.#{session_name}.#{window_index}.#{pane_index}')
+
+decode_uri_path() {
+    local encoded="$1" decoded="" prefix hex byte
+
+    while [[ "$encoded" == *%* ]]; do
+        prefix=${encoded%%\%*}
+        encoded=${encoded#*\%}
+        decoded+="$prefix"
+
+        if [[ "$encoded" =~ ^([[:xdigit:]]{2})(.*)$ ]]; then
+            hex=${BASH_REMATCH[1]}
+            encoded=${BASH_REMATCH[2]}
+            [[ "$hex" == 00 ]] && return 1
+            printf -v byte '%b' "\\x$hex"
+            decoded+="$byte"
+        else
+            decoded+="%"
+        fi
+    done
+
+    decoded+="$encoded"
+    DECODED_PATH="$decoded"
+}
+
+quote_remote_path() {
+    local value="$1" prefix
+
+    QUOTED_PATH="'"
+    while [[ "$value" == *"'"* ]]; do
+        prefix=${value%%"'"*}
+        printf -v QUOTED_PATH '%s%s%s' "$QUOTED_PATH" "$prefix" "'\\''"
+        value=${value#*"'"}
+    done
+    printf -v QUOTED_PATH "%s%s'" "$QUOTED_PATH" "$value"
+}
+
+remote_command='exec /home/coder/.nix-profile/bin/zmx attach %k'
+
+if [[ "$uri" == file://*/* ]]; then
+    encoded_path=${uri#file://}
+    encoded_path="/${encoded_path#*/}"
+
+    if decode_uri_path "$encoded_path"; then
+        quote_remote_path "$DECODED_PATH"
+        # OpenSSH expands percent tokens in RemoteCommand; literal percents are %%.
+        QUOTED_PATH=${QUOTED_PATH//%/%%}
+        remote_command="cd $QUOTED_PATH && $remote_command"
+    fi
+fi
+
+exec ssh -t -o "RemoteCommand=$remote_command" "$host"

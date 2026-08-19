@@ -1,0 +1,8 @@
+---
+- name: Group windows by application to improve aerospace # defaults write com.apple.dock expose-group-apps -bool true && killall Dock
+  community.general.osx_defaults:
+    domain: com.apple.dock
+    key: expose-group-apps
+    type: bool
+    value: true
+    state: present
