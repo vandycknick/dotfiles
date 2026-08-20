@@ -103,21 +103,6 @@ ensure_clean_checkout() {
     fi
 }
 
-ensure_checkout_is_updateable() {
-    if [ -n "$(git -C "$DOTFILES_DIR" status --porcelain --untracked-files=no)" ]; then
-        git -C "$DOTFILES_DIR" status --short >&2
-        die "$DOTFILES_DIR has tracked changes; commit or remove them before updating"
-    fi
-
-    if [ -n "$(git -C "$DOTFILES_DIR" ls-files --others --exclude-standard -- \
-        . ':(exclude).config' ':(exclude).config/**' \
-        ':(exclude).local' ':(exclude).local/**' \
-        ':(exclude).ssh' ':(exclude).ssh/**')" ]; then
-        git -C "$DOTFILES_DIR" status --short >&2
-        die "$DOTFILES_DIR has untracked files outside the migratable home directories"
-    fi
-}
-
 is_expected_origin() {
     case "$1" in
         https://github.com/vandycknick/dotfiles.git \
@@ -150,9 +135,7 @@ update_dotfiles() {
     [ "$current_branch" = "$REPO_BRANCH" ] \
         || die "$DOTFILES_DIR must be on the $REPO_BRANCH branch, not ${current_branch:-a detached HEAD}"
 
-    # Untracked files may be application state written through an old folded
-    # Stow link. They are migrated after Stow is available.
-    ensure_checkout_is_updateable
+    ensure_clean_checkout
     info "Updating dotfiles"
     git -C "$DOTFILES_DIR" pull --ff-only origin "$REPO_BRANCH"
 }
@@ -212,75 +195,8 @@ restore_checkout() {
     fi
 }
 
-is_disposable_generated_path() {
-    case "$1" in
-        .config/nvim/result | .config/opencode/.gitignore | .config/opencode/node_modules)
-            return 0
-            ;;
-        *)
-            return 1
-            ;;
-    esac
-}
-
-migrate_unmanaged_dotfiles() {
-    migration_list=$(mktemp "${TMPDIR:-/tmp}/dotfiles-migration.XXXXXX") \
-        || die "could not create a temporary migration list"
-    trap 'rm -f "$migration_list"' 0
-
-    git -C "$DOTFILES_DIR" ls-files --others --exclude-standard \
-        --directory --no-empty-directory -- .config .local .ssh >"$migration_list"
-    git -C "$DOTFILES_DIR" ls-files --others --ignored --exclude-standard \
-        --directory --no-empty-directory -- .config .local .ssh >>"$migration_list"
-
-    if [ ! -s "$migration_list" ]; then
-        rm -f "$migration_list"
-        trap - 0
-        return
-    fi
-
-    # Check every destination before removing the current Stow links. A path
-    # resolving to its source is visible through a folded link and is safe.
-    while IFS= read -r path; do
-        path=${path%/}
-        is_disposable_generated_path "$path" && continue
-
-        source_path="$DOTFILES_DIR/$path"
-        target_path="$HOME/$path"
-        if { [ -e "$target_path" ] || [ -L "$target_path" ]; } \
-            && ! [ "$target_path" -ef "$source_path" ]; then
-            die "cannot migrate $path because $target_path already exists"
-        fi
-    done <"$migration_list"
-
-    info "Moving generated files out of the dotfiles checkout"
-    "$STOW" --dir="$DOTFILES_DIR" --target="$HOME" --delete --no-folding .
-
-    while IFS= read -r path; do
-        path=${path%/}
-        source_path="$DOTFILES_DIR/$path"
-        [ -e "$source_path" ] || [ -L "$source_path" ] || continue
-
-        if is_disposable_generated_path "$path"; then
-            rm -rf "$source_path"
-            continue
-        fi
-
-        target_path="$HOME/$path"
-        if [ -e "$target_path" ] || [ -L "$target_path" ]; then
-            die "cannot migrate $path because $target_path still exists after unstowing"
-        fi
-        mkdir -p "$(dirname "$target_path")"
-        mv "$source_path" "$target_path"
-    done <"$migration_list"
-
-    rm -f "$migration_list"
-    trap - 0
-}
-
 stow_dotfiles() {
     find_stow
-    migrate_unmanaged_dotfiles
     ensure_clean_checkout
 
     info "Linking dotfiles"

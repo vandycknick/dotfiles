@@ -24,10 +24,7 @@ restow the repository.
 Stow links individual files rather than folding whole directories into the
 repository. Directories such as `~/.config/fish`, `~/.local/bin`, and
 `~/.local/share/gnupg` therefore remain real directories, so application state
-created alongside the managed links stays outside the dotfiles checkout. When
-upgrading an older folded installation, `dot` preserves generated state by
-moving it into the real home directory and discards only rebuildable dependency
-directories.
+created alongside the managed links stays outside the dotfiles checkout.
 
 The repository is authoritative: files in the home directory that conflict
 with managed dotfiles are replaced. Untracked or uncommitted repository changes
