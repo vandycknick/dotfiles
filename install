@@ -11,6 +11,7 @@ NIX_DAEMON_PROFILE="/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
 NIX_FEATURES="nix-command flakes"
 PROFILE_NAME=".config/nix/profile"
 PROFILE_FLAKE="$DOTFILES_DIR/$PROFILE_NAME"
+PROFILE_BIN="$HOME/.local/state/nix/profiles/profile/bin"
 RESTORE_CHECKOUT=0
 
 info() {
@@ -31,24 +32,24 @@ EOF
 }
 
 run_as_root() {
-    command -v sudo >/dev/null 2>&1 || die "sudo is required to install system packages"
+    command -v sudo >/dev/null 2>&1 || die "sudo is required for system installation and configuration"
     sudo "$@"
 }
 
 install_linux_dependencies() {
     if command -v apt-get >/dev/null 2>&1; then
         run_as_root apt-get update
-        run_as_root apt-get install -y ca-certificates curl git tar xz-utils
+        run_as_root apt-get install -y ca-certificates curl git passwd tar xz-utils
     elif command -v pacman >/dev/null 2>&1; then
-        run_as_root pacman -S --needed --noconfirm ca-certificates curl git tar xz
+        run_as_root pacman -S --needed --noconfirm ca-certificates curl git tar util-linux xz
     elif command -v dnf >/dev/null 2>&1; then
-        run_as_root dnf install -y ca-certificates curl git tar xz
+        run_as_root dnf install -y ca-certificates curl git tar util-linux-user xz
     elif command -v yum >/dev/null 2>&1; then
-        run_as_root yum install -y ca-certificates curl git tar xz
+        run_as_root yum install -y ca-certificates curl git tar util-linux-user xz
     elif command -v zypper >/dev/null 2>&1; then
-        run_as_root zypper --non-interactive install ca-certificates curl git tar xz
+        run_as_root zypper --non-interactive install ca-certificates curl git tar util-linux xz
     else
-        die "no supported package manager found; install curl, git, tar, and xz, then rerun"
+        die "no supported package manager found; install chsh, curl, git, tar, and xz, then rerun"
     fi
 }
 
@@ -82,10 +83,12 @@ ensure_bootstrap_dependencies() {
             if ! command -v git >/dev/null 2>&1 \
                 || ! command -v curl >/dev/null 2>&1 \
                 || ! command -v tar >/dev/null 2>&1 \
-                || ! command -v xz >/dev/null 2>&1; then
+                || ! command -v xz >/dev/null 2>&1 \
+                || ! command -v chsh >/dev/null 2>&1; then
                 info "Installing bootstrap dependencies"
                 install_linux_dependencies
             fi
+            command -v chsh >/dev/null 2>&1 || die "chsh installation failed"
             ;;
     esac
 
@@ -97,6 +100,21 @@ ensure_clean_checkout() {
     if [ -n "$(git -C "$DOTFILES_DIR" status --porcelain --untracked-files=normal)" ]; then
         git -C "$DOTFILES_DIR" status --short >&2
         die "$DOTFILES_DIR has uncommitted changes; commit or remove them before updating"
+    fi
+}
+
+ensure_checkout_is_updateable() {
+    if [ -n "$(git -C "$DOTFILES_DIR" status --porcelain --untracked-files=no)" ]; then
+        git -C "$DOTFILES_DIR" status --short >&2
+        die "$DOTFILES_DIR has tracked changes; commit or remove them before updating"
+    fi
+
+    if [ -n "$(git -C "$DOTFILES_DIR" ls-files --others --exclude-standard -- \
+        . ':(exclude).config' ':(exclude).config/**' \
+        ':(exclude).local' ':(exclude).local/**' \
+        ':(exclude).ssh' ':(exclude).ssh/**')" ]; then
+        git -C "$DOTFILES_DIR" status --short >&2
+        die "$DOTFILES_DIR has untracked files outside the migratable home directories"
     fi
 }
 
@@ -132,7 +150,9 @@ update_dotfiles() {
     [ "$current_branch" = "$REPO_BRANCH" ] \
         || die "$DOTFILES_DIR must be on the $REPO_BRANCH branch, not ${current_branch:-a detached HEAD}"
 
-    ensure_clean_checkout
+    # Untracked files may be application state written through an old folded
+    # Stow link. They are migrated after Stow is available.
+    ensure_checkout_is_updateable
     info "Updating dotfiles"
     git -C "$DOTFILES_DIR" pull --ff-only origin "$REPO_BRANCH"
 }
@@ -179,7 +199,7 @@ update_nix_profile() {
 }
 
 find_stow() {
-    STOW="$HOME/.local/state/nix/profiles/profile/bin/stow"
+    STOW="$PROFILE_BIN/stow"
     if [ ! -x "$STOW" ]; then
         STOW="$HOME/.nix-profile/bin/stow"
     fi
@@ -192,19 +212,109 @@ restore_checkout() {
     fi
 }
 
+is_disposable_generated_path() {
+    case "$1" in
+        .config/nvim/result | .config/opencode/.gitignore | .config/opencode/node_modules)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+migrate_unmanaged_dotfiles() {
+    migration_list=$(mktemp "${TMPDIR:-/tmp}/dotfiles-migration.XXXXXX") \
+        || die "could not create a temporary migration list"
+    trap 'rm -f "$migration_list"' 0
+
+    git -C "$DOTFILES_DIR" ls-files --others --exclude-standard \
+        --directory --no-empty-directory -- .config .local .ssh >"$migration_list"
+    git -C "$DOTFILES_DIR" ls-files --others --ignored --exclude-standard \
+        --directory --no-empty-directory -- .config .local .ssh >>"$migration_list"
+
+    if [ ! -s "$migration_list" ]; then
+        rm -f "$migration_list"
+        trap - 0
+        return
+    fi
+
+    # Check every destination before removing the current Stow links. A path
+    # resolving to its source is visible through a folded link and is safe.
+    while IFS= read -r path; do
+        path=${path%/}
+        is_disposable_generated_path "$path" && continue
+
+        source_path="$DOTFILES_DIR/$path"
+        target_path="$HOME/$path"
+        if { [ -e "$target_path" ] || [ -L "$target_path" ]; } \
+            && ! [ "$target_path" -ef "$source_path" ]; then
+            die "cannot migrate $path because $target_path already exists"
+        fi
+    done <"$migration_list"
+
+    info "Moving generated files out of the dotfiles checkout"
+    "$STOW" --dir="$DOTFILES_DIR" --target="$HOME" --delete --no-folding .
+
+    while IFS= read -r path; do
+        path=${path%/}
+        source_path="$DOTFILES_DIR/$path"
+        [ -e "$source_path" ] || [ -L "$source_path" ] || continue
+
+        if is_disposable_generated_path "$path"; then
+            rm -rf "$source_path"
+            continue
+        fi
+
+        target_path="$HOME/$path"
+        if [ -e "$target_path" ] || [ -L "$target_path" ]; then
+            die "cannot migrate $path because $target_path still exists after unstowing"
+        fi
+        mkdir -p "$(dirname "$target_path")"
+        mv "$source_path" "$target_path"
+    done <"$migration_list"
+
+    rm -f "$migration_list"
+    trap - 0
+}
+
 stow_dotfiles() {
     find_stow
+    migrate_unmanaged_dotfiles
     ensure_clean_checkout
 
     info "Linking dotfiles"
     trap restore_checkout 0
     RESTORE_CHECKOUT=1
-    "$STOW" --dir="$DOTFILES_DIR" --target="$HOME" --adopt --restow .
+    "$STOW" --dir="$DOTFILES_DIR" --target="$HOME" --adopt --restow --no-folding .
     git -C "$DOTFILES_DIR" restore --worktree -- .
     RESTORE_CHECKOUT=0
     trap - 0
 
     ensure_clean_checkout
+}
+
+configure_linux_login_shell() {
+    [ "$(uname -s)" = "Linux" ] || return
+
+    fish_shell="$PROFILE_BIN/fish"
+    [ -x "$fish_shell" ] || die "Fish was not installed by the personal Nix profile"
+    command -v getent >/dev/null 2>&1 || die "getent is required to inspect the current login shell"
+
+    if ! grep -Fqx "$fish_shell" /etc/shells 2>/dev/null; then
+        info "Registering Nix Fish as a login shell"
+        printf '%s\n' "$fish_shell" | run_as_root tee -a /etc/shells >/dev/null
+    fi
+
+    current_user=$(id -un)
+    passwd_entry=$(getent passwd "$current_user") \
+        || die "could not inspect the login shell for $current_user"
+    current_shell=${passwd_entry##*:}
+
+    if [ "$current_shell" != "$fish_shell" ]; then
+        info "Changing the login shell to Nix Fish"
+        run_as_root chsh -s "$fish_shell" "$current_user"
+    fi
 }
 
 main() {
@@ -227,6 +337,7 @@ main() {
     ensure_nix
     update_nix_profile
     stow_dotfiles
+    configure_linux_login_shell
 
     info "Dotfiles are up to date"
     printf 'Open a new shell to load the updated environment.\n'

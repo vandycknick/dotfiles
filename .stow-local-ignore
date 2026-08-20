@@ -29,4 +29,12 @@ playbooks
 ^/systemd
 .config/nvim/result
 .config/gcloud
+.config/fish/fish_variables
+.config/opencode/node_modules
+.config/opencode/package.json
+.config/opencode/package-lock.json
+.config/opencode/bun.lock
+.ssh/config.d/private
+.ssh/known_hosts
+.ssh/known_hosts.old
 .local/share/gnupg/pubring.kbx

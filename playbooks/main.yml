@@ -22,9 +22,8 @@
     when: ansible_os_family == "Darwin" # https://github.com/ansible/ansible/blob/520fa688ba232ed165fc2dbd3b2be2ebde365ba1/lib/ansible/module_utils/facts/system/distribution.py#L511
 
   - name: Stow dotfiles
-    # shell: "stow . --target {{ ansible_env.HOME }} --verbose=2" # Should I go with this one instead?
     shell:
-      cmd: "stow . --verbose=2"
+      cmd: "stow --restow --no-folding --verbose=2 ."
       chdir: ../
     register: result
     changed_when: 'result.stderr is search("LINK: ")'
