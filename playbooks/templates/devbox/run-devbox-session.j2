@@ -39,7 +39,6 @@ exec /usr/bin/systemd-run \
     --setenv=HOME={{ devbox_home }} \
     --setenv=USER={{ devbox_user }} \
     --setenv=LOGNAME={{ devbox_user }} \
-    --setenv=SHELL=/bin/bash \
     --setenv="SSH_AUTH_SOCK=$forwarded_agent_socket" \
     --setenv="SSH_ORIGINAL_COMMAND=$original_command" \
     --setenv="TERM=$terminal" \
