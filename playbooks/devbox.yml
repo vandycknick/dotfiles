@@ -49,6 +49,21 @@
           - ansible_facts.distribution == 'Archlinux'
         fail_msg: This playbook currently supports Arch Linux hosts only.
 
+    - name: Inspect the host KVM device
+      ansible.builtin.stat:
+        path: /dev/kvm
+      register: devbox_host_kvm_device
+
+    - name: Require host KVM support
+      ansible.builtin.assert:
+        that:
+          - devbox_host_kvm_device.stat.exists
+          - devbox_host_kvm_device.stat.ischr | default(false)
+          - devbox_host_kvm_device.stat.gid is defined
+        fail_msg: >-
+          /dev/kvm must be available as a character device on the host before
+          provisioning the devbox.
+
     - name: Look up the invoking user ID
       ansible.builtin.command:
         argv:
@@ -107,6 +122,8 @@
         devbox_gid: "{{ devbox_invoking_passwd.stdout.split(':')[3] | int }}"
         devbox_group: "{{ devbox_invoking_group.stdout.split(':')[0] }}"
         devbox_home: "{{ devbox_invoking_passwd.stdout.split(':')[5] }}"
+        devbox_gnupg_home: >-
+          {{ devbox_invoking_passwd.stdout.split(':')[5] }}/.local/share/gnupg
 
   tasks:
     - name: Install host dependencies
@@ -129,20 +146,22 @@
 
     - name: Create the user GnuPG directory
       ansible.builtin.file:
-        path: "{{ devbox_home }}/.gnupg"
+        path: "{{ devbox_gnupg_home }}"
         state: directory
         owner: "{{ devbox_user }}"
         group: "{{ devbox_group }}"
         mode: "0700"
 
-    - name: Disable automatic local GPG agent startup
+    - name: Remove the legacy GPG agent startup override
       ansible.builtin.lineinfile:
         path: "{{ devbox_home }}/.gnupg/gpg.conf"
         line: no-autostart
-        create: true
-        owner: "{{ devbox_user }}"
-        group: "{{ devbox_group }}"
-        mode: "0600"
+        state: absent
+
+    - name: Remove the legacy forwarded GPG agent socket
+      ansible.builtin.file:
+        path: "{{ devbox_home }}/.gnupg/S.gpg-agent"
+        state: absent
 
     - name: Create the public-key cache directory
       ansible.builtin.file:
@@ -187,6 +206,8 @@
         argv:
           - /usr/bin/gpg
           - --batch
+          - --homedir
+          - "{{ devbox_gnupg_home }}"
           - --import
           - "{{ devbox_gpg_key_file }}"
       become: true
@@ -289,6 +310,101 @@
           - devbox_image_after_build.stat.isdir | default(false)
         fail_msg: mkosi did not produce the expected directory image.
       when: not ansible_check_mode
+
+    - name: Read the container group database
+      ansible.builtin.slurp:
+        path: "{{ devbox_image_path }}/etc/group"
+      register: devbox_container_group_database
+      when: devbox_image_after_build.stat.exists
+
+    - name: Locate the container KVM group
+      ansible.builtin.set_fact:
+        devbox_container_kvm_group_entries: >-
+          {{ (devbox_container_group_database.content | b64decode).splitlines()
+             | select('match', '^kvm:[^:]*:[0-9]+:')
+             | list }}
+      when: devbox_image_after_build.stat.exists
+
+    - name: Require a container KVM group
+      ansible.builtin.assert:
+        that:
+          - devbox_container_kvm_group_entries | length == 1
+        fail_msg: The devbox image must contain exactly one kvm group.
+      when: devbox_image_after_build.stat.exists
+
+    - name: Locate container groups using the host KVM group ID
+      ansible.builtin.set_fact:
+        devbox_container_host_kvm_gid_entries: >-
+          {{ (devbox_container_group_database.content | b64decode).splitlines()
+             | select(
+                 'match',
+                 '^[^:]+:[^:]*:' ~
+                 (devbox_host_kvm_device.stat.gid | string) ~ ':')
+             | list }}
+      when: devbox_image_after_build.stat.exists
+
+    - name: Require the host KVM group ID to be available in the container
+      ansible.builtin.assert:
+        that:
+          - >-
+            devbox_container_host_kvm_gid_entries
+            | reject('match', '^kvm:')
+            | list
+            | length == 0
+        fail_msg: >-
+          The host /dev/kvm group ID is already assigned to a different group
+          in the devbox image and cannot be assigned safely to kvm.
+      when: devbox_image_after_build.stat.exists
+
+    - name: Align the container KVM group ID with the host device
+      ansible.builtin.command:
+        argv:
+          - /usr/bin/groupmod
+          - --root
+          - "{{ devbox_image_path }}"
+          - --gid
+          - "{{ devbox_host_kvm_device.stat.gid }}"
+          - kvm
+      changed_when: true
+      when:
+        - devbox_image_after_build.stat.exists
+        - not ansible_check_mode
+        - >-
+          devbox_container_kvm_group_entries[0].split(':')[2] | int !=
+          devbox_host_kvm_device.stat.gid | int
+
+    - name: Re-read the container group database
+      ansible.builtin.slurp:
+        path: "{{ devbox_image_path }}/etc/group"
+      register: devbox_reconciled_group_database
+      when:
+        - devbox_image_after_build.stat.exists
+        - not ansible_check_mode
+
+    - name: Record the reconciled container KVM group
+      ansible.builtin.set_fact:
+        devbox_reconciled_kvm_group_entries: >-
+          {{ (devbox_reconciled_group_database.content | b64decode).splitlines()
+             | select('match', '^kvm:[^:]*:[0-9]+:')
+             | list }}
+      when:
+        - devbox_image_after_build.stat.exists
+        - not ansible_check_mode
+
+    - name: Require matching host and container KVM group IDs
+      ansible.builtin.assert:
+        that:
+          - devbox_reconciled_kvm_group_entries | length == 1
+          - >-
+            devbox_reconciled_kvm_group_entries[0].split(':')[2] | int ==
+            devbox_host_kvm_device.stat.gid | int
+        fail_msg: >-
+          The host /dev/kvm group ID does not match the devbox kvm group ID.
+          Device permissions require identical numeric IDs because the
+          container uses PrivateUsers=no.
+      when:
+        - devbox_image_after_build.stat.exists
+        - not ansible_check_mode
 
     - name: Explain a deferred mkosi definition change
       ansible.builtin.debug:
@@ -622,6 +738,32 @@
       ansible.builtin.assert:
         that:
           - devbox_container_uid.stdout | trim == devbox_uid | string
+      when: devbox_image_after_build.stat.exists
+
+    - name: Verify that KVM is exposed inside the container
+      ansible.builtin.command:
+        argv: >-
+          {{ devbox_root_machine_argv + ['/usr/bin/test', '-c', '/dev/kvm'] }}
+      changed_when: false
+      when: devbox_image_after_build.stat.exists
+
+    - name: Verify devbox account access to KVM
+      ansible.builtin.command:
+        argv:
+          - /usr/bin/systemd-run
+          - --quiet
+          - --wait
+          - --pipe
+          - --collect
+          - "--machine={{ devbox_name }}"
+          - "--uid={{ devbox_user }}"
+          - /usr/bin/test
+          - "{{ item }}"
+          - /dev/kvm
+      loop:
+        - -r
+        - -w
+      changed_when: false
       when: devbox_image_after_build.stat.exists
 
     - name: Inspect the container core repository server

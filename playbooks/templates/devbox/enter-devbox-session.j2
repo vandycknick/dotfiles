@@ -17,7 +17,7 @@ readonly login_shell
 export SHELL="$login_shell"
 
 readonly forwarded_gpg_socket="$HOME/.ssh/forwarded/S.gpg-agent"
-readonly standard_gpg_socket="$HOME/.gnupg/S.gpg-agent"
+readonly standard_gpg_socket="$HOME/.local/share/gnupg/S.gpg-agent"
 if [[ -S "$forwarded_gpg_socket" ]]; then
     rm -f -- "$standard_gpg_socket"
     ln -s -- "$forwarded_gpg_socket" "$standard_gpg_socket"

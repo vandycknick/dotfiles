@@ -22,7 +22,7 @@ set -Ux XDG_STATE_HOME "$HOME/.local/state"
 
 switch (uname)
 case Linux
-  set -Ux BROWSER ""
+  # set -Ux BROWSER ""
 case Darwin
   set -Ux BROWSER "/Applications/Zen.app/Contents/MacOS/zen"
 

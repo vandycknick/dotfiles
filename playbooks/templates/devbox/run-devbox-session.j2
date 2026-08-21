@@ -33,6 +33,7 @@ exec /usr/bin/systemd-run \
     --quiet \
     --wait \
     --collect \
+    --property=KillMode=process \
     "$transport" \
     --machine={{ devbox_name }} \
     --uid={{ devbox_user }} \
