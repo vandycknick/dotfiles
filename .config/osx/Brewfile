@@ -1,0 +1,8 @@
+tap "nikitabobko/tap"
+
+cask "1password"
+cask "aerospace"
+cask "font-jetbrains-mono-nerd-font"
+cask "ghostty"
+cask "slack"
+cask "zen"

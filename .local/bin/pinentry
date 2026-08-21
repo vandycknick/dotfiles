@@ -1,18 +1,25 @@
 #!/bin/sh
-set -euo pipefail
+set -eu
+
+PROFILE_BIN="$HOME/.local/state/nix/profiles/profile/bin"
 
 case "$(uname -s)" in
   Darwin)
-    PINENTRY="/opt/homebrew/bin/pinentry-mac"
+    PINENTRY="$PROFILE_BIN/pinentry-mac"
     ;;
   Linux)
-    PINENTRY="/usr/bin/pinentry-gnome3"
+    PINENTRY="$PROFILE_BIN/pinentry-gnome3"
     ;;
   *)
     echo "Unsupported OS: $(uname -s)" >&2
     exit 1
     ;;
 esac
+
+[ -x "$PINENTRY" ] || {
+  echo "Nix-managed pinentry is unavailable: $PINENTRY" >&2
+  exit 1
+}
 
 exec "$PINENTRY" "$@"
 # vim: ft=sh

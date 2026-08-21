@@ -12,10 +12,21 @@ NIX_FEATURES="nix-command flakes"
 PROFILE_NAME=".config/nix/profile"
 PROFILE_FLAKE="$DOTFILES_DIR/$PROFILE_NAME"
 PROFILE_BIN="$HOME/.local/state/nix/profiles/profile/bin"
+OSX_DIR="$DOTFILES_DIR/.config/osx"
 RESTORE_CHECKOUT=0
+DOCTOR_ISSUES=0
+DOCTOR_WARNINGS=0
 
 info() {
     printf '\n==> %s\n' "$1"
+}
+
+pass() {
+    printf 'ok: %s\n' "$1"
+}
+
+warn() {
+    printf 'warning: %s\n' "$1" >&2
 }
 
 die() {
@@ -25,15 +36,117 @@ die() {
 
 usage() {
     cat <<EOF
-Usage: dot
+dot - manage the personal development environment
 
-Install or update the dotfiles, Nix profile, and Stow links.
+Usage:
+  dot COMMAND [OPTIONS]
+
+Commands:
+  init      Install or initialize the environment
+  update    Update the checkout, Nix profile, applications, and links
+  stow      Restow the managed dotfiles
+  doctor    Diagnose the installation without changing it
+  help      Show this help
+
+Init options:
+  --skip-nix         Do not install or update the Nix profile
+  --skip-stow        Do not link dotfiles
+  --skip-shell       Do not configure Fish as the login shell
+  --skip-homebrew    Do not install macOS applications
+  --skip-defaults    Do not apply macOS defaults
+
+Examples:
+  dot init
+  dot init --skip-homebrew --skip-defaults
+  dot update
+  dot doctor
 EOF
 }
 
+init_usage() {
+    cat <<EOF
+Usage: dot init [OPTIONS]
+
+Initialize the dotfiles checkout, Nix profile, Stow links, and platform setup.
+
+Options:
+  --skip-nix         Do not install or update the Nix profile
+  --skip-stow        Do not link dotfiles
+  --skip-shell       Do not configure Fish as the login shell
+  --skip-homebrew    Do not install macOS applications
+  --skip-defaults    Do not apply macOS defaults
+  -h, --help         Show this help
+EOF
+}
+
+command_usage() {
+    case "$1" in
+        init)
+            init_usage
+            ;;
+        update)
+            printf 'Usage: dot update\n\nUpdate the checkout, Nix profile, macOS applications, and Stow links.\n'
+            ;;
+        stow)
+            printf 'Usage: dot stow\n\nRestow managed files from the clean dotfiles checkout.\n'
+            ;;
+        doctor)
+            printf 'Usage: dot doctor\n\nDiagnose the installed environment without changing it.\n'
+            ;;
+        help)
+            printf 'Usage: dot help [COMMAND]\n\nShow general or command-specific help.\n'
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+require_no_args() {
+    command_name=$1
+    shift
+    [ "$#" -eq 0 ] || die "unexpected argument for $command_name: $1"
+}
+
+require_regular_user() {
+    [ "$(id -u)" -ne 0 ] || die "run this command as your regular user, not root"
+}
+
 run_as_root() {
-    command -v sudo >/dev/null 2>&1 || die "sudo is required for system installation and configuration"
+    command -v sudo >/dev/null 2>&1 \
+        || die "sudo is required for system installation and configuration"
     sudo "$@"
+}
+
+is_supported_platform() {
+    platform=$(uname -s):$(uname -m)
+    case "$platform" in
+        Darwin:arm64 | Darwin:aarch64 | Linux:x86_64 | Linux:aarch64)
+            return 0
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+require_supported_platform() {
+    os=$(uname -s)
+    arch=$(uname -m)
+
+    case "$os:$arch" in
+        Darwin:arm64 | Darwin:aarch64 | Linux:x86_64 | Linux:aarch64)
+            ;;
+        Darwin:*)
+            die "the personal Nix profile supports Apple Silicon macOS only"
+            ;;
+        Linux:*)
+            die "the personal Nix profile supports x86_64 and aarch64 Linux only"
+            ;;
+        *)
+            die "only Linux and macOS are supported"
+            ;;
+    esac
 }
 
 install_linux_dependencies() {
@@ -54,22 +167,8 @@ install_linux_dependencies() {
 }
 
 ensure_bootstrap_dependencies() {
+    require_supported_platform
     os=$(uname -s)
-    arch=$(uname -m)
-
-    case "$os:$arch" in
-        Darwin:arm64 | Darwin:aarch64 | Linux:x86_64 | Linux:aarch64)
-            ;;
-        Darwin:*)
-            die "the personal Nix profile supports Apple Silicon macOS only"
-            ;;
-        Linux:*)
-            die "the personal Nix profile supports x86_64 and aarch64 Linux only"
-            ;;
-        *)
-            die "only Linux and macOS are supported"
-            ;;
-    esac
 
     case "$os" in
         Darwin)
@@ -99,7 +198,7 @@ ensure_bootstrap_dependencies() {
 ensure_clean_checkout() {
     if [ -n "$(git -C "$DOTFILES_DIR" status --porcelain --untracked-files=normal)" ]; then
         git -C "$DOTFILES_DIR" status --short >&2
-        die "$DOTFILES_DIR has uncommitted changes; commit or remove them before updating"
+        die "$DOTFILES_DIR has uncommitted changes; commit or remove them before continuing"
     fi
 }
 
@@ -133,7 +232,7 @@ update_dotfiles() {
 
     current_branch=$(git -C "$DOTFILES_DIR" branch --show-current)
     [ "$current_branch" = "$REPO_BRANCH" ] \
-        || die "$DOTFILES_DIR must be on the $REPO_BRANCH branch, not ${current_branch:-a detached HEAD}"
+        || die "$DOTFILES_DIR must be on $REPO_BRANCH, not ${current_branch:-a detached HEAD}"
 
     ensure_clean_checkout
     info "Updating dotfiles"
@@ -186,7 +285,7 @@ find_stow() {
     if [ ! -x "$STOW" ]; then
         STOW="$HOME/.nix-profile/bin/stow"
     fi
-    [ -x "$STOW" ] || die "GNU Stow was not installed by the personal Nix profile"
+    [ -x "$STOW" ] || die "GNU Stow is not installed by the personal Nix profile"
 }
 
 restore_checkout() {
@@ -210,53 +309,350 @@ stow_dotfiles() {
     ensure_clean_checkout
 }
 
-configure_linux_login_shell() {
-    [ "$(uname -s)" = "Linux" ] || return
+current_login_shell() {
+    current_user=$(id -un)
+    case "$(uname -s)" in
+        Darwin)
+            dscl . -read "/Users/$current_user" UserShell 2>/dev/null | awk '{print $2}'
+            ;;
+        Linux)
+            getent passwd "$current_user" 2>/dev/null | awk -F: '{print $7}'
+            ;;
+    esac
+}
 
+configure_login_shell() {
     fish_shell="$PROFILE_BIN/fish"
-    [ -x "$fish_shell" ] || die "Fish was not installed by the personal Nix profile"
-    command -v getent >/dev/null 2>&1 || die "getent is required to inspect the current login shell"
+    [ -x "$fish_shell" ] || die "Fish is not installed by the personal Nix profile"
 
     if ! grep -Fqx "$fish_shell" /etc/shells 2>/dev/null; then
         info "Registering Nix Fish as a login shell"
         printf '%s\n' "$fish_shell" | run_as_root tee -a /etc/shells >/dev/null
     fi
 
-    current_user=$(id -un)
-    passwd_entry=$(getent passwd "$current_user") \
-        || die "could not inspect the login shell for $current_user"
-    current_shell=${passwd_entry##*:}
-
-    if [ "$current_shell" != "$fish_shell" ]; then
+    configured_shell=$(current_login_shell)
+    [ -n "$configured_shell" ] || die "could not inspect the current login shell"
+    if [ "$configured_shell" != "$fish_shell" ]; then
         info "Changing the login shell to Nix Fish"
-        run_as_root chsh -s "$fish_shell" "$current_user"
+        run_as_root chsh -s "$fish_shell" "$(id -un)"
     fi
 }
 
-main() {
-    case "${1:-}" in
-        -h | --help)
-            usage
-            exit 0
+run_homebrew() {
+    mode=$1
+    [ -r "$OSX_DIR/homebrew" ] || die "missing macOS Homebrew script"
+    sh "$OSX_DIR/homebrew" "$mode"
+}
+
+apply_macos_defaults() {
+    [ -r "$OSX_DIR/defaults" ] || die "missing macOS defaults script"
+    info "Applying macOS defaults"
+    sh "$OSX_DIR/defaults"
+}
+
+doctor_pass() {
+    pass "$1"
+}
+
+doctor_warn() {
+    DOCTOR_WARNINGS=$((DOCTOR_WARNINGS + 1))
+    warn "$1"
+}
+
+doctor_fail() {
+    DOCTOR_ISSUES=$((DOCTOR_ISSUES + 1))
+    printf 'error: %s\n' "$1" >&2
+}
+
+doctor_profile_command() {
+    command_name=$1
+    if [ -x "$PROFILE_BIN/$command_name" ]; then
+        doctor_pass "$command_name is Nix profile-managed"
+    else
+        doctor_fail "$command_name is missing from $PROFILE_BIN"
+    fi
+}
+
+doctor_repository() {
+    if [ ! -d "$DOTFILES_DIR/.git" ]; then
+        doctor_fail "$DOTFILES_DIR is not a Git repository"
+        return
+    fi
+
+    origin_url=$(git -C "$DOTFILES_DIR" remote get-url origin 2>/dev/null || true)
+    if [ -n "$origin_url" ] && is_expected_origin "$origin_url"; then
+        doctor_pass "dotfiles origin is expected"
+    else
+        doctor_fail "dotfiles origin is missing or unexpected: ${origin_url:-none}"
+    fi
+
+    current_branch=$(git -C "$DOTFILES_DIR" branch --show-current)
+    if [ "$current_branch" = "$REPO_BRANCH" ]; then
+        doctor_pass "dotfiles are on $REPO_BRANCH"
+    else
+        doctor_fail "dotfiles are on ${current_branch:-a detached HEAD}"
+    fi
+
+    if [ -n "$(git -C "$DOTFILES_DIR" status --porcelain --untracked-files=normal)" ]; then
+        doctor_warn "dotfiles have uncommitted changes; update and stow are blocked"
+    else
+        doctor_pass "dotfiles checkout is clean"
+    fi
+}
+
+doctor_nix() {
+    load_nix
+    if [ -r "$NIX_DAEMON_PROFILE" ]; then
+        doctor_pass "multi-user Nix profile is installed"
+    else
+        doctor_fail "multi-user Nix profile is missing"
+    fi
+
+    if ! command -v nix >/dev/null 2>&1; then
+        doctor_fail "nix is unavailable"
+        return
+    fi
+    doctor_pass "nix is available"
+
+    if profile_json=$(nix --extra-experimental-features "$NIX_FEATURES" profile list --json 2>/dev/null); then
+        if printf '%s' "$profile_json" | grep -Fq "\"$PROFILE_NAME\":"; then
+            doctor_pass "personal Nix profile is installed"
+        else
+            doctor_fail "personal Nix profile is not installed"
+        fi
+
+        if [ -d "$DOTFILES_DIR/.git" ]; then
+            checkout_revision=$(git -C "$DOTFILES_DIR" rev-parse HEAD)
+            if printf '%s' "$profile_json" | grep -Fq "$checkout_revision"; then
+                doctor_pass "personal Nix profile matches the checkout revision"
+            else
+                doctor_warn "personal Nix profile does not match the checkout revision"
+            fi
+        fi
+    else
+        doctor_fail "personal Nix profile cannot be inspected"
+    fi
+
+    for command_name in \
+        ansible-playbook bc dig docker fish git git-lfs gpg gum nvim shellcheck \
+        ssh stow tldr tmux wget wtp
+    do
+        doctor_profile_command "$command_name"
+    done
+
+    case "$(uname -s)" in
+        Darwin)
+            doctor_profile_command pinentry-mac
             ;;
-        "")
-            ;;
-        *)
-            usage >&2
-            exit 2
+        Linux)
+            for command_name in ip pgrep pinentry-gnome3 wl-copy xclip; do
+                doctor_profile_command "$command_name"
+            done
             ;;
     esac
+}
 
-    [ "$(id -u)" -ne 0 ] || die "run this command as your regular user, not root"
+doctor_stow() {
+    if [ ! -x "$PROFILE_BIN/stow" ]; then
+        doctor_fail "cannot inspect links without Nix profile Stow"
+        return
+    fi
+
+    if "$PROFILE_BIN/stow" --simulate --restow --no-folding \
+        --dir="$DOTFILES_DIR" --target="$HOME" . >/dev/null 2>&1; then
+        doctor_pass "Stow reports no link conflicts"
+    else
+        doctor_fail "Stow reports link conflicts"
+    fi
+
+    if [ -L "$HOME/.local/bin/dot" ] && [ -x "$HOME/.local/bin/dot" ]; then
+        doctor_pass "dot command is linked into ~/.local/bin"
+    else
+        doctor_fail "dot command is not linked into ~/.local/bin"
+    fi
+}
+
+doctor_shell() {
+    configured_shell=$(current_login_shell)
+    if [ "$configured_shell" = "$PROFILE_BIN/fish" ]; then
+        doctor_pass "Nix Fish is the login shell"
+    else
+        doctor_warn "login shell is ${configured_shell:-unknown}, expected $PROFILE_BIN/fish"
+    fi
+}
+
+doctor_macos() {
+    if grep -Eq '^[[:space:]]*brew[[:space:]]' "$OSX_DIR/Brewfile"; then
+        doctor_fail "macOS Brewfile contains a formula; user CLIs must come from Nix"
+    else
+        doctor_pass "macOS Brewfile contains no formulae"
+    fi
+
+    if [ -x /opt/homebrew/bin/brew ] || [ -x /usr/local/bin/brew ]; then
+        if sh "$OSX_DIR/homebrew" check >/dev/null 2>&1; then
+            doctor_pass "macOS applications match the Brewfile"
+        else
+            doctor_warn "one or more macOS applications are missing"
+        fi
+    else
+        doctor_warn "Homebrew is not installed; macOS applications are unavailable"
+    fi
+}
+
+cmd_init() {
+    SKIP_NIX=0
+    SKIP_STOW=0
+    SKIP_SHELL=0
+    SKIP_HOMEBREW=0
+    SKIP_DEFAULTS=0
+
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --skip-nix)
+                SKIP_NIX=1
+                ;;
+            --skip-stow)
+                SKIP_STOW=1
+                ;;
+            --skip-shell)
+                SKIP_SHELL=1
+                ;;
+            --skip-homebrew)
+                SKIP_HOMEBREW=1
+                ;;
+            --skip-defaults)
+                SKIP_DEFAULTS=1
+                ;;
+            -h | --help)
+                init_usage
+                return
+                ;;
+            *)
+                die "unknown init option: $1"
+                ;;
+        esac
+        shift
+    done
+
+    require_regular_user
+    ensure_bootstrap_dependencies
+    update_dotfiles
+
+    if [ "$SKIP_NIX" -eq 0 ]; then
+        ensure_nix
+        update_nix_profile
+    fi
+
+    if [ "$SKIP_STOW" -eq 0 ]; then
+        stow_dotfiles
+    fi
+
+    if [ "$(uname -s)" = "Darwin" ]; then
+        if [ "$SKIP_HOMEBREW" -eq 0 ]; then
+            run_homebrew install
+        fi
+        if [ "$SKIP_DEFAULTS" -eq 0 ]; then
+            apply_macos_defaults
+        fi
+    fi
+
+    if [ "$SKIP_SHELL" -eq 0 ]; then
+        configure_login_shell
+    fi
+
+    info "Dotfiles initialized"
+    printf 'Open a new shell to load the updated environment.\n'
+}
+
+cmd_update() {
+    require_no_args update "$@"
+    require_regular_user
     ensure_bootstrap_dependencies
     update_dotfiles
     ensure_nix
     update_nix_profile
     stow_dotfiles
-    configure_linux_login_shell
+
+    if [ "$(uname -s)" = "Darwin" ]; then
+        run_homebrew update
+    fi
 
     info "Dotfiles are up to date"
-    printf 'Open a new shell to load the updated environment.\n'
+}
+
+cmd_stow() {
+    require_no_args stow "$@"
+    require_regular_user
+    [ -d "$DOTFILES_DIR/.git" ] || die "$DOTFILES_DIR is not a Git repository"
+    stow_dotfiles
+}
+
+cmd_doctor() {
+    require_no_args doctor "$@"
+    info "Running diagnostics"
+
+    if is_supported_platform; then
+        doctor_pass "platform $(uname -s)/$(uname -m) is supported"
+    else
+        doctor_fail "platform $(uname -s)/$(uname -m) is unsupported"
+    fi
+
+    doctor_repository
+    doctor_nix
+    doctor_stow
+    doctor_shell
+
+    if [ "$(uname -s)" = "Darwin" ]; then
+        doctor_macos
+    fi
+
+    printf '\nDiagnostics: %s issue(s), %s warning(s)\n' "$DOCTOR_ISSUES" "$DOCTOR_WARNINGS"
+    [ "$DOCTOR_ISSUES" -eq 0 ]
+}
+
+main() {
+    command_name=${1:-help}
+    if [ "$#" -gt 0 ]; then
+        shift
+    fi
+
+    if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+        [ "$#" -eq 1 ] || die "unexpected argument after help option: $2"
+        command_usage "$command_name" || die "unknown command: $command_name"
+        return
+    fi
+
+    case "$command_name" in
+        init)
+            cmd_init "$@"
+            ;;
+        update)
+            cmd_update "$@"
+            ;;
+        stow)
+            cmd_stow "$@"
+            ;;
+        doctor)
+            cmd_doctor "$@"
+            ;;
+        help)
+            if [ "$#" -eq 0 ]; then
+                usage
+            elif [ "$#" -eq 1 ]; then
+                command_usage "$1" || die "unknown command: $1"
+            else
+                die "unexpected argument for help: $2"
+            fi
+            ;;
+        -h | --help)
+            require_no_args help "$@"
+            usage
+            ;;
+        *)
+            usage >&2
+            die "unknown command: $command_name"
+            ;;
+    esac
 }
 
 main "$@"

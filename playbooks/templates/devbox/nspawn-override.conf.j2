@@ -1,8 +1,0 @@
-[Unit]
-Wants=network-online.target
-Requires=dev-kvm.device
-After=network-online.target dev-kvm.device
-RequiresMountsFor={{ devbox_home }} {{ devbox_machine_path }}
-
-[Service]
-DeviceAllow=/dev/kvm rw

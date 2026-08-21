@@ -19,13 +19,13 @@ _darcs
 \#.*\#       # emacs autosave files
 
 ^/README.*
+^/AGENTS.*
 ^/LICENSE.*
 ^/COPYING
 
 # Custom
 \.editorconfig
 install
-playbooks
 ^/systemd
 .config/nvim/result
 .config/gcloud

@@ -12,11 +12,6 @@ if [ -f /etc/os-release ]; then
   source /etc/os-release
 fi
 
-# MacOS specific
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  export PATH="/opt/homebrew/bin:/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
-fi
-
 # Zsh
 ZDOTDIR="$HOME/.config/shell"
 
@@ -51,8 +46,6 @@ alias \
     mkd="mkdir -pv" \
     ip="ip --color=auto"
 
-alias tfs="tfswitch -b /home/nickvd/.local/bin/terraform"
-
 alias myip="dig txt ch +short whoami.cloudflare @1.1.1.1"
 alias myip6="dig txt ch +short whoami.cloudflare @2606:4700:4700::1111"
 alias tun0="ip -o -4 addr list tun0 | awk -F ' *|/' '{print \$4}'"
@@ -73,5 +66,4 @@ fi
 
 # Shell integrations
 eval "$(atuin init zsh)"
-eval "$(mise activate zsh)"
 eval "$(zoxide init zsh)"

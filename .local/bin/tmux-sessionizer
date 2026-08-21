@@ -58,37 +58,31 @@ tmux-sessionizer() {
     return 0
 }
 
-needs_cmd() {
-    if ! check_cmd "$1"; then
-        err "need '$1' (command not found)"
-    fi
-}
-
-check_cmd() {
-    command -v "$1" > /dev/null 2>&1
-}
-
 main() {
-    needs_cmd getopt
-
-    local argc
-    local argv
-
-    # shellcheck disable=SC2034
-    argc="$#"
-    argv=$(getopt --options w:,h --longoptions workspace:,help -- "$@")
-    eval set -- "$argv"
-
     local workspace=""
     local help=false
 
-    while true; do
+    while [[ $# -gt 0 ]]; do
        case "$1" in
-            -h | --help) help=true ; shift ;;
-            -w | --workspace) workspace="$2" ; shift 2;;
-            --) shift; break ;;
-            *) log-err "Unexpected option: $1. This should not happen."; usage; exit 1 ;;
-        esac
+            -h | --help)
+                help=true
+                shift
+                ;;
+            -w | --workspace)
+                [[ $# -ge 2 ]] || { usage; exit 2; }
+                workspace="$2"
+                shift 2
+                ;;
+            --)
+                shift
+                break
+                ;;
+            *)
+                printf 'error: unknown option: %s\n' "$1" >&2
+                usage
+                exit 2
+                ;;
+       esac
     done
 
     if [ "$help" = true ]; then

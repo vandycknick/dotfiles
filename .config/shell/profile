@@ -10,15 +10,9 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
-
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$HOME/.local/bin:$PATH"
-fi
+# User commands and the declarative Nix profile own the interactive CLI path.
+PATH="$HOME/.local/bin:$HOME/.local/state/nix/profiles/profile/bin:$PATH"
+export PATH
 
 # Configure LANGs
 export LANG=en_US.UTF-8
@@ -26,7 +20,7 @@ export LC_ALL=en_US.UTF-8
 
 # Default programs:
 export EDITOR="nvim"
-export TERMINAL="alacritty"
+export TERMINAL="ghostty"
 export BROWSER="Zen"
 
 # XDG Configuration
@@ -41,12 +35,10 @@ export TMUX_TMPDIR="$XDG_RUNTIME_DIR"
 
 # Golang:
 export GOPATH="${XDG_DATA_HOME:-$HOME/.local/share}/go"
-export PATH="$PATH:/usr/local/go/bin:$GOPATH/bin"
 
 # Rust:
 export CARGO_HOME="$XDG_DATA_HOME/cargo"
 export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
-export PATH="$PATH:$CARGO_HOME/bin"
 
 # Dotnet:
 export NUGET_PACKAGES="$XDG_CACHE_HOME/NuGet/packages"

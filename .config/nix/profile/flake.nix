@@ -95,9 +95,11 @@
               [
                 # Shell & environment
                 fish
+                tmux
                 zoxide
                 atuin
                 direnv
+                wtp
                 zmx
 
                 # File & text navigation
@@ -111,9 +113,15 @@
                 jq
                 yq-go
                 tokei
+                bc
+                bind
+                gum
+                tealdeer
+                wget
 
                 # Git
                 git
+                git-lfs
                 stow
                 lazygit
                 hunk
@@ -127,13 +135,26 @@
                 kubernetes-helm
                 k9s
                 coder
+                docker-client
 
                 # Secrets
+                gnupg
+                openssh
                 onePasswordCliBeta
 
                 # Editors & AI
+                python3Packages.ansible-core
                 opencode
+                shellcheck
                 nvim.packages.${system}.default
+              ]
+              ++ lib.optionals pkgs.stdenv.isLinux [
+                # Linux user utilities
+                iproute2
+                pinentry-gnome3
+                procps
+                wl-clipboard
+                xclip
               ]
               ++ lib.optionals pkgs.stdenv.isDarwin [
                 # macOS only
