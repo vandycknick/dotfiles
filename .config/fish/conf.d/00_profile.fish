@@ -27,6 +27,9 @@ case Darwin
   set -Ux BROWSER "/Applications/Zen.app/Contents/MacOS/zen"
 end
 
+# Pi coding agent
+set -Ux PI_CODING_AGENT_DIR "$XDG_CONFIG_HOME/pi"
+
 # Golang:
 set -Ux GOPATH "$XDG_DATA_HOME/go"
 
