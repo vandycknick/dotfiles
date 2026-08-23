@@ -145,6 +145,7 @@
                 # Editors & AI
                 python3Packages.ansible-core
                 opencode
+                pi-coding-agent
                 shellcheck
                 nvim.packages.${system}.default
               ]
