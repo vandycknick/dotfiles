@@ -29,6 +29,7 @@ end
 
 # Pi coding agent
 set -Ux PI_CODING_AGENT_DIR "$XDG_CONFIG_HOME/pi"
+set -Ux PI_CODING_AGENT_SESSION_DIR "$XDG_DATA_HOME/pi/sessions"
 
 # Golang:
 set -Ux GOPATH "$XDG_DATA_HOME/go"
