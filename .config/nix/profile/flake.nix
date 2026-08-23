@@ -144,6 +144,7 @@
 
                 # Editors & AI
                 python3Packages.ansible-core
+                claude-code
                 opencode
                 pi-coding-agent
                 shellcheck

@@ -1,7 +1,11 @@
 {
   "lastChangelogVersion": "0.84.2",
   "theme": "kanagawa",
-  "packages": [],
+  "packages": [
+    "npm:@narumitw/pi-starship",
+    "npm:pi-web-access",
+    "npm:pi-mcp-adapter"
+  ],
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.6-sol",
   "defaultThinkingLevel": "medium"
