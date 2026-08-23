@@ -12,6 +12,8 @@ NIX_FEATURES="nix-command flakes"
 PROFILE_NAME=".config/nix/profile"
 PROFILE_FLAKE="$DOTFILES_DIR/$PROFILE_NAME"
 PROFILE_BIN="$HOME/.local/state/nix/profiles/profile/bin"
+PI_AGENT_DIR="$HOME/.config/pi"
+PI_SETTINGS="$DOTFILES_DIR/.config/pi/settings.json"
 OSX_DIR="$DOTFILES_DIR/.config/osx"
 RESTORE_CHECKOUT=0
 DOCTOR_ISSUES=0
@@ -280,6 +282,14 @@ update_nix_profile() {
     fi
 }
 
+sync_pi_packages() {
+    "$PROFILE_BIN/jq" -r '
+        .packages[]? | if type == "string" then . else .source end
+    ' "$PI_SETTINGS" | while IFS= read -r package_source; do
+        PI_CODING_AGENT_DIR="$PI_AGENT_DIR" "$PROFILE_BIN/pi" install "$package_source"
+    done
+}
+
 find_stow() {
     STOW="$PROFILE_BIN/stow"
     if [ ! -x "$STOW" ]; then
@@ -545,6 +555,7 @@ cmd_init() {
 
     if [ "$SKIP_STOW" -eq 0 ]; then
         stow_dotfiles
+        sync_pi_packages
     fi
 
     if [ "$(uname -s)" = "Darwin" ]; then
@@ -572,6 +583,7 @@ cmd_update() {
     ensure_nix
     update_nix_profile
     stow_dotfiles
+    sync_pi_packages
 
     if [ "$(uname -s)" = "Darwin" ]; then
         run_homebrew update
