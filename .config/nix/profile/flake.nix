@@ -136,6 +136,7 @@
                 k9s
                 coder
                 docker-client
+                gcx
 
                 # Secrets
                 gnupg
