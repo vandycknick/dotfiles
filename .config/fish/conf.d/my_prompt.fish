@@ -39,12 +39,21 @@ function _my_prompt_detect_environment --description "Cache VM and SSH status fo
         end
     end
 
-    set --local indicators
-    test $is_vm = true; and set --append indicators "☁️"
-    set --query SSH_CONNECTION[1]; or set --query SSH_TTY[1]; and set --append indicators "🔑"
-
-    if set --query indicators[1]
-        set --global _my_prompt_environment (string join " " $indicators)"  "
+    # Icon options:
+    #   U+0F0AC     nf-fa-globe
+    #   U+0F233     nf-fa-server
+    #   U+0F0C2     nf-fa-cloud
+    #   U+0F484     nf-oct-globe
+    #   U+0EB3A     nf-cod-remote
+    #   U+0EA7A     nf-cod-vm
+    #   U+F069F  󰚟   nf-md-remote
+    #   U+F08B9  󰢹   nf-md-remote_desktop
+    #   U+F08C0  󰣀   nf-md-ssh
+    #   U+F0318  󰌘   nf-md-lan_connect
+    if set --query SSH_CONNECTION[1]; or set --query SSH_TTY[1]
+        set --global _my_prompt_environment "$yellow󰢹$normal  "
+    else if test $is_vm = true
+        set --global _my_prompt_environment "  "
     end
 end
 
