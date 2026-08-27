@@ -1,6 +1,13 @@
 # Place a copy of this config to ~/.aerospace.toml
 # After that, you can edit ~/.aerospace.toml to your liking
 
+# See: https://nikitabobko.github.io/AeroSpace/guide#config-version
+config-version = 2
+
+# Under config-version 1 these were inferred from the workspace bindings.
+# Version 2 defaults to an empty list, so they are stated explicitly.
+persistent-workspaces = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
+
 # You can use it to add commands that run after login to macOS user session.
 # 'start-at-login' needs to be 'true' for 'after-login-command' to work
 # Available commands: https://nikitabobko.github.io/AeroSpace/commands
@@ -82,11 +89,6 @@ alt-shift-l = 'move right'
 
 alt-f = 'fullscreen'
 
-alt-x = 'layout h_tiles'
-alt-s = 'layout v_accordion' # 'layout stacking' in i3
-alt-w = 'layout h_accordion' # 'layout tabbed' in i3
-alt-a = 'layout tiles horizontal vertical' # 'layout toggle split' in i3
-
 alt-1 = 'workspace 1'
 alt-2 = 'workspace 2'
 alt-3 = 'workspace 3'
@@ -140,6 +142,19 @@ alt-shift-j = ['join-with down', 'mode main']
 alt-shift-k = ['join-with up', 'mode main']
 alt-shift-l = ['join-with right', 'mode main']
 
+# NOTE: Keep this map in sync with the on-window-detected rules below. It is a
+# comment, so nothing validates it. Update it in the same edit whenever a rule
+# is added, removed, or retargeted.
+#
+# workspace 1: Ghostty
+# workspace 2: Zen
+# workspace 3: Slack
+# workspace 4: Calendar, Mail, Reminders
+# workspace 5: Notion, Linear, Fizzy
+# workspace 6: Proton Pass, 1Password
+# workspace 7: (free)
+# workspace 8: Zoom
+# workspace 9: Spotify
 [[on-window-detected]]
   if.app-id = 'com.mitchellh.ghostty'
   run = 'move-node-to-workspace 1'
@@ -159,3 +174,37 @@ alt-shift-l = ['join-with right', 'mode main']
 [[on-window-detected]]
   if.app-id = 'com.apple.mail'
   run = 'move-node-to-workspace 4'
+
+[[on-window-detected]]
+  if.app-id = 'com.apple.reminders'
+  run = 'move-node-to-workspace 4'
+
+[[on-window-detected]]
+  if.app-id = 'notion.id'
+  run = 'move-node-to-workspace 5'
+
+[[on-window-detected]]
+  if.app-id = 'com.linear'
+  run = 'move-node-to-workspace 5'
+
+# Safari web app. Matched by name because its bundle id carries a UUID that
+# changes whenever the web app is recreated.
+[[on-window-detected]]
+  if.app-name-regex-substring = '^Fizzy$'
+  run = 'move-node-to-workspace 5'
+
+[[on-window-detected]]
+  if.app-id = 'me.proton.pass.electron'
+  run = 'move-node-to-workspace 6'
+
+[[on-window-detected]]
+  if.app-id = 'com.1password.1password'
+  run = 'move-node-to-workspace 6'
+
+[[on-window-detected]]
+  if.app-id = 'us.zoom.xos'
+  run = 'move-node-to-workspace 8'
+
+[[on-window-detected]]
+  if.app-id = 'com.spotify.client'
+  run = 'move-node-to-workspace 9'
