@@ -100,7 +100,6 @@
                 atuin
                 direnv
                 wtp
-                zmx
 
                 # File & text navigation
                 eza

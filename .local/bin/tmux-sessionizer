@@ -8,7 +8,10 @@ IFS=$'\n\t'
 usage() {
     cat 1>&2 <<EOF
 tmux-sessionizer [OPTION]
-Start a tmux session from a project or folder.
+Start a tmux session from a local folder or an ssh host.
+
+The picker lists both. Folders open a local session, hosts are handed to
+tmux-ssh, which owns the remote connection.
 
 USAGE: tmux-sessionizer [FLAGS] [OPTIONS]
 
@@ -20,14 +23,43 @@ OPTIONS:
 EOF
 }
 
+# The cloud matches the remote marker in the tmux status bar.
+folder_icon=''
+remote_icon='󰅟'
+
+candidates() {
+    # Folders first so they sit closest to the prompt.
+    find ~/Projects ~/Work -mindepth 1 -maxdepth 1 -type d 2> /dev/null \
+        | (cat; echo "$HOME/.dotfiles") \
+        | sed "s|^|$folder_icon |"
+    # The folder emoji is two columns wide and the cloud is one, so the
+    # cloud gets an extra space to keep both columns aligned.
+    tmux-ssh --list 2> /dev/null | sed "s|^|$remote_icon  |"
+}
+
 tmux-sessionizer() {
     local selected="${1:-}"
     local tmux="${TMUX:-}"
 
     if [[ -z "$selected" ]]; then
         set +e # Disable failing on NZEC, if a directory doesn't exist find returns a NZEC. We just don't care about it.
-        selected=$(find ~/Projects ~/Work -mindepth 1 -maxdepth 1 -type d 2> /dev/null | (cat;echo "$HOME/.dotfiles") | fzf)
+        selected=$(candidates \
+            | fzf --style=minimal --padding=1 --scheme=path \
+                  --color=bg+:-1,gutter:-1 --ghost 'search sessions')
         set -e
+
+        if [[ -z $selected ]]; then
+            return 0
+        fi
+
+        local icon="${selected%%[[:space:]]*}"
+        selected="${selected#"$icon"}"
+        selected="${selected#"${selected%%[![:space:]]*}"}"
+
+        if [[ "$icon" == "$remote_icon" ]]; then
+            tmux-ssh "$selected"
+            return 0
+        fi
     fi
 
     if [[ -z $selected ]]; then
