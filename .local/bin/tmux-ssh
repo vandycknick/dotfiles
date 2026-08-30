@@ -1,0 +1,131 @@
+#!/usr/bin/env bash
+# -e : Stop script on None Zero Exit Code (NZEC)
+# -u : Stop script if unbound variable found (use ${var:-} if intentional)
+# -o pipefail : By default cmd1 | cmd2 returns exit code of cmd2 regardless of cmd1 success
+set -euo pipefail
+IFS=$'\n\t'
+
+usage() {
+    cat 1>&2 <<EOF
+tmux-ssh [OPTION] HOST
+Start a tmux session that holds an ssh connection to a remote tmux.
+
+The host session hands its prefix to the remote tmux: inside a remote session
+C-b drives the remote and C-M-b drives the host.
+
+USAGE: tmux-ssh [FLAGS] [OPTIONS] HOST
+
+FLAGS:
+    -h|--help         Show command line help.
+    -l|--list         List ssh hosts and exit. Used by tmux-sessionizer.
+
+OPTIONS:
+    -s|--session      Remote session name to attach or create (default: main).
+
+ARGS:
+    HOST              SSH host to connect to.
+EOF
+}
+
+ssh_hosts() {
+    local config="$HOME/.ssh/config"
+    local -a configs=("$config")
+
+    [[ -f $config ]] || return 0
+
+    while IFS= read -r include; do
+        configs+=("$include")
+    done < <(find "$HOME/.ssh/config.d" -name '*.conf' -type f 2> /dev/null)
+
+    awk 'tolower($1) == "host" && $2 !~ /[*?!]/ { print $2 }' "${configs[@]}" \
+        | grep -v -e '^github\.com$' -e '^codeberg\.org$' \
+        | sort -u
+}
+
+tmux-ssh() {
+    local host="${1:-}"
+    local remote_session="${2:-main}"
+    local tmux="${TMUX:-}"
+
+    if [[ -z "$host" ]]; then
+        printf 'error: no host given\n' >&2
+        usage
+        return 2
+    fi
+
+    local session="${host//./_}"
+
+    if ! tmux has-session -t="$session" 2> /dev/null; then
+        # Single Tag value: the comma is part of the string, not an option
+        # separator. ssh selects on it with "Match tagged *session*" and
+        # "Match tagged *forward*".
+        local command
+        command=$(printf 'ssh -o Tag=%q -t %q %q' \
+            'session,forward' "$host" "tmux new-session -A -s $remote_session")
+
+        tmux new-session -ds "$session" "$command"
+        tmux set-option -t "$session" @remote "$host"
+        tmux set-option -t "$session" prefix C-M-b
+        tmux set-option -t "$session" status off
+    fi
+
+    if [[ -z "$tmux" ]]; then
+        tmux attach -t "$session"
+    else
+        tmux switch-client -t "$session"
+    fi
+
+    return 0
+}
+
+main() {
+    local session="main"
+    local help=false
+    local list=false
+
+    while [[ $# -gt 0 ]]; do
+       case "$1" in
+            -h | --help)
+                help=true
+                shift
+                ;;
+            -l | --list)
+                list=true
+                shift
+                ;;
+            -s | --session)
+                [[ $# -ge 2 ]] || { usage; exit 2; }
+                session="$2"
+                shift 2
+                ;;
+            --)
+                shift
+                break
+                ;;
+            -*)
+                printf 'error: unknown option: %s\n' "$1" >&2
+                usage
+                exit 2
+                ;;
+            *)
+                break
+                ;;
+       esac
+    done
+
+    if [ "$help" = true ]; then
+        usage
+        exit 0
+    fi
+
+    if [ "$list" = true ]; then
+        ssh_hosts
+        exit 0
+    fi
+
+    tmux-ssh "${1:-}" "$session"
+    local result="$?"
+    exit $result
+}
+
+main "$@"
