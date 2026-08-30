@@ -53,6 +53,19 @@ tmux-ssh() {
         return 2
     fi
 
+    # Both values cross command-parser boundaries below: host is interpreted by
+    # ssh and remote_session by the remote login shell. Keep them to the subset
+    # accepted by our SSH aliases and tmux session names rather than attempting
+    # to quote arbitrary input through both shells.
+    if [[ ! "$host" =~ ^[[:alnum:]_][[:alnum:]_.-]*$ ]]; then
+        printf 'error: invalid ssh host alias: %s\n' "$host" >&2
+        return 2
+    fi
+    if [[ ! "$remote_session" =~ ^[[:alnum:]_-]+$ ]]; then
+        printf 'error: invalid remote tmux session name: %s\n' "$remote_session" >&2
+        return 2
+    fi
+
     local session="${host//./_}"
 
     if ! tmux has-session -t="$session" 2> /dev/null; then
