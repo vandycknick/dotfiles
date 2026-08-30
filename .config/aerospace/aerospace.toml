@@ -50,10 +50,19 @@ key-mapping.preset = 'qwerty'
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 [workspace-to-monitor-force-assignment]
-1 = ['DELL U3223QE', 'DELL U3225QE', 'main']
-2 = ['DELL U3223QE', 'DELL U3225QE', 'main']
-3 = ['main']
-4 = ['main']
+# Every workspace is pinned so it cannot drift to whichever monitor happened to
+# be focused. Patterns are most-specific first and end in 'built-in' so a
+# laptop-only setup still resolves. 'built-in' rather than 'main' because 'main'
+# tracks the menu bar monitor, not the laptop.
+1 = ['PL2730H', 'DELL U3223QE', 'DELL U3225QE', 'built-in']
+2 = ['PL2730H', 'DELL U3223QE', 'DELL U3225QE', 'built-in']
+3 = ['PLE2482H', 'built-in']
+4 = 'built-in'
+5 = 'built-in'
+6 = 'built-in'
+7 = 'built-in'
+8 = 'built-in'
+9 = 'built-in'
 
 
 # Gaps between windows (inner-*) and between monitor edges (outer-*).
