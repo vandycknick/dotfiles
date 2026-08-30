@@ -50,6 +50,13 @@
       "textVerbosity": "low",
     },
 
+    "coder": {
+      "model": "openai/gpt-5.6-sol",
+      "reasoningEffort": "medium",
+      "reasoningSummary": "auto",
+      "textVerbosity": "low",
+    },
+
     // Local codebase discovery is usually straightforward enough
     // for medium reasoning.
     "explore": {
