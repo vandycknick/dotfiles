@@ -19,7 +19,16 @@ if ! plutil -replace DesktopViewSettings.IconViewSettings.arrangeBy \
             -string dateAdded "$FINDER_PLIST"
     fi
 fi
+# Both settings keep AeroSpace stable. It hides inactive-workspace windows just
+# off a monitor's bottom corner, which Mission Control renders badly unless
+# windows are grouped, and which breaks outright when moving a window between
+# monitors also moves it between macOS Spaces.
+# https://nikitabobko.github.io/AeroSpace/guide#a-note-on-mission-control
 defaults write com.apple.dock expose-group-apps -bool true
+# Inverted key: spans-displays true means 'Displays have separate Spaces' off.
+# Takes effect only after logout.
+# https://nikitabobko.github.io/AeroSpace/guide#a-note-on-displays-have-separate-spaces
+defaults write com.apple.spaces spans-displays -bool true
 
 killall Finder 2>/dev/null || true
 killall Dock 2>/dev/null || true
