@@ -136,6 +136,7 @@
                 coder
                 docker-client
                 gcx
+                github-cli
 
                 # Secrets
                 gnupg
