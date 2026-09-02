@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     systems.url = "github:nix-systems/default";
 
     nvim = {
@@ -14,6 +15,7 @@
   outputs =
     {
       nixpkgs,
+      nixpkgs-master,
       systems,
       nvim,
       ...
@@ -47,6 +49,11 @@
       packages = forEachSystem (
         system: pkgs:
         let
+          pkgsMaster = import nixpkgs-master {
+            inherit system;
+            config.allowUnfree = true;
+          };
+
           onePasswordVersion = "2.39.0-beta.02";
 
           onePasswordSource =
@@ -145,7 +152,7 @@
 
                 # Editors & AI
                 python3Packages.ansible-core
-                claude-code
+                pkgsMaster.claude-code
                 opencode
                 pi-coding-agent
                 shellcheck
