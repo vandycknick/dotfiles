@@ -2,6 +2,8 @@
 
 set -eu
 
+# Reference for tunable macOS defaults: https://macos-defaults.com/
+
 [ "$(uname -s)" = "Darwin" ] || {
     printf 'error: macOS defaults can only be configured on macOS\n' >&2
     exit 1
@@ -29,6 +31,8 @@ defaults write com.apple.dock expose-group-apps -bool true
 # Takes effect only after logout.
 # https://nikitabobko.github.io/AeroSpace/guide#a-note-on-displays-have-separate-spaces
 defaults write com.apple.spaces spans-displays -bool true
+# https://macos-defaults.com/misc/nsquitalwayskeepwindows.html
+defaults write -g NSQuitAlwaysKeepsWindows -bool false
 
 killall Finder 2>/dev/null || true
 killall Dock 2>/dev/null || true
