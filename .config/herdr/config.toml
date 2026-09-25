@@ -1,0 +1,56 @@
+onboarding = false
+
+[ui.toast]
+delivery = "system"
+
+[theme]
+name = "kanagawa"
+auto_switch = false
+
+[ui]
+sidebar_collapsed_mode = "hidden"
+hide_tab_bar_when_single_tab = false
+agent_panel_sort = "spaces"
+show_agent_labels_on_pane_borders = true
+pane_borders = "auto"
+pane_outer_borders = false
+pane_gaps = false
+pane_scrollbars = false
+prompt_new_tab_name = false
+
+[terminal]
+new_cwd = "follow"
+
+[keys]
+prefix = "ctrl+b"
+split_vertical = ["prefix+|", "prefix+%", "prefix+v"]
+split_horizontal = ['prefix+-', 'prefix+"']
+focus_pane_left = ["prefix+h", "prefix+ctrl+h"]
+focus_pane_down = ["prefix+j", "prefix+ctrl+j"]
+focus_pane_up = ["prefix+k", "prefix+ctrl+k"]
+focus_pane_right = ["prefix+l", "prefix+ctrl+l"]
+previous_tab = ["prefix+p", "prefix+ctrl+p"]
+next_tab = ["prefix+n", "prefix+ctrl+n"]
+resize_pane_left = "prefix+shift+h"
+resize_pane_down = "prefix+shift+j"
+resize_pane_up = "prefix+shift+k"
+resize_pane_right = "prefix+shift+l"
+reload_config = ["prefix+r", "prefix+shift+r"]
+resize_mode = "prefix+alt+r"
+goto = ["alt+o", "prefix+g"]
+workspace_picker = ["prefix+s", "prefix+w"]
+detach = ["prefix+d", "prefix+q"]
+rename_tab = ["prefix+,", "prefix+shift+t"]
+
+[[keys.command]]
+key = "prefix+f"
+type = "popup"
+command = "bash ~/.config/herdr/scripts/remote-workspace.sh"
+width = "75%"
+height = "55%"
+
+[[keys.command]]
+key = "prefix+o"
+type = "plugin_action"
+command = "herdr-bar.open"
+description = "command bar"

@@ -1,3 +1,7 @@
+# The following lines were added by Docker Desktop to add commands to your PATH.
+export PATH="$PATH:/Users/nickvd/.docker/bin"
+# End of Docker Desktop section.
+
 #!/bin/zsh
 
 # profile file. Runs on login. Environmental variables are set here.
