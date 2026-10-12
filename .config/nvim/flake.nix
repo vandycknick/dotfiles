@@ -59,6 +59,9 @@
           default = pkgs.writeShellScriptBin "nvim" ''
             ${lib.concatMapStringsSep "\n" (option: "set -o ${option}") bashOptions}
             export PATH="${plugins}/bin:$PATH"
+            # sqlite.lua (yanky's ring storage) dlopens libsqlite3 and only probes
+            # FHS and Homebrew paths, which NixOS and a formula-free Homebrew lack.
+            export LIBSQLITE="${pkgs.sqlite.out}/lib/libsqlite3${pkgs.stdenv.hostPlatform.extensions.sharedLibrary}"
 
             exec ${pkgs.neovim}/bin/nvim "$@"
           '';
