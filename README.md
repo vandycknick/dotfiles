@@ -26,7 +26,7 @@ Open a new shell after initialization to load the updated environment.
 
 ## Dot Command
 
-`.local/bin/dot` links to `install.sh`:
+`dot` is installed by Home Manager and runs `~/.dotfiles/install.sh`:
 
 | Command | Purpose |
 |---|---|
@@ -67,18 +67,19 @@ Outside the top-level repository files, the tree follows the layout of
 |-- home.nix          Packages, file links, and activation steps
 |-- install.sh        Bootstrap and dot command implementation
 |-- .config/          Application, shell, Nix, editor, and desktop config
-|-- .local/bin/       Personal commands, including dot
+|-- .local/bin/       Personal commands
 |-- .local/share/     Managed user data such as GnuPG policy
 |-- .ssh/             SSH policy and public trust material
-|-- systemd/          Host service artifacts not installed by dot
 |-- AGENTS.md         Repository guidance for coding agents
 `-- README.md
 ```
 
-Home Manager links every git-tracked file individually to its path in the
-`~/.dotfiles` checkout, so edits apply without a rebuild and application-owned
-state stays outside the checkout. Newly added files must be `git add`ed and
-followed by `dot switch` before they are linked.
+Home Manager links every git-tracked file individually from a read-only copy
+in the Nix store, so application-owned state can sit next to managed files.
+Edit files in the checkout and run `dot switch` to apply them; new files must
+be `git add`ed first. The few files applications rewrite themselves
+(`lazy-lock.json`, k9s `config.yaml`, pi `settings.json`) are listed in
+`mutable` in `home.nix` and link directly to the `~/.dotfiles` checkout.
 
 ## Migrating From Stow
 

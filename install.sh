@@ -11,8 +11,8 @@ BASHRC="$HOME/.bashrc"
 FISH_HANDOFF_BEGIN="# >>> dot: fish handoff >>>"
 FISH_HANDOFF_END="# <<< dot: fish handoff <<<"
 
-# Resolves through ~/.local/bin/dot -> ~/.dotfiles/.local/bin/dot -> install.sh,
-# so the checkout is found however the script is invoked.
+# The dot wrapper execs ~/.dotfiles/install.sh; resolving symlinks finds the
+# real checkout however the script is invoked.
 DOTFILES_DIR=$(dirname "$(readlink -f "$0")")
 
 info() {
@@ -89,8 +89,8 @@ ensure_nix() {
     command -v nix >/dev/null 2>&1 || die "Nix was installed but is unavailable in this shell"
 }
 
-# Home Manager links point into ~/.dotfiles, so that path must resolve to this
-# checkout even when Coder cloned it elsewhere.
+# The dot wrapper and the app-writable files link into ~/.dotfiles, so that
+# path must resolve to this checkout even when Coder cloned it elsewhere.
 ensure_home_link() {
     if [ ! -e "$HOME/.dotfiles" ] && [ ! -L "$HOME/.dotfiles" ]; then
         info "Linking $HOME/.dotfiles to $DOTFILES_DIR"

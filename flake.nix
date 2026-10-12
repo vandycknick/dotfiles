@@ -22,7 +22,7 @@
         system: source:
         import source {
           inherit system;
-          # terraform (BUSL), 1Password CLI and claude-code are unfree.
+          # terraform (BUSL) and claude-code are unfree.
           config.allowUnfree = true;
         };
 

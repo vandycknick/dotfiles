@@ -2,8 +2,8 @@
 
 Personal Linux and Apple Silicon macOS configuration applied with standalone
 Home Manager. Below the top-level repository files the tree follows `$HOME`;
-`home.nix` links every git-tracked file individually to its live path in
-`~/.dotfiles` (`mkOutOfStoreSymlink`) and declares the user CLI packages.
+`home.nix` links every git-tracked file individually from a read-only Nix
+store copy and declares the user CLI packages.
 `install.sh` provides the bootstrap and ongoing `dot` command.
 
 ## STRUCTURE
@@ -30,8 +30,6 @@ Home Manager. Below the top-level repository files the tree follows `$HOME`;
 |   |-- bin/                        # Personal commands and dot symlink
 |   `-- share/gnupg/                # GnuPG policy, never private key material
 |-- .ssh/                           # SSH policy and public trust anchors
-|-- .profile, .zprofile             # Symlinks to the shared login profile
-|-- systemd/                        # Host artifacts, intentionally not linked
 |-- .gitignore                      # Private and runtime state exclusions
 |-- AGENTS.md
 `-- README.md
@@ -69,17 +67,21 @@ Home Manager. Below the top-level repository files the tree follows `$HOME`;
 | Change OpenCode models or agent routing | `.config/opencode/opencode.jsonc` |
 | Change SSH trust or authentication policy | `.ssh/config`, `.ssh/README.md` |
 | Change state exclusions | `.gitignore` |
-| Change host service artifacts | `systemd/` |
 | Change host or devbox provisioning | `/home/nickvd/Projects/boxes` |
 
 ## CONVENTIONS
 
 - Edit files in this checkout, never the linked counterpart in `$HOME`.
-- Home Manager links one file at a time, so managed links coexist with
-  application-owned state in real directories. Only git-tracked files are
-  linked (the flake source excludes untracked files); new files need `git add`
-  and `dot switch`. New top-level repo-only files must be added to `repoOnly`
-  in `home.nix`; nested `.gitignore` files are never linked.
+- Home Manager links one file at a time from the Nix store, so managed links
+  coexist with application-owned state in real directories. Edits take effect
+  on `dot switch`. Only git-tracked files are linked (the flake source excludes
+  untracked files); new files need `git add`. New top-level repo-only files
+  must be added to `repoOnly` in `home.nix`; nested `.gitignore` files are
+  never linked. Do not track symlinks: they dangle once copied to the store;
+  declare the alias in `home.file` instead (as for `.profile`).
+- Files an application rewrites at runtime (`lazy-lock.json`, k9s
+  `config.yaml`, pi `settings.json`) are listed in `mutable` in `home.nix` and
+  link straight to `~/.dotfiles` so the writes land in the checkout.
 - `homeConfigurations` are keyed `<user>@<flavor>` (`nixos`, `linux`,
   `darwin`); `install.sh` derives the key from `id -un` and the OS. Targets are
   `x86_64-linux` and `aarch64-darwin`.
@@ -100,8 +102,6 @@ Home Manager. Below the top-level repository files the tree follows `$HOME`;
 - Keep credentials, private SSH hosts, cloud state, GnuPG keyrings, and
   generated application files out of Git. Check `.gitignore` before adding
   stateful paths.
-- `systemd/` contains host-side artifacts and is excluded from the links. `dot`
-  does not install or enable them.
 
 ## ANTI-PATTERNS
 
@@ -194,14 +194,13 @@ validation shortcut: they can change links, packages, the shell, or
 
 ## NOTES
 
-- `.local/bin/dot` is a tracked symlink to `install.sh`; Home Manager exposes it
-  under `~/.local/bin`.
-- `.profile` and `.zprofile` are tracked symlinks to `.config/shell/profile`.
+- `dot` is a Home Manager package that execs `~/.dotfiles/install.sh`;
+  `install.sh` links `~/.dotfiles` to the checkout when it lives elsewhere.
+- `.profile` and `.zprofile` are declared in `home.nix` from
+  `.config/shell/profile`.
 - Home Manager owns user CLI tools but not complete desktop sessions or
   system-service daemons.
 - Private SSH host fragments belong under ignored `.ssh/config.d/private/`.
   Public GitHub and Codeberg trust anchors are tracked separately.
 - The tracked `.ssh/id_rsa` file contains public key material despite its
   private-key-style name. Never add the corresponding private key.
-- `systemd/nvim-remote.service` and its firewall helper are host-specific and
-  are not installed by `dot`.

@@ -6,7 +6,8 @@
   ...
 }:
 let
-  # Live checkout; install.sh guarantees this path exists (symlink allowed).
+  # Checkout path; install.sh guarantees it exists (symlink allowed). Only the
+  # mutable files below and the dot wrapper refer to it.
   dotfiles = "${config.home.homeDirectory}/.dotfiles";
 
   # Top-level repo entries that are not part of $HOME.
@@ -15,12 +16,19 @@ let
     "flake.lock"
     "home.nix"
     "install.sh"
-    "systemd"
     "README.md"
     "AGENTS.md"
     "LICENSE"
     ".editorconfig"
     ".gitignore"
+  ];
+
+  # Files the owning application rewrites at runtime. A read-only store copy
+  # would break them, so they link to the checkout and changes show up in git.
+  mutable = [
+    ".config/nvim/lazy-lock.json"
+    ".config/k9s/config.yaml"
+    ".config/pi/settings.json"
   ];
 
   root = toString ./.;
@@ -34,50 +42,28 @@ let
     ))
   ];
 
-  onePasswordVersion = "2.39.0-beta.02";
-
-  onePasswordSource =
-    {
-      x86_64-linux = {
-        platform = "linux_amd64";
-        extension = "zip";
-      };
-
-      aarch64-darwin = {
-        platform = "apple_universal";
-        extension = "pkg";
-      };
-    }
-    .${pkgs.stdenv.hostPlatform.system}
-      or (throw "1Password CLI beta is not supported on ${pkgs.stdenv.hostPlatform.system}");
-
-  onePasswordCliBeta = pkgs._1password-cli.overrideAttrs (_old: {
-    version = onePasswordVersion;
-
-    src =
-      if onePasswordSource.extension == "zip" then
-        pkgs.fetchzip {
-          url = "https://cache.agilebits.com/dist/1P/op2/pkg/v${onePasswordVersion}/op_${onePasswordSource.platform}_v${onePasswordVersion}.zip";
-          hash = "sha256-ZbqkqY2InfeBU3jxh27F9WPMy6EyrERUbO1PM9i0ycA=";
-          stripRoot = false;
-        }
-      else
-        pkgs.fetchurl {
-          url = "https://cache.agilebits.com/dist/1P/op2/pkg/v${onePasswordVersion}/op_${onePasswordSource.platform}_v${onePasswordVersion}.pkg";
-          hash = "sha256-af3G2rc4JsqN7fn9uitN4S5z1x/DVLadHbszCUQswz0=";
-        };
-  });
+  dot = pkgs.writeShellScriptBin "dot" ''
+    exec "${dotfiles}/install.sh" "$@"
+  '';
 in
 {
   home.stateVersion = "26.05";
   programs.home-manager.enable = true;
 
-  # One link per tracked file into the live checkout; this replaces
-  # `stow --no-folding`. Edits apply without a rebuild, and app-written files
-  # (lazy-lock.json, k9s config.yaml, pi settings.json) stay writable.
-  home.file = lib.genAttrs managed (rel: {
-    source = config.lib.file.mkOutOfStoreSymlink "${dotfiles}/${rel}";
-  });
+  # One store-backed link per tracked file, so directories stay real and
+  # application state can live next to managed files. Edits apply on switch.
+  home.file =
+    lib.genAttrs managed (rel: {
+      source =
+        if lib.elem rel mutable then
+          config.lib.file.mkOutOfStoreSymlink "${dotfiles}/${rel}"
+        else
+          ./. + "/${rel}";
+    })
+    // {
+      ".profile".source = ./.config/shell/profile;
+      ".zprofile".source = ./.config/shell/profile;
+    };
 
   home.packages =
     with pkgs;
@@ -129,7 +115,9 @@ in
       # Secrets
       gnupg
       openssh
-      onePasswordCliBeta
+
+      # Dotfiles CLI
+      dot
 
       # Editors & AI
       python3Packages.ansible-core
