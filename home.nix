@@ -149,14 +149,4 @@ in
       run touch "$HOME/.gitconfig"
     fi
   '';
-
-  # pi installs npm: sources with npm, which activation's PATH does not carry.
-  home.activation.piPackages = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-    ${pkgs.jq}/bin/jq -r '.packages[]? | if type == "string" then . else .source end' \
-      "${dotfiles}/.config/pi/settings.json" |
-    while IFS= read -r source; do
-      run env PI_CODING_AGENT_DIR="$HOME/.config/pi" PATH="${pkgs.nodejs}/bin:$PATH" \
-        ${pkgs.pi-coding-agent}/bin/pi install "$source"
-    done
-  '';
 }

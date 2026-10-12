@@ -136,7 +136,7 @@ All commands except `help` mutate the environment.
 | Area | Entry point | Important behavior |
 |---|---|---|
 | Bootstrap | `install.sh` | Installs multi-user Nix, links `~/.dotfiles` to the checkout, runs the Home Manager switch, and sets the Fish login shell. |
-| Home Manager | `home.nix` | Declares user CLI packages, links tracked files, ensures `~/.gitconfig`, and installs pi packages on activation. |
+| Home Manager | `home.nix` | Declares user CLI packages, links tracked files, and ensures `~/.gitconfig`. Tools and pi extensions come from Nix; activation never installs from npm or other registries. |
 | Neovim | `.config/nvim/init.lua` | Loads options, mappings, autocommands, and lazy.nvim configuration. |
 | Fish | `.config/fish/config.fish` | Uses vi bindings and initializes direnv, zoxide, Atuin, and wtp interactively. |
 | Shared shell | `.config/shell/profile` | Establishes XDG paths and the Nix/user command path. |
