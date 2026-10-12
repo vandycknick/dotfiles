@@ -1,0 +1,11 @@
+theme:
+  dark: titanium
+defaultThinkingLevel: medium
+hideThinkingBlock: false
+setupVersion: 2
+disabledProviders:
+  - llama.cpp
+  - lm-studio
+  - ollama
+power:
+  sleepPrevention: "off"
