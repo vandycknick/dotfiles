@@ -12,6 +12,9 @@ NIX_FEATURES="nix-command flakes"
 PROFILE_NAME=".config/nix/profile"
 PROFILE_FLAKE="$DOTFILES_DIR/$PROFILE_NAME"
 PROFILE_BIN="$HOME/.local/state/nix/profiles/profile/bin"
+BASHRC="$HOME/.bashrc"
+FISH_HANDOFF_BEGIN="# >>> dot: fish handoff >>>"
+FISH_HANDOFF_END="# <<< dot: fish handoff <<<"
 PI_AGENT_DIR="$HOME/.config/pi"
 PI_SETTINGS="$DOTFILES_DIR/.config/pi/settings.json"
 OSX_DIR="$DOTFILES_DIR/.config/osx"
@@ -250,8 +253,19 @@ load_nix() {
     fi
 }
 
+is_nixos() {
+    [ -e /etc/NIXOS ]
+}
+
 ensure_nix() {
     load_nix
+
+    # NixOS runs the daemon from the system configuration and ships no
+    # nix-daemon.sh profile hook, so a working nix is all we can check for.
+    if is_nixos; then
+        command -v nix >/dev/null 2>&1 || die "nix is unavailable on this NixOS host"
+        return
+    fi
 
     if command -v nix >/dev/null 2>&1; then
         [ -r "$NIX_DAEMON_PROFILE" ] \
@@ -331,9 +345,47 @@ current_login_shell() {
     esac
 }
 
+has_fish_handoff() {
+    [ -r "$BASHRC" ] && grep -Fqx "$FISH_HANDOFF_BEGIN" "$BASHRC"
+}
+
+# NixOS owns /etc/shells (a read-only store link) and, with immutable users,
+# rewrites the login shell from the system configuration on every activation,
+# so chsh cannot stick. Interactive bash sessions hand off to Fish instead.
+# The TTY and parent checks keep scripted, agent, and nested shells on bash.
+configure_fish_handoff() {
+    if has_fish_handoff; then
+        return
+    fi
+
+    info "Handing interactive bash sessions off to Nix Fish"
+    cat >>"$BASHRC" <<EOF
+$FISH_HANDOFF_BEGIN
+# Managed by dot on NixOS. Set DOT_NO_FISH=1 to stay in bash.
+case \$- in
+    *i*)
+        if [ -z "\${DOT_NO_FISH:-}" ] && [ -t 0 ] && [ -t 1 ] \\
+            && [ -x "$PROFILE_BIN/fish" ] \\
+            && [ "\$(ps -o comm= -p "\$PPID" 2>/dev/null)" != fish ]; then
+            if shopt -q login_shell; then
+                exec "$PROFILE_BIN/fish" --login
+            fi
+            exec "$PROFILE_BIN/fish"
+        fi
+        ;;
+esac
+$FISH_HANDOFF_END
+EOF
+}
+
 configure_login_shell() {
     fish_shell="$PROFILE_BIN/fish"
     [ -x "$fish_shell" ] || die "Fish is not installed by the personal Nix profile"
+
+    if is_nixos; then
+        configure_fish_handoff
+        return
+    fi
 
     if ! grep -Fqx "$fish_shell" /etc/shells 2>/dev/null; then
         info "Registering Nix Fish as a login shell"
@@ -412,7 +464,9 @@ doctor_repository() {
 
 doctor_nix() {
     load_nix
-    if [ -r "$NIX_DAEMON_PROFILE" ]; then
+    if is_nixos; then
+        doctor_pass "Nix is provided by NixOS"
+    elif [ -r "$NIX_DAEMON_PROFILE" ]; then
         doctor_pass "multi-user Nix profile is installed"
     else
         doctor_fail "multi-user Nix profile is missing"
@@ -483,6 +537,15 @@ doctor_stow() {
 }
 
 doctor_shell() {
+    if is_nixos; then
+        if has_fish_handoff; then
+            doctor_pass "interactive bash hands off to Nix Fish"
+        else
+            doctor_warn "interactive bash does not hand off to Nix Fish; run dot init"
+        fi
+        return
+    fi
+
     configured_shell=$(current_login_shell)
     if [ "$configured_shell" = "$PROFILE_BIN/fish" ]; then
         doctor_pass "Nix Fish is the login shell"
