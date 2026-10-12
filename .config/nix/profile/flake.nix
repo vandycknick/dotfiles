@@ -155,6 +155,7 @@
                 pkgsMaster.claude-code
                 opencode
                 pi-coding-agent
+                omp
                 shellcheck
                 nvim.packages.${system}.default
               ]
