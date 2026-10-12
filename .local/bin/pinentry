@@ -1,14 +1,14 @@
 #!/bin/sh
 set -eu
 
-PROFILE_BIN="$HOME/.local/state/nix/profiles/profile/bin"
+NIX_BIN="$HOME/.nix-profile/bin"
 
 case "$(uname -s)" in
   Darwin)
-    PINENTRY="$PROFILE_BIN/pinentry-mac"
+    PINENTRY="$NIX_BIN/pinentry-mac"
     ;;
   Linux)
-    PINENTRY="$PROFILE_BIN/pinentry-gnome3"
+    PINENTRY="$NIX_BIN/pinentry-gnome3"
     ;;
   *)
     echo "Unsupported OS: $(uname -s)" >&2

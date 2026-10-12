@@ -6,7 +6,7 @@ end
 
 # These paths are required in interactive non-login shells too.
 fish_add_path --global --prepend --move /nix/var/nix/profiles/default/bin
-fish_add_path --global --prepend --move "$HOME/.local/state/nix/profiles/profile/bin"
+fish_add_path --global --prepend --move "$HOME/.nix-profile/bin"
 fish_add_path --global --prepend --move "$HOME/.local/bin"
 
 status is-login; or return

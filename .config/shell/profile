@@ -14,8 +14,8 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
-# User commands and the declarative Nix profile own the interactive CLI path.
-PATH="$HOME/.local/bin:$HOME/.local/state/nix/profiles/profile/bin:$PATH"
+# User commands and the Home Manager profile own the interactive CLI path.
+PATH="$HOME/.local/bin:$HOME/.nix-profile/bin:$PATH"
 export PATH
 
 # Configure LANGs
