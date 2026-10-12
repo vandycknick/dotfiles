@@ -1,79 +1,96 @@
 # Dotfiles
 
-Personal Linux and Apple Silicon macOS configuration managed with Nix and GNU
-Stow.
+Personal Linux and Apple Silicon macOS configuration managed with standalone
+Home Manager.
 
 ## Quick Start
 
-Bootstrap a new machine directly from GitHub:
+Clone the repository and run the installer:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/vandycknick/dotfiles/main/install \
-  | sh -s -- init
+git clone https://github.com/vandycknick/dotfiles.git ~/.dotfiles
+~/.dotfiles/install.sh
 ```
 
-The installer supports x86_64 and aarch64 Linux plus Apple Silicon macOS. It
-clones this repository to `~/.dotfiles`, installs multi-user Nix, builds the
-personal CLI profile, links the configuration, and configures Fish as the login
-shell. On macOS it also installs the configured applications and applies the
-tracked defaults.
+The installer installs multi-user Nix when it is missing, applies the Home
+Manager configuration for the current user and OS, and configures Fish as the
+login shell. It also runs unchanged as a Coder dotfiles script: when the
+checkout is not at `~/.dotfiles`, it links `~/.dotfiles` to it.
 
-Linux installation requires systemd and `sudo`. macOS requires the Xcode
-Command Line Tools; the installer starts their installation when necessary.
+Configurations are keyed `<user>@<flavor>`, where flavor is `nixos`, `linux`
+(non-NixOS, using `targets.genericLinux`) or `darwin`. The installer picks the
+key from `id -un` and the OS; add a `homeConfigurations` entry in `flake.nix`
+for a new user or host. Linux installation of Nix requires systemd and `sudo`.
 
 Open a new shell after initialization to load the updated environment.
 
 ## Dot Command
 
-After initialization, use `dot` to maintain the environment:
+`.local/bin/dot` links to `install.sh`:
 
 | Command | Purpose |
 |---|---|
-| `dot init` | Install or initialize the environment |
-| `dot update` | Update the checkout, tools, applications, and links |
-| `dot stow` | Relink managed files |
-| `dot doctor` | Diagnose the installed environment without changing it |
-| `dot help [COMMAND]` | Show general or command-specific help |
+| `dot init` | Install Nix if needed, apply Home Manager, and set Fish as login shell |
+| `dot switch` | Apply the Home Manager configuration |
+| `dot update` | Update flake inputs, then apply the configuration |
+| `dot help` | Show help |
 
-Initialization steps can be skipped explicitly:
+`dot switch` is equivalent to:
 
 ```sh
-dot init --skip-nix
-dot init --skip-stow --skip-shell
-dot init --skip-homebrew --skip-defaults
+nix run --inputs-from . home-manager -- switch --flake .#<user>@<flavor> -b hm-bak
 ```
 
-Run `dot init --help` for the complete option list.
+`dot update` leaves the updated `flake.lock` for you to commit; it does not
+pull the checkout.
 
 ## Package Management
 
-User-facing command-line tools are declared in
-`.config/nix/profile/flake.nix`. Homebrew is reserved for macOS applications
-and fonts declared in `.config/osx/Brewfile`; the Brewfile contains no
-formulae, and Homebrew directories are not added to the shell `PATH`.
+User-facing command-line tools are declared in `home.packages` in `home.nix`.
+Homebrew is reserved for macOS applications and fonts declared in
+`.config/osx/Brewfile`; the Brewfile contains no formulae, and Homebrew
+directories are not added to the shell `PATH`. Run `.config/osx/homebrew` and
+`.config/osx/defaults` manually on macOS.
 
 Use project development shells for project-specific language runtimes and
 toolchains rather than installing global Go, Cargo, npm, or mise tools.
 
 ## Repository
 
-The repository root is the Stow package and follows the layout of `$HOME`:
+Outside the top-level repository files, the tree follows the layout of
+`$HOME`:
 
 ```text
 ~/.dotfiles/
+|-- flake.nix         Inputs and per-host homeConfigurations
+|-- flake.lock
+|-- home.nix          Packages, file links, and activation steps
+|-- install.sh        Bootstrap and dot command implementation
 |-- .config/          Application, shell, Nix, editor, and desktop config
 |-- .local/bin/       Personal commands, including dot
 |-- .local/share/     Managed user data such as GnuPG policy
 |-- .ssh/             SSH policy and public trust material
 |-- systemd/          Host service artifacts not installed by dot
-|-- install           Bootstrap and dot command implementation
 |-- AGENTS.md         Repository guidance for coding agents
 `-- README.md
 ```
 
-GNU Stow links managed files individually, allowing application-owned state to
-remain outside the checkout. The checkout is authoritative, and commands that
-update or relink files require it to be clean.
+Home Manager links every git-tracked file individually to its path in the
+`~/.dotfiles` checkout, so edits apply without a rebuild and application-owned
+state stays outside the checkout. Newly added files must be `git add`ed and
+followed by `dot switch` before they are linked.
+
+## Migrating From Stow
+
+On a host still using Stow and the old `nix profile`, pull this checkout, then:
+
+```sh
+cd ~/.dotfiles
+stow --delete --no-folding --dir="$HOME/.dotfiles" --target="$HOME" .
+rm -r ~/.config/nix/profile   # stale links Stow no longer knows about
+nix profile remove .config/nix/profile
+./install.sh init
+```
 
 ## Platform Configuration
 
@@ -96,14 +113,3 @@ Herdr preferences and keybindings are managed in `.config/herdr/config.toml`.
 Plugins, scripts, and runtime state remain local. The `prefix + f` popup requires
 `~/.config/herdr/scripts/remote-workspace.sh`; `prefix + o` requires the
 `herdr-bar` plugin.
-
-## Diagnostics
-
-Run the read-only health check after installation or when configuration drifts:
-
-```sh
-dot doctor
-```
-
-Warnings describe non-critical drift. Missing requirements or unhealthy Stow
-links produce a nonzero exit status.

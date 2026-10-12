@@ -1,19 +1,20 @@
 # DOTFILES
 
-Personal Linux and Apple Silicon macOS configuration. The repository root is a
-GNU Stow package that follows `$HOME`; managed files are linked individually
-with `--no-folding`. Nix owns the user CLI environment, while `install` provides
-the bootstrap and ongoing `dot` command.
+Personal Linux and Apple Silicon macOS configuration applied with standalone
+Home Manager. Below the top-level repository files the tree follows `$HOME`;
+`home.nix` links every git-tracked file individually to its live path in
+`~/.dotfiles` (`mkOutOfStoreSymlink`) and declares the user CLI packages.
+`install.sh` provides the bootstrap and ongoing `dot` command.
 
 ## STRUCTURE
 
 ```text
 .dotfiles/
-|-- install                         # POSIX-sh bootstrap and dot CLI
+|-- flake.nix, flake.lock           # Inputs and per-host homeConfigurations
+|-- home.nix                        # Packages, file links, activation steps
+|-- install.sh                      # POSIX-sh bootstrap and dot CLI
 |-- .config/
-|   |-- nix/
-|   |   |-- profile/                # Declarative user CLI profile
-|   |   `-- nix.conf                # Nix CLI features and policy
+|   |-- nix/nix.conf                # Nix CLI features and policy
 |   |-- nvim/                       # Lua config, plugins, and Nix wrapper
 |   |-- fish/                       # Interactive shell, prompt, and functions
 |   |-- shell/                      # Shared login environment and zsh config
@@ -30,8 +31,7 @@ the bootstrap and ongoing `dot` command.
 |   `-- share/gnupg/                # GnuPG policy, never private key material
 |-- .ssh/                           # SSH policy and public trust anchors
 |-- .profile, .zprofile             # Symlinks to the shared login profile
-|-- systemd/                        # Host artifacts, intentionally not stowed
-|-- .stow-local-ignore              # Stow exclusions
+|-- systemd/                        # Host artifacts, intentionally not linked
 |-- .gitignore                      # Private and runtime state exclusions
 |-- AGENTS.md
 `-- README.md
@@ -41,10 +41,12 @@ the bootstrap and ongoing `dot` command.
 
 | Task | Location |
 |---|---|
-| Bootstrap, update, Stow, doctor, platform support | `install` |
-| Add or remove a user CLI tool | `.config/nix/profile/flake.nix` |
+| Bootstrap, switch, update, login shell | `install.sh` |
+| Add a host or user configuration | `flake.nix` |
+| Add or remove a user CLI tool | `home.nix` (`home.packages`) |
+| Change which repo files are linked into `$HOME` | `home.nix` (`repoOnly`) |
 | Change Nix CLI behavior | `.config/nix/nix.conf` |
-| Change packaged Neovim or LSP tools | `.config/nvim/flake.nix` |
+| Change packaged Neovim or LSP tools | `.config/nvim/package.nix` |
 | Change Neovim startup | `.config/nvim/init.lua` |
 | Change Neovim options, mappings, or autocommands | `.config/nvim/lua/config/` |
 | Add a general Neovim plugin | `.config/nvim/lua/plugins/` |
@@ -66,24 +68,28 @@ the bootstrap and ongoing `dot` command.
 | Change Git defaults | `.config/git/config` |
 | Change OpenCode models or agent routing | `.config/opencode/opencode.jsonc` |
 | Change SSH trust or authentication policy | `.ssh/config`, `.ssh/README.md` |
-| Change Stow or state exclusions | `.stow-local-ignore`, `.gitignore` |
+| Change state exclusions | `.gitignore` |
 | Change host service artifacts | `systemd/` |
 | Change host or devbox provisioning | `/home/nickvd/Projects/boxes` |
 
 ## CONVENTIONS
 
 - Edit files in this checkout, never the linked counterpart in `$HOME`.
-- The repository root is the Stow package. Always use `--no-folding` so
-  managed links can coexist with application-owned state in real directories.
-- `dot stow` uses `--adopt --restow --no-folding`, restores tracked files
-  immediately, and refuses to run against a dirty checkout.
-- User-facing CLI tools belong in `.config/nix/profile/flake.nix`. The profile
-  supports `x86_64-linux`, `aarch64-linux`, and `aarch64-darwin`.
-- Neovim runtime executables and LSP tools belong in `.config/nvim/flake.nix`;
-  the personal profile consumes the packaged Neovim output.
+- Home Manager links one file at a time, so managed links coexist with
+  application-owned state in real directories. Only git-tracked files are
+  linked (the flake source excludes untracked files); new files need `git add`
+  and `dot switch`. New top-level repo-only files must be added to `repoOnly`
+  in `home.nix`; nested `.gitignore` files are never linked.
+- `homeConfigurations` are keyed `<user>@<flavor>` (`nixos`, `linux`,
+  `darwin`); `install.sh` derives the key from `id -un` and the OS. Targets are
+  `x86_64-linux` and `aarch64-darwin`.
+- User-facing CLI tools belong in `home.packages` in `home.nix`. Unfree
+  packages are allowed; `pkgsMaster` exposes nixpkgs master.
+- Neovim runtime executables and LSP tools belong in `.config/nvim/package.nix`;
+  both `home.nix` and the standalone `.config/nvim/flake.nix` import it.
 - Homebrew declarations are macOS-only taps and casks. Formulae are forbidden,
   and Homebrew directories must not be added to shell `PATH`.
-- Keep `install`, `.config/osx/homebrew`, `.config/osx/defaults`, and
+- Keep `install.sh`, `.config/osx/homebrew`, `.config/osx/defaults`, and
   `.local/bin/pinentry` compatible with POSIX `sh`. Other scripts must satisfy
   the interpreter named by their shebang.
 - Put Fish startup snippets in `conf.d/` and named functions in `functions/`.
@@ -94,17 +100,16 @@ the bootstrap and ongoing `dot` command.
 - Keep credentials, private SSH hosts, cloud state, GnuPG keyrings, and
   generated application files out of Git. Check `.gitignore` before adding
   stateful paths.
-- `systemd/` contains host-side artifacts and is excluded from Stow. `dot`
+- `systemd/` contains host-side artifacts and is excluded from the links. `dot`
   does not install or enable them.
 
 ## ANTI-PATTERNS
 
 - Editing managed files directly under `~/.config`, `~/.local`, or `~/.ssh`.
-- Running `dot init`, `dot update`, or `dot stow` with a dirty checkout.
 - Adding a Homebrew formula, Homebrew `PATH` entry, or downloaded global-tool
   directory to the shared shell environment.
 - Adding Go, Cargo, npm-global, mise, or equivalent tool bins globally; use the
-  Nix profile or a project development shell.
+  Home Manager packages or a project development shell.
 - Tracking runtime state, credentials, private keys, cloud configuration, or
   application-generated files.
 - Assuming desktop configuration is desktop provisioning. Hyprland, i3,
@@ -118,23 +123,20 @@ the bootstrap and ongoing `dot` command.
 ## COMMANDS
 
 ```sh
-dot init [--skip-nix] [--skip-stow] [--skip-shell] [--skip-homebrew] [--skip-defaults]
-dot update
-dot stow
-dot doctor
-dot help [COMMAND]
+dot init     # install Nix if missing, switch, set Fish as login shell
+dot switch   # nix run --inputs-from . home-manager -- switch --flake .#<user>@<flavor> -b hm-bak
+dot update   # nix flake update, then switch; leaves flake.lock to commit
+dot help
 ```
 
-`dot init`, `dot update`, and `dot stow` mutate the environment and require a
-clean checkout. `dot doctor` is read-only and returns nonzero for critical
-requirements or unhealthy Stow links.
+All commands except `help` mutate the environment.
 
 ## KEY CONFIGS
 
 | Area | Entry point | Important behavior |
 |---|---|---|
-| Bootstrap | `install` | Manages checkout updates, multi-user Nix, the user profile, Stow links, Fish login shell, and macOS steps. |
-| Nix profile | `.config/nix/profile/flake.nix` | Single declarative user CLI environment; permits required unfree packages. |
+| Bootstrap | `install.sh` | Installs multi-user Nix, links `~/.dotfiles` to the checkout, runs the Home Manager switch, and sets the Fish login shell. |
+| Home Manager | `home.nix` | Declares user CLI packages, links tracked files, ensures `~/.gitconfig`, and installs pi packages on activation. |
 | Neovim | `.config/nvim/init.lua` | Loads options, mappings, autocommands, and lazy.nvim configuration. |
 | Fish | `.config/fish/config.fish` | Uses vi bindings and initializes direnv, zoxide, Atuin, and wtp interactively. |
 | Shared shell | `.config/shell/profile` | Establishes XDG paths and the Nix/user command path. |
@@ -173,28 +175,29 @@ requirements or unhealthy Stow links.
 Run checks relevant to the changed files:
 
 ```sh
-sh -n install
+sh -n install.sh
 sh -n .config/osx/homebrew
 sh -n .config/osx/defaults
 sh -n .local/bin/pinentry
-shellcheck install .config/osx/homebrew .config/osx/defaults .local/bin/pinentry
-nix --extra-experimental-features 'nix-command flakes' \
-  flake check --all-systems --no-write-lock-file .config/nix/profile
-stow --simulate --restow --no-folding --dir="$HOME/.dotfiles" --target="$HOME" .
+shellcheck install.sh .config/osx/homebrew .config/osx/defaults .local/bin/pinentry
+for c in coder@nixos nickvd@nixos nickvd@linux nickvd@darwin; do
+  nix eval --raw ".#homeConfigurations.\"$c\".activationPackage.drvPath"
+done
+nix build --no-link ".#homeConfigurations.\"$(id -un)@nixos\".activationPackage"
 git diff --check
 ```
 
 Also run the declared interpreter's syntax checker for changed Fish, Bash, Lua,
-or other scripts. Do not use `dot init`, `dot update`, or `dot stow` as a
-validation shortcut: they can change the checkout, links, profile, shell,
-applications, or system settings.
+or other scripts. Do not use `dot init`, `dot switch`, or `dot update` as a
+validation shortcut: they can change links, packages, the shell, or
+`flake.lock`.
 
 ## NOTES
 
-- `.local/bin/dot` is a tracked symlink to `install`; Stow exposes it under
-  `~/.local/bin`.
+- `.local/bin/dot` is a tracked symlink to `install.sh`; Home Manager exposes it
+  under `~/.local/bin`.
 - `.profile` and `.zprofile` are tracked symlinks to `.config/shell/profile`.
-- The Nix profile owns user CLI tools but not complete desktop sessions or
+- Home Manager owns user CLI tools but not complete desktop sessions or
   system-service daemons.
 - Private SSH host fragments belong under ignored `.ssh/config.d/private/`.
   Public GitHub and Codeberg trust anchors are tracked separately.
