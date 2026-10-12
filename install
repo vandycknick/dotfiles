@@ -318,9 +318,18 @@ restore_checkout() {
     fi
 }
 
+# ~/.gitconfig is the per-host layer over the tracked ~/.config/git/config;
+# a Coder workspace writes its signing key and identity there on every boot.
+# It must exist: without it, `git config --global` writes to the XDG file and
+# replaces the Stow link with a regular file.
+ensure_host_gitconfig() {
+    [ -e "$HOME/.gitconfig" ] || : >"$HOME/.gitconfig"
+}
+
 stow_dotfiles() {
     find_stow
     ensure_clean_checkout
+    ensure_host_gitconfig
 
     info "Linking dotfiles"
     trap restore_checkout 0
