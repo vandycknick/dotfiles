@@ -264,7 +264,8 @@ return {
       smear_between_buffers = false,
       stiffness = 0.5,
       trailing_stiffness = 0.49,
-      legacy_computing_symbols_support = true,
+      -- JetBrains Mono Nerd Font lacks the U+1FB8x "Legacy Computing" blocks; Tern draws them as "?"
+      legacy_computing_symbols_support = false,
     },
   },
 }
