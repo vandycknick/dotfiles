@@ -65,7 +65,7 @@ store copy and declares the user CLI packages.
 | Change terminal or multiplexer behavior | `.config/ghostty/`, `.config/tmux/` |
 | Change Git defaults | `.config/git/config` |
 | Change OpenCode models or agent routing | `.config/opencode/opencode.jsonc` |
-| Change SSH trust or authentication policy | `.ssh/config`, `.ssh/README.md` |
+| Change SSH trust or authentication policy | `.ssh/config` |
 | Change state exclusions | `.gitignore` |
 | Change host or devbox provisioning | `/home/nickvd/Projects/boxes` |
 
@@ -204,4 +204,4 @@ validation shortcut: they can change links, packages, the shell, or
   private-key-style name. Never add the corresponding private key.
 - `MACHINE_IDENTITY` selects personal versus agent routing; Home Manager generates
   `~/.config/machine-identity` from each target's `machineIdentity`. The dedicated
-  SSH agent never replaces personal socket defaults. See `.ssh/README.md`.
+  SSH agent never replaces personal socket defaults.

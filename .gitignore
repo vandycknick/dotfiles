@@ -3,6 +3,8 @@
 
 .ssh/config.d/private/*
 .ssh/agent_ed25519*
+!.ssh/agent_ed25519.pub
+!.ssh/agent_ed25519.allowed_signers
 .ssh/known_hosts*
 !.ssh/known_hosts.services
 .local/share/gnupg/pubring.kbx
