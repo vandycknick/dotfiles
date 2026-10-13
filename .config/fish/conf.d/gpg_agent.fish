@@ -1,10 +1,8 @@
-status is-interactive || exit
-
 set -Ux GNUPGHOME "$XDG_DATA_HOME/gnupg"
 
-set -x GPG_TTY (tty)
+# Runs for non-interactive shells too (editors, agent tools like tern), so their
+# git/ssh reach the YubiKey instead of launchd's empty ssh-agent.
 gpgconf --launch gpg-agent
-
 # Preserve an agent socket inherited from sshd, which forwards signing requests
 # to the host's SSH agent/YubiKey. Fall back to the local GPG agent otherwise.
 # Gate on SSH_CONNECTION, not on the socket existing: launchd sets SSH_AUTH_SOCK
@@ -13,3 +11,7 @@ gpgconf --launch gpg-agent
 if not set -q SSH_CONNECTION; or not test -S "$SSH_AUTH_SOCK"
   set -gx SSH_AUTH_SOCK (gpgconf --list-dirs agent-ssh-socket)
 end
+
+status is-interactive || exit
+
+set -x GPG_TTY (tty)
