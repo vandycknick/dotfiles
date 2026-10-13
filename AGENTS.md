@@ -141,7 +141,7 @@ All commands except `help` mutate the environment.
 | Fish | `.config/fish/config.fish` | Uses vi bindings and initializes direnv, zoxide, Atuin, and wtp interactively. |
 | Shared shell | `.config/shell/profile` | Establishes XDG paths and the Nix/user command path. |
 | macOS | `.config/osx/` | Keeps application installation and OS defaults separate. |
-| Git | `.config/git/config` | Uses GPG signing, pull rebase, current-branch pushes, Git LFS, and hunk as the pager. |
+| Git | `.config/git/config`, `.config/git/agent` | Personal OpenPGP defaults; agent contexts select the alternate global config for SSH signing without reading Coder's `~/.gitconfig`. |
 | SSH | `.ssh/config` | Enforces strict host checking and separates public service anchors from private host config. |
 | GnuPG | `.local/share/gnupg/gpg-agent.conf` | Enables SSH-agent support and delegates platform pinentry selection to the wrapper. |
 | OpenCode | `.config/opencode/opencode.jsonc` | Disables sharing and routes primary, delegated, and lightweight work to explicit models. |
@@ -202,3 +202,6 @@ validation shortcut: they can change links, packages, the shell, or
   Public GitHub and Codeberg trust anchors are tracked separately.
 - The tracked `.ssh/id_rsa` file contains public key material despite its
   private-key-style name. Never add the corresponding private key.
+- `MACHINE_IDENTITY` selects personal versus agent routing; Home Manager generates
+  `~/.config/machine-identity` from each target's `machineIdentity`. The dedicated
+  SSH agent never replaces personal socket defaults. See `.ssh/README.md`.

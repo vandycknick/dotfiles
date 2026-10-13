@@ -107,3 +107,49 @@ Host provisioning and service deployment are outside the bootstrap workflow.
 The tracked SSH configuration uses strict host-key checking and separates
 public service trust anchors from ignored private host configuration. See
 `.ssh/README.md` before adding or changing hosts.
+
+### Personal and agent identities
+
+Home Manager generates `~/.config/machine-identity` from `machineIdentity` in
+`flake.nix`: `coder@nixos` is `agent`; `nickvd@nixos`, `nickvd@linux`, and
+`nickvd@darwin` are `personal`. No manual selector file is needed. Ordinary
+personal sessions retain the YubiKey SSH/OpenPGP setup and its short cache.
+Missing selectors default to personal for machines not yet using Home Manager;
+invalid selectors fail initialization rather than guessing an identity.
+
+The `claude`, `opencode`, and `omp` executables in `~/.local/bin` automatically
+use a separate SSH agent when `~/.ssh/agent_ed25519` or its `.pub` companion is
+configured, or when they inherit `MACHINE_IDENTITY=agent`. Their managed
+executables must exist in `~/.nix-profile/bin`. They keep Git signing enabled
+and use SSH-format signatures with the agent key. A locked or missing agent
+does not fall back to personal credentials. `with-agent COMMAND ...` selects
+the same context explicitly.
+
+After applying, open a fresh login session (old Fish sessions can retain the
+removed `claude`/`opencode` functions). Inspect the declared default and effective
+process context with:
+
+```sh
+cat ~/.config/machine-identity
+printenv MACHINE_IDENTITY
+with-agent git config --get user.signingkey
+```
+
+An inherited identity wins over the machine default, so nested shells launched
+by coding tools stay in agent context. Change defaults in `flake.nix`, apply,
+then start a fresh login environment. A future device with the same user/OS but
+a different role needs a distinct target and explicit target selection; it
+must not silently change every personal Linux machine.
+
+Agent sessions select `~/.config/git/agent` using `GIT_CONFIG_GLOBAL`, leaving
+Coder's writable `~/.gitconfig` and its bootstrap writers untouched. Subsequent
+Coder writes to that file cannot change agent-session settings. The alternate
+config includes shared author defaults, selects normal SSH, and rewrites
+GitHub/Codeberg HTTPS remotes to SSH without Coder token rewrites. Git's
+repository, command-line, and environment overrides retain normal precedence.
+Inside agent context, `git config --global` targets the managed alternate file:
+edit its source in this checkout instead of writing to the read-only store link.
+
+See [SSH credential setup](.ssh/README.md#personal-and-agent-credentials) for
+encrypted-key provisioning, one-time unlock, service lifetime, and revocation.
+This is credential routing, **not a sandbox**.

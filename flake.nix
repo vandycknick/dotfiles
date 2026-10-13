@@ -31,11 +31,13 @@
           system,
           username,
           homeDirectory,
+          machineIdentity,
           genericLinux ? false,
         }:
         home-manager.lib.homeManagerConfiguration {
           pkgs = unfree system nixpkgs;
           extraSpecialArgs.pkgsMaster = unfree system nixpkgs-master;
+          extraSpecialArgs.machineIdentity = machineIdentity;
           modules = [
             ./home.nix
             {
@@ -52,22 +54,26 @@
           system = "x86_64-linux";
           username = "coder";
           homeDirectory = "/home/coder";
+          machineIdentity = "agent";
         };
         "nickvd@nixos" = mkHome {
           system = "x86_64-linux";
           username = "nickvd";
           homeDirectory = "/home/nickvd";
+          machineIdentity = "personal";
         };
         "nickvd@linux" = mkHome {
           system = "x86_64-linux";
           username = "nickvd";
           homeDirectory = "/home/nickvd";
           genericLinux = true;
+          machineIdentity = "personal";
         };
         "nickvd@darwin" = mkHome {
           system = "aarch64-darwin";
           username = "nickvd";
           homeDirectory = "/Users/nickvd";
+          machineIdentity = "personal";
         };
       };
     };

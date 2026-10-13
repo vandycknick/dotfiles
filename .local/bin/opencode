@@ -1,0 +1,13 @@
+#!/bin/sh
+
+real="$HOME/.nix-profile/bin/opencode"
+if [ ! -x "$real" ]; then
+    echo 'opencode: managed package not installed in ~/.nix-profile/bin' >&2
+    exit 127
+fi
+key="$HOME/.ssh/agent_ed25519"
+if [ "${MACHINE_IDENTITY:-}" = agent ] || [ -e "$key" ] || [ -L "$key" ] ||
+    [ -e "$key.pub" ] || [ -L "$key.pub" ]; then
+    exec "$HOME/.local/bin/with-agent" "$real" "$@"
+fi
+exec "$real" "$@"

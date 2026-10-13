@@ -64,6 +64,33 @@ export AZURE_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/azure"
 # GnuPG
 export GNUPGHOME="${XDG_DATA_HOME:-$HOME/.local/share}/gnupg"
 
+# An inherited tool context takes precedence over the declared machine default.
+if [ -z "${MACHINE_IDENTITY:-}" ]; then
+    if [ -e "$HOME/.config/machine-identity" ] || [ -L "$HOME/.config/machine-identity" ]; then
+        MACHINE_IDENTITY=$(cat "$HOME/.config/machine-identity") || return 1
+    else
+        MACHINE_IDENTITY=personal
+    fi
+fi
+case "$MACHINE_IDENTITY" in
+    agent)
+        SSH_AUTH_SOCK=$("$HOME/.local/bin/with-agent" printenv SSH_AUTH_SOCK) || return 1
+        if [ -z "$SSH_AUTH_SOCK" ]; then
+            echo 'machine-identity: empty agent socket' >&2
+            return 1
+        fi
+        export SSH_AUTH_SOCK
+        export GIT_CONFIG_GLOBAL="$HOME/.config/git/agent"
+        export GIT_SSH_COMMAND=ssh
+        ;;
+    personal) ;;
+    *)
+        echo 'machine-identity: expected personal or agent' >&2
+        return 1
+        ;;
+esac
+export MACHINE_IDENTITY
+
 # K9S
 export K9SCONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/k9s"
 

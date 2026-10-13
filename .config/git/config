@@ -1,7 +1,7 @@
-# Personal defaults: GPG signing and personal identity. ~/.gitconfig takes
-# precedence and is the per-host layer; a Coder workspace writes its SSH signing
-# key and work identity there on every boot. Keep host-specific values out of
-# this file and let that one win.
+# Personal defaults: GPG signing and personal identity. In ordinary sessions,
+# ~/.gitconfig is the higher-precedence per-host layer (including Coder bootstrap).
+# Agent sessions instead select the sibling `agent` config, which includes these
+# defaults without reading ~/.gitconfig.
 [user]
 	name = Nick Van Dyck
 	email = vandyck.nick@outlook.com

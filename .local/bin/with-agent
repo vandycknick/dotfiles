@@ -1,0 +1,36 @@
+#!/bin/sh
+
+if [ "$#" -eq 0 ]; then
+    echo 'Usage: with-agent COMMAND [ARG ...]' >&2
+    exit 2
+fi
+
+case $(uname -s) in
+    Linux)
+        runtime=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
+        ;;
+    Darwin)
+        if ! runtime=$(getconf DARWIN_USER_TEMP_DIR); then
+            echo 'with-agent: cannot determine Darwin agent runtime directory' >&2
+            exit 2
+        fi
+        ;;
+    *)
+        echo 'with-agent: unsupported operating system' >&2
+        exit 2
+        ;;
+esac
+if [ -z "$runtime" ]; then
+    echo 'with-agent: cannot determine agent runtime directory' >&2
+    exit 2
+fi
+if [ ! -r "$HOME/.config/git/agent" ]; then
+    echo 'with-agent: missing managed Git config ~/.config/git/agent; apply dotfiles first' >&2
+    exit 2
+fi
+
+export MACHINE_IDENTITY=agent
+export SSH_AUTH_SOCK="${runtime%/}/dotfiles-agent"
+export GIT_CONFIG_GLOBAL="$HOME/.config/git/agent"
+export GIT_SSH_COMMAND=ssh
+exec "$@"

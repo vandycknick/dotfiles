@@ -3,6 +3,7 @@
   lib,
   pkgs,
   pkgsMaster,
+  machineIdentity,
   ...
 }:
 let
@@ -49,6 +50,22 @@ in
 {
   home.stateVersion = "26.05";
   programs.home-manager.enable = true;
+
+  services.ssh-agent = {
+    enable = true;
+    socket = "dotfiles-agent";
+    defaultMaximumIdentityLifetime = null;
+  };
+  # Keep the dedicated agent out of ordinary personal sessions.
+  sshAuthSock.enable = lib.mkForce false;
+
+  assertions = [
+    {
+      assertion = lib.elem machineIdentity [ "personal" "agent" ];
+      message = "machineIdentity must be personal or agent";
+    }
+  ];
+  xdg.configFile."machine-identity".text = "${machineIdentity}\n";
 
   # One store-backed link per tracked file, so directories stay real and
   # application state can live next to managed files. Edits apply on switch.
