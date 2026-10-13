@@ -107,10 +107,3 @@ Host provisioning and service deployment are outside the bootstrap workflow.
 The tracked SSH configuration uses strict host-key checking and separates
 public service trust anchors from ignored private host configuration. See
 `.ssh/README.md` before adding or changing hosts.
-
-## Herdr
-
-Herdr preferences and keybindings are managed in `.config/herdr/config.toml`.
-Plugins, scripts, and runtime state remain local. The `prefix + f` popup requires
-`~/.config/herdr/scripts/remote-workspace.sh`; `prefix + o` requires the
-`herdr-bar` plugin.

@@ -163,8 +163,6 @@ All commands except `help` mutate the environment.
 - Tmux keeps its standard prefix, vi copy mode, and a top status bar. `s` or
   `Alt-o` opens the native session tree, `h/j/k/l` navigate panes, and
   `H/J/K/L` resize them.
-- Herdr preferences and keybindings live in `.config/herdr/config.toml`.
-  Plugins, scripts, logs, sockets, and session state remain unmanaged.
 - AeroSpace uses `Alt-H/J/K/L` to focus, `Alt-Shift-H/J/K/L` to move windows,
   and number keys for workspaces.
 - Hyprland uses Super as its primary modifier; Super-Space launches Walker and
