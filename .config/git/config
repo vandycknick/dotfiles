@@ -68,7 +68,7 @@
     context    = white
     whitespace = yellow reverse
 
-[url "git@github.com"]
+[url "git@github.com:"]
 insteadOf = "gh:"
 
 [filter "lfs"]

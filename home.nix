@@ -32,6 +32,12 @@ let
     ".config/pi/settings.json"
   ];
 
+  # Paths other installers claim with their own symlinks, which Home Manager
+  # refuses to back up. Tern links ~/.local/bin/omp to its bundled binary.
+  forced = [
+    ".local/bin/omp"
+  ];
+
   root = toString ./.;
 
   # The flake source contains only git-tracked files, so ignored state
@@ -76,6 +82,7 @@ in
           config.lib.file.mkOutOfStoreSymlink "${dotfiles}/${rel}"
         else
           ./. + "/${rel}";
+      force = lib.elem rel forced;
     })
     // {
       ".profile".source = ./.config/shell/profile;
@@ -126,6 +133,7 @@ in
       k9s
       coder
       docker-client
+      docker-compose
       gcx
       github-cli
 
@@ -156,6 +164,8 @@ in
     ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       # macOS only
       pinentry_mac
+      # ~/.docker/config.json uses credsStore osxkeychain.
+      docker-credential-helpers
     ];
 
   # ~/.gitconfig is the per-host layer over ~/.config/git/config (Coder writes

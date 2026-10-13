@@ -32,7 +32,6 @@ autoload -Uz colors && colors
 PROMPT="%{$fg[cyan]%}%c%{$reset_color%} %(?:%{$fg_bold[green]%}❱ :%{$fg_bold[red]%}❱ )%{$reset_color%}"
 
 # Settings
-export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s"
 export LESS=" -R "
 
 # Aliases
@@ -58,7 +57,6 @@ alias k="kubectl"
 if [[ "$OSTYPE" == "darwin"* ]]; then
     alias clip="pbcopy"
 else
-    alias clip="xclip -selection clipboard"
     alias clip="wl-copy"
     alias open=xdg-open
 fi

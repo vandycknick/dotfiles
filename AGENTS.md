@@ -82,6 +82,9 @@ store copy and declares the user CLI packages.
 - Files an application rewrites at runtime (`lazy-lock.json`, k9s
   `config.yaml`, pi `settings.json`) are listed in `mutable` in `home.nix` and
   link straight to `~/.dotfiles` so the writes land in the checkout.
+- Paths another installer re-links (Tern's `~/.local/bin/omp`) are listed in
+  `forced` in `home.nix`; Home Manager overwrites them instead of failing,
+  because it never backs up foreign symlinks.
 - `homeConfigurations` are keyed `<user>@<flavor>` (`nixos`, `linux`,
   `darwin`); `install.sh` derives the key from `id -un` and the OS. Targets are
   `x86_64-linux` and `aarch64-darwin`.
