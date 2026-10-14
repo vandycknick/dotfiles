@@ -143,6 +143,7 @@ in
       # Editors & AI
       python3Packages.ansible-core
       pkgsMaster.claude-code
+      pkgsMaster.codex
       opencode
       pi-coding-agent
       omp
