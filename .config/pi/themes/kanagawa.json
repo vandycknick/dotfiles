@@ -41,7 +41,7 @@
 		"success": "springGreen",
 		"error": "samuraiRed",
 		"warning": "roninYellow",
-		"muted": "springViolet1",
+		"muted": "oldWhite",
 		"dim": "fujiGray",
 		"text": "fujiWhite",
 		"thinkingText": "fujiGray",
