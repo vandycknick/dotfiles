@@ -12,19 +12,48 @@
 
   outputs =
     {
+      self,
       nixpkgs,
       nixpkgs-master,
       home-manager,
       ...
     }:
     let
-      unfree =
-        system: source:
-        import source {
-          inherit system;
-          # terraform (BUSL), claude-code, and 1password-cli are unfree.
-          config.allowUnfree = true;
+      inherit (nixpkgs) lib;
+      systems = [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
+
+      config.allowUnfreePredicate =
+        pkg:
+        builtins.elem (lib.getName pkg) [
+          "1password-cli"
+          "claude-code"
+          "terraform"
+        ];
+
+      # Packages that track nixpkgs master for faster releases.
+      fromMaster =
+        final: prev:
+        let
+          master = import nixpkgs-master {
+            inherit (prev.stdenv.hostPlatform) system;
+            inherit config;
+          };
+        in
+        {
+          inherit (master) claude-code codex;
         };
+
+      pkgsFor = lib.genAttrs systems (
+        system:
+        import nixpkgs {
+          inherit system config;
+          overlays = [ fromMaster ];
+        }
+      );
+      forEachSystem = f: lib.genAttrs systems (system: f pkgsFor.${system});
 
       mkHome =
         {
@@ -36,9 +65,8 @@
           desktop ? false,
         }:
         home-manager.lib.homeManagerConfiguration {
-          pkgs = unfree system nixpkgs;
-          extraSpecialArgs.pkgsMaster = unfree system nixpkgs-master;
-          extraSpecialArgs.machineIdentity = machineIdentity;
+          pkgs = pkgsFor.${system};
+          extraSpecialArgs = { inherit machineIdentity; };
           modules = [
             ./home.nix
             {
@@ -80,5 +108,42 @@
           desktop = true;
         };
       };
+
+      # `nix run github:vandycknick/dotfiles#nvim` anywhere.
+      packages = forEachSystem (pkgs: {
+        nvim = import ./.config/nvim/package.nix { inherit pkgs; };
+      });
+
+      apps = forEachSystem (pkgs: {
+        nvim = {
+          type = "app";
+          program = "${self.packages.${pkgs.stdenv.hostPlatform.system}.nvim}/bin/nvim";
+          meta.description = "Neovim with the language servers and tools from .config/nvim";
+        };
+      });
+
+      formatter = forEachSystem (pkgs: pkgs.nixfmt-tree);
+
+      checks = forEachSystem (
+        pkgs:
+        let
+          inherit (pkgs.stdenv.hostPlatform) system;
+          homes = lib.filterAttrs (_: home: home.activationPackage.system == system) self.homeConfigurations;
+        in
+        lib.mapAttrs' (
+          name: home:
+          lib.nameValuePair "home-${lib.replaceStrings [ "@" ] [ "-" ] name}" home.activationPackage
+        ) homes
+        // {
+          shellcheck = pkgs.runCommand "shellcheck" { nativeBuildInputs = [ pkgs.shellcheck ]; } ''
+            shellcheck ${./install.sh}
+            touch $out
+          '';
+          nixfmt = pkgs.runCommand "nixfmt" { nativeBuildInputs = [ pkgs.nixfmt ]; } ''
+            find ${self} -name '*.nix' -exec nixfmt --check {} +
+            touch $out
+          '';
+        }
+      );
     };
 }

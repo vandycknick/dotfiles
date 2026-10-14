@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  pkgsMaster,
   ...
 }:
 let
@@ -48,11 +47,11 @@ let
   agentClis = [
     {
       name = "claude";
-      package = pkgsMaster.claude-code;
+      package = pkgs.claude-code;
     }
     {
       name = "codex";
-      package = pkgsMaster.codex;
+      package = pkgs.codex;
       # Updates come from nixpkgs; the built-in updater would install a curl
       # copy into ~/.local/bin.
       args = [

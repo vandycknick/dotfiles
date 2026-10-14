@@ -49,7 +49,8 @@ let
   inherit (pkgs.stdenv.hostPlatform) isDarwin isLinux;
   inherit (config.dotfiles) desktop;
   excluded =
-    lib.optionals (!(desktop && isLinux)) linuxDesktop ++ lib.optionals (!(desktop && isDarwin)) darwinDesktop;
+    lib.optionals (!(desktop && isLinux)) linuxDesktop
+    ++ lib.optionals (!(desktop && isDarwin)) darwinDesktop;
   isExcluded = rel: lib.any (dir: rel == dir || lib.hasPrefix "${dir}/" rel) excluded;
 
   # The flake source contains only git-tracked files, so ignored state
@@ -84,7 +85,10 @@ in
 
   assertions = [
     {
-      assertion = lib.elem machineIdentity [ "personal" "agent" ];
+      assertion = lib.elem machineIdentity [
+        "personal"
+        "agent"
+      ];
       message = "machineIdentity must be personal or agent";
     }
   ];

@@ -47,7 +47,8 @@ store copy and declares the user CLI packages.
 | Add or remove a user CLI tool | `home.nix` (`home.packages`); platform-only tools in `modules/darwin/` or `modules/linux/` |
 | Change which repo files are linked into `$HOME` | `home.nix` (`repoOnly`) |
 | Change Nix CLI behavior | `.config/nix/nix.conf` |
-| Change packaged Neovim or LSP tools | `.config/nvim/package.nix` |
+| Change packaged Neovim or LSP tools | `.config/nvim/package.nix` (also `nix run .#nvim`) |
+| Allow an unfree package or track one from nixpkgs master | `flake.nix` (`allowUnfreePredicate`, `fromMaster`) |
 | Change Neovim startup | `.config/nvim/init.lua` |
 | Change Neovim options, mappings, or autocommands | `.config/nvim/lua/config/` |
 | Add a general Neovim plugin | `.config/nvim/lua/plugins/` |
@@ -108,9 +109,11 @@ store copy and declares the user CLI packages.
   `darwinDesktop` in `home.nix`), the Brewfile, clipboard tools, and the
   graphical pinentry; headless machines get `pinentry-curses`.
 - User-facing CLI tools belong in `home.packages` in `home.nix`. Unfree
-  packages are allowed; `pkgsMaster` exposes nixpkgs master.
+  packages must be listed in `allowUnfreePredicate` in `flake.nix`; packages
+  that track nixpkgs master (claude-code, codex) are listed in its `fromMaster`
+  overlay, so modules always use plain `pkgs`.
 - Neovim runtime executables and LSP tools belong in `.config/nvim/package.nix`;
-  both `home.nix` and the standalone `.config/nvim/flake.nix` import it.
+  `home.nix` installs it and the root flake exposes it as `packages.nvim`.
 - On macOS, desktop applications (and fonts) are Homebrew casks in
   `modules/darwin/Brewfile`; every CLI comes from Nix. Activation applies the
   Brewfile on desktop Macs and runs `brew bundle cleanup --force`, so anything
@@ -206,15 +209,13 @@ All commands except `help` mutate the environment.
 
 ## VALIDATION
 
-Run checks relevant to the changed files:
+Run before committing (on macOS it builds the darwin target and only
+evaluates the Linux ones):
 
 ```sh
-sh -n install.sh
-shellcheck install.sh
-for c in coder@nixos nickvd@nixos nickvd@linux nickvd@darwin; do
-  nix eval --raw ".#homeConfigurations.\"$c\".activationPackage.drvPath"
-done
-nix build --no-link ".#homeConfigurations.\"$(id -un)@nixos\".activationPackage"
+nix fmt
+nix flake check                          # this system's targets, shellcheck, nixfmt
+nix flake check --all-systems --no-build # evaluate every target
 git diff --check
 ```
 
