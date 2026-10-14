@@ -13,10 +13,10 @@ let
 
   # The gpg-agent socket for sh-family logins, with the same forwarded-agent
   # guard Home Manager applies to the shells it manages. macOS has no socket
-  # activation for gpg-agent (modules/gpg), so the login starts it.
+  # activation for gpg-agent (modules/gpg), so connecting at login starts it.
   sshAuthSock =
     lib.optionalString isDarwin ''
-      ${config.programs.gpg.package}/bin/gpgconf --launch gpg-agent
+      ${config.programs.gpg.package}/bin/gpg-connect-agent --quiet /bye
     ''
     + lib.optionalString config.sshAuthSock.enable ''
       if [ -z "''${SSH_AUTH_SOCK:-}" ] || [ -z "''${SSH_CONNECTION:-}" ]; then

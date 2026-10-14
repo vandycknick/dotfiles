@@ -20,11 +20,15 @@ function $_my_prompt_git --on-variable $_my_prompt_git
     commandline --function repaint
 end
 
-# Shells that died without fish_exit leave their universal behind.
-for var in (set --universal --names | string match --regex '^_my_prompt_git_\d+$')
-    set --local pid (string replace _my_prompt_git_ '' $var)
-    command kill -0 $pid 2>/dev/null || set --erase --universal $var
-end
+# Shells that died without fish_exit leave their universal behind. One kill
+# per shell costs ~10 ms, so a background fish erases them.
+fish --private --command '
+    for var in (set --universal --names | string match --regex "^_my_prompt_git_\d+\$")
+        command kill -0 (string replace _my_prompt_git_ "" $var) 2>/dev/null ||
+            set --erase --universal $var
+    end
+' &
+builtin disown $last_pid 2>/dev/null
 
 # An icon on SSH sessions.
 set --global _my_prompt_environment

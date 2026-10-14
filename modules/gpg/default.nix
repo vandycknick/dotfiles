@@ -6,7 +6,9 @@
 }:
 let
   inherit (pkgs.stdenv.hostPlatform) isDarwin;
-  gpgconf = "${config.programs.gpg.package}/bin/gpgconf";
+  # Starts gpg-agent if it isn't running, in ~10 ms; `gpgconf --launch` takes
+  # ~360 ms even when the agent is already up.
+  startAgent = "${config.programs.gpg.package}/bin/gpg-connect-agent --quiet /bye";
 in
 {
   # Keyrings and trust stay mutable state in the home directory (git-ignored).
@@ -56,9 +58,12 @@ in
   # gpg-agent only accepts systemd-style sockets (LISTEN_FDS), and Home
   # Manager's launchd agent binds them under /private/var/run instead of the
   # directory gpgconf reports. On macOS the agent starts on demand instead:
-  # every shell (and with-agent) launches it.
+  # every shell (and with-agent) connects to it, which starts it. Interactive
+  # Fish already does so through Home Manager's updatestartuptty hook.
   launchd.agents.gpg-agent.enable = lib.mkForce false;
-  programs.fish.shellInit = lib.mkIf isDarwin "${gpgconf} --launch gpg-agent";
+  programs.fish.shellInit = lib.mkIf isDarwin ''
+    status is-interactive; or ${startAgent}
+  '';
 
   home.packages = [ pkgs.yubikey-manager ];
 }

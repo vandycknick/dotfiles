@@ -29,8 +29,8 @@ let
       fi
     ''
     + lib.optionalString isDarwin ''
-      # No socket activation on macOS (modules/gpg): start the agent if needed.
-      ${gpgconf} --launch gpg-agent
+      # No socket activation on macOS (modules/gpg): connecting starts the agent.
+      ${config.programs.gpg.package}/bin/gpg-connect-agent --quiet /bye
     ''
     + ''
 
