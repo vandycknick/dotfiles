@@ -117,7 +117,6 @@ let
         "pipefail"
       ];
     })
-    (mkScript "edit" { bashOptions = [ ]; })
     (mkScript "kubectl-ctx" {
       runtimeInputs = with pkgs; [
         gnugrep
@@ -135,8 +134,6 @@ let
         yq-go
       ];
     })
-    # Runs the system sshd through sudo.
-    (mkScript "quick-sshd" { bashOptions = [ ]; })
   ];
 in
 {

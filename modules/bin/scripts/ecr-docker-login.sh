@@ -10,52 +10,49 @@ Usage:
   ecr-docker-login [options]
 
 Options:
-  -p <profile>                          AWS profile to use.
-  -r <region>                           AWS region to use
+  -p <profile>                          AWS profile to use (default: \$AWS_PROFILE).
+  -r <region>                           AWS region to use (default: us-east-1).
   -l                                    List named profiles.
-  -?, -h                                Show help and usage information
+  -h                                    Show help and usage information.
 EOF
 }
 
-RED="\x1b[31m."
-RESET="\x1b[0m"
-
-ecr_docker_login() {
-    local profile="$1"
-    local region="$2"
-
-    [ -z "$profile" ] && echo "$RED Profile not provided, either provide a profile with -p or set AWS_PROFILE!$RESET" && exit 1
-
-    local registry_id
-    registry_id=$(aws --profile "$profile" --region "$region" ecr describe-registry --query 'registryId' --output text)
-
-    aws --profile "$profile" --region "$region" ecr get-login-password |
-        docker login --username AWS --password-stdin "$registry_id.dkr.ecr.$region.amazonaws.com"
-    exit 0
+die() {
+    printf '\033[31m%s\033[0m\n' "$1" >&2
+    exit 1
 }
 
-list_profiles() {
-    aws configure list-profiles
-}
+profile="${AWS_PROFILE:-}"
+region="us-east-1"
 
-
-while getopts "h?p:?l?r?" opt; do
+while getopts "hlp:r:" opt; do
     case "$opt" in
-    h|\?)
+    h)
         show_help
         exit 0
         ;;
     l)
-        list_profiles
+        aws configure list-profiles
         exit 0
         ;;
     p)
-        PROFILE="$OPTARG"
+        profile="$OPTARG"
         ;;
     r)
-        REGION="$OPTARG"
+        region="$OPTARG"
+        ;;
+    *)
+        show_help >&2
+        exit 2
         ;;
     esac
 done
 
-ecr_docker_login "${PROFILE:-$AWS_PROFILE}" "${REGION:-us-east-1}"
+if [ -z "$profile" ]; then
+    die "Profile not provided, either provide a profile with -p or set AWS_PROFILE!"
+fi
+
+registry_id=$(aws --profile "$profile" --region "$region" ecr describe-registry --query 'registryId' --output text)
+
+aws --profile "$profile" --region "$region" ecr get-login-password |
+    docker login --username AWS --password-stdin "$registry_id.dkr.ecr.$region.amazonaws.com"
