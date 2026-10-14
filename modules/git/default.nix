@@ -1,5 +1,113 @@
-{ ... }:
+{ lib, ... }:
 {
+  # Personal defaults, written to ~/.config/git/config. In ordinary sessions
+  # ~/.gitconfig is the higher-precedence per-host layer (including Coder
+  # bootstrap); agent sessions select ~/.config/git/agent instead.
+  programs.git = {
+    enable = true;
+    lfs.enable = true;
+
+    # OpenPGP signing with the YubiKey; signs through the Nix-managed gpg.
+    signing = {
+      format = "openpgp";
+      key = "E742877FB4B706FC";
+    };
+
+    settings = {
+      user = {
+        name = "Nick Van Dyck";
+        email = "vandyck.nick@outlook.com";
+      };
+
+      core = {
+        autocrlf = "input"; # keep newlines as in input
+        compression = 9; # trade cpu for network
+        fsync = "none";
+        whitespace = "error"; # treat incorrect whitespace as errors
+        pager = "hunk pager";
+      };
+      pager.log = "less";
+
+      init.defaultBranch = "main";
+      # Commits only: signing.signByDefault would also sign every tag.
+      commit.gpgSign = true;
+
+      status = {
+        branch = true;
+        short = true;
+        showStash = true;
+        showUntrackedFiles = "all";
+      };
+
+      diff = {
+        context = 3;
+        renames = "copies";
+        interHunkContext = 10;
+      };
+
+      interactive.singleKey = true;
+
+      push = {
+        autoSetupRemote = true;
+        default = "current";
+        followTags = true;
+      };
+
+      pull = {
+        default = "current";
+        rebase = true;
+      };
+
+      rebase = {
+        autoStash = true;
+        missingCommitsCheck = "warn";
+      };
+
+      color = {
+        blame.highlightRecent = "black bold,1 year ago,white,1 month ago,default,7 days ago,blue";
+        branch = {
+          current = "magenta";
+          local = "default";
+          remote = "yellow";
+          upstream = "green";
+          plain = "blue";
+        };
+        diff = {
+          meta = "white bold";
+          frag = "magenta";
+          context = "white";
+          whitespace = "yellow reverse";
+        };
+      };
+
+      url."git@github.com:".insteadOf = "gh:";
+    };
+  };
+
+  # Agent contexts set GIT_CONFIG_GLOBAL to this file, which skips ~/.gitconfig.
+  # The include must come first so the agent's SSH signing overrides the
+  # personal OpenPGP defaults; toGitINI sorts sections, hence two fragments.
+  xdg.configFile."git/agent".text =
+    lib.generators.toGitINI { include.path = "config"; }
+    + lib.generators.toGitINI {
+      core.sshCommand = "ssh";
+      gpg.format = "ssh";
+      gpg.ssh.allowedSignersFile = "~/.ssh/agent_ed25519.allowed_signers";
+      user.signingKey = "~/.ssh/agent_ed25519.pub";
+      commit.gpgSign = true;
+      url."git@github.com:".insteadOf = "https://github.com/";
+      url."git@codeberg.org:".insteadOf = "https://codeberg.org/";
+    };
+
+  # ~/.gitconfig is the per-host layer over ~/.config/git/config (Coder writes
+  # the signing identity there). Without it, `git config --global` would try to
+  # write the read-only generated XDG file.
+  home.activation.hostGitconfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    if [ ! -e "$HOME/.gitconfig" ]; then
+      run touch "$HOME/.gitconfig"
+    fi
+  '';
+
   # Git shortcuts for interactive Fish, kept as aliases for muscle memory.
   # Many come from oh-my-zsh's git plugin.
   programs.fish.shellAliases = {

@@ -113,9 +113,7 @@ in
       tealdeer
       wget
 
-      # Git
-      git
-      git-lfs
+      # Git (git and git-lfs come from programs.git)
       lazygit
       hunk
 
@@ -164,13 +162,4 @@ in
       # ~/.docker/config.json uses credsStore osxkeychain.
       docker-credential-helpers
     ];
-
-  # ~/.gitconfig is the per-host layer over ~/.config/git/config (Coder writes
-  # the signing identity there). Without it, `git config --global` writes to
-  # the XDG file and replaces the managed link with a regular file.
-  home.activation.hostGitconfig = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    if [ ! -e "$HOME/.gitconfig" ]; then
-      run touch "$HOME/.gitconfig"
-    fi
-  '';
 }

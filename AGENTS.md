@@ -13,7 +13,7 @@ store copy and declares the user CLI packages.
 |-- flake.nix, flake.lock           # Inputs and per-host homeConfigurations
 |-- home.nix                        # Packages, file links, activation steps
 |-- modules/shell/                  # Session variables, generated Fish and login profiles
-|-- modules/git/                    # Fish Git aliases and helper functions
+|-- modules/git/                    # Git config (personal + agent), Fish Git aliases and helpers
 |-- install.sh                      # POSIX-sh bootstrap and dot CLI
 |-- .config/
 |   |-- nix/nix.conf                # Nix CLI features and policy
@@ -26,7 +26,7 @@ store copy and declares the user CLI packages.
 |   |-- i3/, compton/               # X11 window manager and compositor
 |   |-- waybar/, walker/, rofi/     # Linux status bar and launchers
 |   |-- ghostty/, tmux/             # Terminal environment
-|   |-- git/, lazygit/, k9s/        # Development tool configuration
+|   |-- lazygit/, k9s/              # Development tool configuration
 |   `-- opencode/                   # OpenCode agents, models, and UI settings
 |-- .local/
 |   |-- bin/                        # Personal commands and dot symlink
@@ -69,7 +69,7 @@ store copy and declares the user CLI packages.
 | Change legacy X11 desktop behavior | `.config/i3/`, `.config/compton/`, `.config/rofi/` |
 | Change Waybar or Walker UI | `.config/waybar/`, `.config/walker/` |
 | Change terminal or multiplexer behavior | `.config/ghostty/`, `.config/tmux/` |
-| Change Git defaults | `.config/git/config` |
+| Change Git defaults or the agent Git config | `modules/git/default.nix` (`programs.git`, `xdg.configFile."git/agent"`) |
 | Change OpenCode models or agent routing | `.config/opencode/opencode.jsonc` |
 | Change SSH trust or authentication policy | `.ssh/config` |
 | Change state exclusions | `.gitignore` |
@@ -151,12 +151,12 @@ All commands except `help` mutate the environment.
 | Area | Entry point | Important behavior |
 |---|---|---|
 | Bootstrap | `install.sh` | Installs multi-user Nix, links `~/.dotfiles` to the checkout, runs the Home Manager switch, and sets the Fish login shell. |
-| Home Manager | `home.nix` | Declares user CLI packages, links tracked files, and ensures `~/.gitconfig`. Tools and pi extensions come from Nix; activation never installs from npm or other registries. |
+| Home Manager | `home.nix` | Declares user CLI packages and links tracked files. Tools and pi extensions come from Nix; activation never installs from npm or other registries. |
 | Neovim | `.config/nvim/init.lua` | Loads options, mappings, autocommands, and lazy.nvim configuration. |
 | Fish | `modules/shell/default.nix` | Generates `config.fish`: session variables, machine identity and GPG agent, vi bindings, interactive-only aliases, and the wtp hook. The direnv (with nix-direnv), zoxide, and Atuin modules add their own hooks; Atuin settings stay in `.config/atuin/config.toml`. |
 | Shared shell | `modules/shell/default.nix`, `.config/shell/profile` | Declares XDG and tool variables once; the generated `.profile`/`.zprofile` source them, then set the user command path and identity routing. |
 | macOS | `.config/osx/` | Keeps application installation and OS defaults separate. |
-| Git | `.config/git/config`, `.config/git/agent` | Personal OpenPGP defaults; agent contexts select the alternate global config for SSH signing without reading Coder's `~/.gitconfig`. |
+| Git | `modules/git/default.nix` | Generates `~/.config/git/config` (personal OpenPGP defaults, Nix-pinned gpg and git-lfs) and `~/.config/git/agent`, which includes it first and switches to SSH signing without reading Coder's `~/.gitconfig`. Activation ensures `~/.gitconfig` exists so `git config --global` writes there. |
 | SSH | `.ssh/config` | Enforces strict host checking and separates public service anchors from private host config. |
 | GnuPG | `.local/share/gnupg/gpg-agent.conf` | Enables SSH-agent support and delegates platform pinentry selection to the wrapper. |
 | OpenCode | `.config/opencode/opencode.jsonc` | Disables sharing and routes primary, delegated, and lightweight work to explicit models. |
