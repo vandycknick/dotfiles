@@ -6,11 +6,11 @@ function $_my_prompt_git --on-variable $_my_prompt_git
     commandline --function repaint
 end
 
-set -g cyan (set_color -o cyan)
-set -g yellow (set_color -o yellow)
-set -g red (set_color -o red)
-set -g blue (set_color -o blue)
-set -g green (set_color -o green)
+# Kanagawa's normal yellow, red and blue (ANSI 3, 1, 4) in bold. Named colours
+# would turn bright in Tern, which draws bold text in the bright palette.
+set -g yellow (set_color -o c0a36e)
+set -g red (set_color -o c34043)
+set -g blue (set_color -o 7e9cd8)
 set -g normal (set_color normal)
 
 function _my_prompt_detect_environment --description "Cache VM and SSH status for this fish session"
