@@ -53,7 +53,7 @@ store copy and declares the user CLI packages.
 | Change Neovim options, mappings, or autocommands | `.config/nvim/lua/config/` |
 | Configure a Neovim plugin | `.config/nvim/lua/plugins/` (its package in `package.nix`) |
 | Add language-specific Neovim support | `.config/nvim/lua/plugins/lang/` |
-| Change the Neovim colorscheme | `.config/nvim/colors/titanium.lua`; `init.lua` selects it |
+| Change the Neovim colorscheme | `.config/nvim/lua/plugins/colorscheme.lua` (kanagawa) |
 | Change Fish interactive startup, keybindings, or general aliases | `modules/shell/default.nix` (`programs.fish`) |
 | Change direnv, zoxide, or Atuin integration | `modules/shell/default.nix` (`programs.direnv`, `programs.zoxide`, `programs.atuin`) |
 | Change Fish Git aliases or Git helper functions | `modules/git/default.nix` (`programs.fish.shellAliases`, `programs.fish.functions`) |
@@ -181,7 +181,7 @@ All commands except `help` mutate the environment.
 |---|---|---|
 | Bootstrap | `install.sh` | Installs multi-user Nix, links `~/.dotfiles` to the checkout, runs the Home Manager switch, and sets the Fish login shell outside NixOS. |
 | Home Manager | `home.nix` | Declares user CLI packages and links tracked files. Tools and pi extensions come from Nix; activation never installs from npm or other registries. |
-| Neovim | `.config/nvim/package.nix`, `.config/nvim/init.lua` | The wrapper puts the LSP tools on `PATH` and passes the Nix store paths of lazy.nvim, the plugins, and 49 Treesitter grammars in `vim.g.nix`. `init.lua` loads options, mappings, autocommands, and lazy.nvim, then the titanium colorscheme (from omp's theme; kanagawa stays installed but inactive). |
+| Neovim | `.config/nvim/package.nix`, `.config/nvim/init.lua` | The wrapper puts the LSP tools on `PATH` and passes the Nix store paths of lazy.nvim, the plugins, and 49 Treesitter grammars in `vim.g.nix`. `init.lua` loads options, mappings, autocommands, and lazy.nvim. |
 | Fish | `modules/shell/default.nix` | Generates `config.fish`: session variables, the gpg-agent socket (kept when forwarded over SSH), agent Git routing, vi bindings, interactive-only aliases, and the wtp hook. The direnv (with nix-direnv), zoxide, and Atuin modules add their own hooks; Atuin settings stay in `.config/atuin/config.toml`. |
 | Shared shell | `modules/shell/default.nix`, `.config/shell/profile` | Declares XDG and tool variables once; the generated `.profile`/`.zprofile` source them, then set the user command path and identity routing. `programs.bash` owns `.profile`, `.bashrc`, and `.bash_profile` with the system bash; on NixOS `.bashrc` hands interactive bash off to Fish (`DOT_NO_FISH=1` stays in bash). |
 | macOS | `modules/darwin/` | Desktop Macs: Dock/Spaces/global defaults, the nested Finder desktop view, and the cask-only Brewfile with cleanup. |

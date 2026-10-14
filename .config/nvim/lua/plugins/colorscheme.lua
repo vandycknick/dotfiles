@@ -1,9 +1,8 @@
 return {
-  -- Inactive: titanium (colors/titanium.lua) is the colorscheme. lazy.nvim
-  -- loads this on `:colorscheme kanagawa`.
   {
     'rebelot/kanagawa.nvim',
-    lazy = true,
+    lazy = false,
+    priority = 1000, -- Ensure it loads first
     opts = {
       compile = false,
       theme = 'wave',
@@ -33,6 +32,8 @@ return {
           -- E.g.: autocmd TermOpen * setlocal winhighlight=Normal:NormalDark
           NormalDark = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m3 },
 
+          LazyNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
+
           TabLine = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
           TabLineFill = { bg = theme.ui.bg_m1 },
 
@@ -52,6 +53,7 @@ return {
     },
     config = function(_, opts)
       require('kanagawa').setup(opts)
+      vim.cmd.colorscheme 'kanagawa'
     end,
   },
 }
