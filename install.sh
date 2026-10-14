@@ -32,7 +32,8 @@ Usage:
   dot COMMAND
 
 Commands:
-  init      Install Nix if needed, apply Home Manager, and set Fish as login shell
+  init      Install Nix (and Homebrew on macOS) if needed, apply Home Manager,
+            and set Fish as login shell
   switch    Apply the Home Manager configuration
   update    Update flake inputs, then apply the Home Manager configuration
   help      Show this help
@@ -103,23 +104,38 @@ ensure_home_link() {
         || die "$HOME/.dotfiles points at $linked_dir, not this checkout ($DOTFILES_DIR)"
 }
 
-config_name() {
+flavor_name() {
     case "$(uname -s)" in
         Darwin)
-            flavor=darwin
+            printf 'darwin\n'
             ;;
         Linux)
             if is_nixos; then
-                flavor=nixos
+                printf 'nixos\n'
             else
-                flavor=linux
+                printf 'linux\n'
             fi
             ;;
         *)
             die "unsupported OS: $(uname -s)"
             ;;
     esac
-    printf '%s@%s\n' "$(id -un)" "$flavor"
+}
+
+# Prefer a "<user>@<hostname>" entry, else the "<user>@<flavor>" fallback.
+config_name() {
+    user=$(id -un)
+    node=$(uname -n)
+    host_key="$user@${node%%.*}"
+    flavor_key="$user@$(flavor_name)"
+    names=$(cd "$DOTFILES_DIR" && NIX_CONFIG="$NIX_FLAKES" \
+        nix eval --json .#homeConfigurations --apply builtins.attrNames) \
+        || die "cannot list homeConfigurations in $DOTFILES_DIR"
+    case "$names" in
+        *"\"$host_key\""*) printf '%s\n' "$host_key" ;;
+        *"\"$flavor_key\""*) printf '%s\n' "$flavor_key" ;;
+        *) die "no homeConfigurations entry for $host_key or $flavor_key; add one in flake.nix" ;;
+    esac
 }
 
 hm_switch() {
@@ -129,6 +145,16 @@ hm_switch() {
     NIX_CONFIG="$NIX_FLAKES" \
         nix run --inputs-from . home-manager -- \
         switch --flake ".#$config" -b hm-bak
+}
+
+# The Brewfile (modules/darwin) needs Homebrew installed first.
+ensure_homebrew() {
+    if [ -x /opt/homebrew/bin/brew ] || [ -x /usr/local/bin/brew ]; then
+        return
+    fi
+    command -v curl >/dev/null 2>&1 || die "curl is required to install Homebrew"
+    info "Installing Homebrew"
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 }
 
 current_login_shell() {
@@ -202,6 +228,9 @@ cmd_init() {
     require_regular_user
     ensure_nix
     ensure_home_link
+    if [ "$(uname -s)" = Darwin ]; then
+        ensure_homebrew
+    fi
     hm_switch
     configure_login_shell
     printf '\nOpen a new shell to load the updated environment.\n'

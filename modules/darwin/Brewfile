@@ -1,0 +1,17 @@
+# macOS desktop apps only; CLIs come from Nix.
+tap "nikitabobko/tap"
+
+cask "1password"
+cask "aerospace"
+cask "burp-suite"
+cask "chatgpt"
+cask "claude"
+cask "font-jetbrains-mono-nerd-font"
+cask "ghostty"
+cask "linear"
+cask "proton-pass"
+cask "slack"
+cask "spotify"
+cask "visual-studio-code"
+cask "zen"
+cask "zoom"

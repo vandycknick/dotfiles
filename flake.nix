@@ -22,7 +22,7 @@
         system: source:
         import source {
           inherit system;
-          # terraform (BUSL) and claude-code are unfree.
+          # terraform (BUSL), claude-code, and 1password-cli are unfree.
           config.allowUnfree = true;
         };
 
@@ -33,6 +33,7 @@
           homeDirectory,
           machineIdentity,
           genericLinux ? false,
+          desktop ? false,
         }:
         home-manager.lib.homeManagerConfiguration {
           pkgs = unfree system nixpkgs;
@@ -43,12 +44,14 @@
             {
               home = { inherit username homeDirectory; };
               targets.genericLinux.enable = genericLinux;
+              dotfiles.desktop = desktop;
             }
           ];
         };
     in
     {
-      # Key: "<user>@<flavor>"; install.sh derives flavor as nixos | linux | darwin.
+      # "<user>@<hostname>" for specific machines (desktops), else the headless
+      # "<user>@<flavor>" fallback; install.sh tries them in that order.
       homeConfigurations = {
         "coder@nixos" = mkHome {
           system = "x86_64-linux";
@@ -74,6 +77,7 @@
           username = "nickvd";
           homeDirectory = "/Users/nickvd";
           machineIdentity = "personal";
+          desktop = true;
         };
       };
     };

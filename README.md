@@ -18,11 +18,13 @@ git clone https://github.com/vandycknick/dotfiles.git ~/.dotfiles
 ~/.dotfiles/install.sh
 ```
 
-The installer installs Nix if needed, applies the configuration for your user
-and OS, and sets Fish as the login shell. Linux requires systemd and `sudo`.
-Existing targets are `coder@nixos`, `nickvd@nixos`, `nickvd@linux`, and
-`nickvd@darwin`; add a target in `flake.nix` for other users. Open a fresh login
-session afterward. Existing Stow installations need a separate migration first.
+The installer installs Nix (and, on macOS, Homebrew for desktop apps) if
+needed, applies the configuration for your user and machine, and
+sets Fish as the login shell. Linux requires systemd and `sudo`. It uses a
+`<user>@<hostname>` target when `flake.nix` has one, otherwise the generic
+`coder@nixos`, `nickvd@nixos`, `nickvd@linux` (headless), or `nickvd@darwin`
+(desktop). To make a Linux machine a desktop, add a `<user>@<hostname>` entry
+with `desktop = true`. Open a fresh login session afterward.
 
 To pull and apply dotfiles changes:
 

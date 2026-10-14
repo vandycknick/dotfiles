@@ -152,6 +152,8 @@ in
     // lib.optionalAttrs isLinux {
       ip = "ip --color=auto";
       tun0 = "ip -o -4 addr list tun0 | awk -F ' *|/' '{print $4}'";
+    }
+    // lib.optionalAttrs (isLinux && config.dotfiles.desktop) {
       clip = "wl-copy";
     }
     // lib.optionalAttrs isDarwin {

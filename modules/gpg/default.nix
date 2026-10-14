@@ -41,7 +41,14 @@ in
     defaultCacheTtlSsh = 86400;
     maxCacheTtlSsh = 86400;
 
-    pinentry.package = if isDarwin then pkgs.pinentry_mac else pkgs.pinentry-gnome3;
+    # Headless machines prompt in the SSH terminal.
+    pinentry.package =
+      if !config.dotfiles.desktop then
+        pkgs.pinentry-curses
+      else if isDarwin then
+        pkgs.pinentry_mac
+      else
+        pkgs.pinentry-gnome3;
     # Not set before; pinentry-mac and Wayland ignore it anyway.
     grabKeyboardAndMouse = false;
   };

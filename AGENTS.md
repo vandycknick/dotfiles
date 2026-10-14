@@ -11,20 +11,21 @@ store copy and declares the user CLI packages.
 ```text
 .dotfiles/
 |-- flake.nix, flake.lock           # Inputs and per-host homeConfigurations
-|-- home.nix                        # Packages, file links, activation steps
+|-- home.nix                        # Packages, file links (platform/desktop-gated), activation steps
+|-- modules/roles/                  # The dotfiles.desktop option
 |-- modules/shell/                  # Session variables, generated Fish and login profiles
 |-- modules/git/                    # Git config (personal + agent), Fish Git aliases and helpers
 |-- modules/gpg/                    # GnuPG settings and the single gpg-agent
 |-- modules/bin/                    # Nix-built commands: coding-agent wrappers, with-agent, scripts/
-|-- modules/darwin/, modules/linux/ # Platform-only packages
+|-- modules/darwin/                 # macOS defaults and the Brewfile (desktop apps)
+|-- modules/linux/                  # Linux-only packages
 |-- install.sh                      # POSIX-sh bootstrap and dot CLI
 |-- .config/
 |   |-- nix/nix.conf                # Nix CLI features and policy
 |   |-- nvim/                       # Lua config, plugins, and Nix wrapper
 |   |-- fish/                       # Interactive shell, prompt, and functions
 |   |-- shell/                      # Shared login environment and zsh config
-|   |-- osx/                        # Homebrew casks and macOS defaults
-|   |-- aerospace/                  # macOS tiling window manager
+|   |-- aerospace/                  # macOS tiling window manager (macOS desktops only)
 |   |-- hypr/                       # Wayland compositor, idle, and lock config
 |   |-- i3/, compton/               # X11 window manager and compositor
 |   |-- waybar/, walker/, rofi/     # Linux status bar and launchers
@@ -63,9 +64,9 @@ store copy and declares the user CLI packages.
 | Add a personal command | `modules/bin/scripts/<name>.sh` plus a `mkScript` entry with its `runtimeInputs` |
 | Add a coding-agent CLI | `modules/bin/default.nix` (`agentClis`) |
 | Change GnuPG, gpg-agent, cache TTLs, or pinentry | `modules/gpg/default.nix` (`programs.gpg`, `services.gpg-agent`) |
-| Add a macOS application or font | `.config/osx/Brewfile` |
-| Change Homebrew bootstrap/update behavior | `.config/osx/homebrew` |
-| Change macOS preferences | `.config/osx/defaults` |
+| Add a macOS desktop application or font | cask in `modules/darwin/Brewfile` |
+| Change macOS preferences | `modules/darwin/default.nix` (`targets.darwin.defaults`, `finderDesktopView`) |
+| Make a machine a desktop | `flake.nix`: a `"<user>@<hostname>"` entry with `desktop = true` |
 | Change AeroSpace bindings or workspace rules | `.config/aerospace/aerospace.toml` |
 | Change Hyprland, lock, idle, or wallpaper behavior | `.config/hypr/` |
 | Change legacy X11 desktop behavior | `.config/i3/`, `.config/compton/`, `.config/rofi/` |
@@ -97,18 +98,26 @@ store copy and declares the user CLI packages.
   package. `~/.nix-profile/bin` precedes `~/.local/bin` on `PATH`, so binaries
   other installers drop there (Tern's `omp` link, curl installs) never shadow
   Nix tools. Codex's self-update check is disabled; it updates via nixpkgs.
-- `homeConfigurations` are keyed `<user>@<flavor>` (`nixos`, `linux`,
-  `darwin`); `install.sh` derives the key from `id -un` and the OS. Targets are
+- `homeConfigurations` are keyed `<user>@<hostname>` for specific machines
+  (desktops) and `<user>@<flavor>` (`nixos`, `linux`, `darwin`) as the
+  fallback; `install.sh` tries `id -un`@`uname -n` (short) first, then the
+  flavor. Fallbacks are headless except `nickvd@darwin`. Targets are
   `x86_64-linux` and `aarch64-darwin`.
+- `dotfiles.desktop` (set per target from `flake.nix`, declared in
+  `modules/roles`) gates the window-manager configs (`linuxDesktop` and
+  `darwinDesktop` in `home.nix`), the Brewfile, clipboard tools, and the
+  graphical pinentry; headless machines get `pinentry-curses`.
 - User-facing CLI tools belong in `home.packages` in `home.nix`. Unfree
   packages are allowed; `pkgsMaster` exposes nixpkgs master.
 - Neovim runtime executables and LSP tools belong in `.config/nvim/package.nix`;
   both `home.nix` and the standalone `.config/nvim/flake.nix` import it.
-- Homebrew declarations are macOS-only taps and casks. Formulae are forbidden,
-  and Homebrew directories must not be added to shell `PATH`.
-- Keep `install.sh`, `.config/osx/homebrew`, and `.config/osx/defaults`
-  compatible with POSIX `sh`. Other scripts must satisfy the interpreter named
-  by their shebang.
+- On macOS, desktop applications (and fonts) are Homebrew casks in
+  `modules/darwin/Brewfile`; every CLI comes from Nix. Activation applies the
+  Brewfile on desktop Macs and runs `brew bundle cleanup --force`, so anything
+  not listed, formulae included, is uninstalled. Homebrew directories must not
+  be added to `PATH`.
+- Keep `install.sh` compatible with POSIX `sh`. Other scripts must satisfy the
+  interpreter named by their shebang.
 - One gpg-agent serves every context: the YubiKey (personal) and the agent SSH
   key, imported with `ssh-add` and kept passphrase-protected in its key store.
   `MACHINE_IDENTITY` selects the Git config and, in `.ssh/config`, the key
@@ -133,7 +142,7 @@ store copy and declares the user CLI packages.
 
 - Editing managed files directly under `~/.config` or `~/.ssh`.
 - Tracking scripts under `.local/bin`; add them to `modules/bin` instead.
-- Adding a Homebrew formula, Homebrew `PATH` entry, or downloaded global-tool
+- Adding a Homebrew formula or `PATH` entry, or a downloaded global-tool
   directory to the shared shell environment.
 - Adding Go, Cargo, npm-global, mise, or equivalent tool bins globally; use the
   Home Manager packages or a project development shell.
@@ -150,8 +159,8 @@ store copy and declares the user CLI packages.
 ## COMMANDS
 
 ```sh
-dot init     # install Nix if missing, switch, set Fish as login shell
-dot switch   # nix run --inputs-from . home-manager -- switch --flake .#<user>@<flavor> -b hm-bak
+dot init     # install Nix (and Homebrew on macOS) if missing, switch, set Fish as login shell
+dot switch   # home-manager switch --flake .#<user>@<hostname>, else .#<user>@<flavor>; -b hm-bak
 dot update   # nix flake update, then switch; leaves flake.lock to commit
 dot help
 ```
@@ -167,7 +176,7 @@ All commands except `help` mutate the environment.
 | Neovim | `.config/nvim/init.lua` | Loads options, mappings, autocommands, and lazy.nvim configuration. |
 | Fish | `modules/shell/default.nix` | Generates `config.fish`: session variables, the gpg-agent socket (kept when forwarded over SSH), agent Git routing, vi bindings, interactive-only aliases, and the wtp hook. The direnv (with nix-direnv), zoxide, and Atuin modules add their own hooks; Atuin settings stay in `.config/atuin/config.toml`. |
 | Shared shell | `modules/shell/default.nix`, `.config/shell/profile` | Declares XDG and tool variables once; the generated `.profile`/`.zprofile` source them, then set the user command path and identity routing. |
-| macOS | `.config/osx/` | Keeps application installation and OS defaults separate. |
+| macOS | `modules/darwin/` | Desktop Macs: Dock/Spaces/global defaults, the nested Finder desktop view, and the cask-only Brewfile with cleanup. |
 | Git | `modules/git/default.nix` | Generates `~/.config/git/config` (personal OpenPGP defaults, Nix-pinned gpg and git-lfs) and `~/.config/git/agent`, which includes it first and switches to SSH signing without reading Coder's `~/.gitconfig`. Activation ensures `~/.gitconfig` exists so `git config --global` writes there. |
 | SSH | `.ssh/config` | Enforces strict host checking and separates public service anchors from private host config. |
 | GnuPG | `modules/gpg/default.nix` | drduh-style `gpg.conf`; one gpg-agent with SSH support, 60/120 s passphrase cache, 24 h cache for the agent SSH key, platform pinentry. systemd socket activation on Linux; on macOS every login and `with-agent` run `gpgconf --launch`, because gpg-agent cannot take launchd sockets. |
@@ -201,9 +210,7 @@ Run checks relevant to the changed files:
 
 ```sh
 sh -n install.sh
-sh -n .config/osx/homebrew
-sh -n .config/osx/defaults
-shellcheck install.sh .config/osx/homebrew .config/osx/defaults
+shellcheck install.sh
 for c in coder@nixos nickvd@nixos nickvd@linux nickvd@darwin; do
   nix eval --raw ".#homeConfigurations.\"$c\".activationPackage.drvPath"
 done

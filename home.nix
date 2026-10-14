@@ -34,12 +34,33 @@ let
 
   root = toString ./.;
 
+  # Desktop-session configs, linked only on desktops of that platform.
+  linuxDesktop = [
+    ".config/hypr"
+    ".config/i3"
+    ".config/compton"
+    ".config/rofi"
+    ".config/waybar"
+    ".config/walker"
+    ".xsessionrc"
+  ];
+  darwinDesktop = [ ".config/aerospace" ];
+
+  inherit (pkgs.stdenv.hostPlatform) isDarwin isLinux;
+  inherit (config.dotfiles) desktop;
+  excluded =
+    lib.optionals (!(desktop && isLinux)) linuxDesktop ++ lib.optionals (!(desktop && isDarwin)) darwinDesktop;
+  isExcluded = rel: lib.any (dir: rel == dir || lib.hasPrefix "${dir}/" rel) excluded;
+
   # The flake source contains only git-tracked files, so ignored state
   # (fish_variables, .ssh/config.d/private, pubring.kbx) is never linked.
   managed = lib.pipe (lib.filesystem.listFilesRecursive ./.) [
     (map (path: lib.removePrefix "${root}/" (toString path)))
     (lib.filter (
-      rel: !(lib.elem (lib.head (lib.splitString "/" rel)) repoOnly) && baseNameOf rel != ".gitignore"
+      rel:
+      !(lib.elem (lib.head (lib.splitString "/" rel)) repoOnly)
+      && baseNameOf rel != ".gitignore"
+      && !(isExcluded rel)
     ))
   ];
 
@@ -49,6 +70,7 @@ let
 in
 {
   imports = [
+    ./modules/roles
     ./modules/shell
     ./modules/git
     ./modules/gpg
