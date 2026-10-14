@@ -188,18 +188,18 @@ All commands except `help` mutate the environment.
 | Nix | `modules/nix/default.nix` | Generates `~/.config/nix/nix.conf` (flakes enabled; checked against `pkgs.nix` at build). A weekly `nix-collect-garbage --delete-older-than 30d` (launchd on macOS, systemd timer on Linux) also prunes Home Manager generations. `install.sh` passes `NIX_CONFIG` for the first run. |
 | Git | `modules/git/default.nix` | Generates `~/.config/git/config` (personal OpenPGP defaults, Nix-pinned gpg and git-lfs) and `~/.config/git/agent`, which includes it first and switches to SSH signing without reading Coder's `~/.gitconfig`. Activation ensures `~/.gitconfig` exists so `git config --global` writes there. |
 | SSH | `.ssh/config` | Enforces strict host checking and separates public service anchors from private host config. |
-| GnuPG | `modules/gpg/default.nix` | drduh-style `gpg.conf`; one gpg-agent with SSH support, 60/120 s passphrase cache, 24 h cache for the agent SSH key, platform pinentry. systemd socket activation on Linux; on macOS every login and `with-agent` run `gpgconf --launch`, because gpg-agent cannot take launchd sockets. |
+| GnuPG | `modules/gpg/default.nix` | drduh-style `gpg.conf`; one gpg-agent with SSH support, 60/120 s passphrase cache, 24 h cache for the agent SSH key, platform pinentry. systemd socket activation on Linux; on macOS logins, non-interactive Fish, and `with-agent` start it with `gpg-connect-agent /bye` (not the ~360 ms `gpgconf --launch`), because gpg-agent cannot take launchd sockets. |
 | OpenCode | `.config/opencode/opencode.jsonc` | Disables sharing and routes primary, delegated, and lightweight work to explicit models. |
 
 ## DISTINCTIVE STYLES
 
 - Fish uses vi mode. Insert-mode `Ctrl-P` and `Ctrl-N` search history, while
   `Ctrl-Y` accepts the current autosuggestion.
-- The Fish prompt computes Git state asynchronously and marks virtual machines
-  and SSH sessions. The prompt symbol is `>`-shaped and command failures retain
-  pipeline status information.
+- The Fish prompt computes Git state asynchronously and marks SSH sessions.
+  The prompt symbol is `>`-shaped and command failures retain pipeline status
+  information. Keep blocking work out of startup; it delays the first prompt.
 - Neovim uses Space as leader, `Ctrl-S` to write, `Ctrl-H/J/K/L` for split
-  navigation, `Shift-H/J/K/L` for resizing, and `Esc Esc` to leave terminal
+  navigation, `Alt-H/J/K/L` for resizing, and `Esc Esc` to leave terminal
   mode. Normal-mode arrow keys intentionally refuse movement.
 - Neovim uses Kanagawa, OSC52 clipboard integration, relative numbers,
   tree-sitter folds, blink.cmp, Snacks pickers, and `Ctrl-.` for OpenCode.
