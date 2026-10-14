@@ -1,10 +1,9 @@
-set -g prompt_color_normal (set_color normal)
-set -g prompt_color_pwd (set_color cyan)
-
-function fish_prompt --description MyPrompt
-  printf "$prompt_color_normal$_my_prompt_environment"
-  printf "$prompt_color_normal$prompt_color_pwd$_my_prompt_pwd"
-  printf "$prompt_color_normal $_my_prompt_color_git$$_my_prompt_git"
-  printf "$prompt_color_normal$_my_prompt_color_duration$_my_prompt_cmd_duration"
-  printf "$prompt_color_normal$_my_prompt_status$prompt_color_normal \n"
+# State and colours come from conf.d/my_prompt.fish.
+function fish_prompt --description 'pwd, Git, duration, status'
+    echo -n -s \
+        $_my_prompt_environment \
+        $_my_prompt_c_pwd $_my_prompt_pwd $_my_prompt_c_normal ' ' \
+        $$_my_prompt_git \
+        $_my_prompt_cmd_duration \
+        $_my_prompt_status $_my_prompt_c_normal ' '
 end

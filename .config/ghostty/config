@@ -1,5 +1,7 @@
 font-family = "JetBrainsMono Nerd Font Mono"
 theme = "Kanagawa Wave"
+# kanagawa.nvim's sumiInk0, as in Neovim's terminal and the Tern theme.
+palette = 0=#16161d
 window-decoration = "false"
 background-opacity = 0.97
 

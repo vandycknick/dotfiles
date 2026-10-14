@@ -1,77 +1,52 @@
 status is-interactive || exit
 
+# Prompt state for functions/fish_prompt.fish. A background fish computes the
+# Git part and hands it back through a per-shell universal variable, which
+# repaints the prompt when it changes.
+
+# Kanagawa's normal palette as hex. Tern draws bold named colours in the bright
+# palette; hex keeps both terminals on the colours Ghostty shows.
+set --global _my_prompt_c_pwd (set_color 6a9589)
+set --global _my_prompt_c_paren (set_color --bold 7e9cd8)
+set --global _my_prompt_c_branch (set_color --bold c34043)
+set --global _my_prompt_c_dirty (set_color --bold c0a36e)
+set --global _my_prompt_c_symbol (set_color 76946a)
+set --global _my_prompt_c_error (set_color $fish_color_error)
+set --global _my_prompt_c_normal (set_color normal)
+
 set --global _my_prompt_git _my_prompt_git_$fish_pid
 
 function $_my_prompt_git --on-variable $_my_prompt_git
     commandline --function repaint
 end
 
-# Kanagawa's normal yellow, red and blue (ANSI 3, 1, 4) in bold. Named colours
-# would turn bright in Tern, which draws bold text in the bright palette.
-set -g yellow (set_color -o c0a36e)
-set -g red (set_color -o c34043)
-set -g blue (set_color -o 7e9cd8)
-set -g normal (set_color normal)
-
-function _my_prompt_detect_environment --description "Cache VM and SSH status for this fish session"
-    if set --query _my_prompt_environment_checked
-        return
-    end
-
-    set --global _my_prompt_environment_checked 1
-    set --global _my_prompt_environment
-    set --local is_vm false
-
-    if command -q systemd-detect-virt
-        if systemd-detect-virt --vm --quiet
-            set is_vm true
-        end
-    end
-
-    if test $is_vm = false; and test (uname) = Linux
-        if test -r /sys/class/dmi/id/product_name
-            read --local --line product_name </sys/class/dmi/id/product_name
-            set product_name (string lower (string trim $product_name))
-
-            if string match -rq 'virtual|vmware|kvm|qemu|virtualbox|hyper-v|bochs|parallels' -- $product_name
-                set is_vm true
-            end
-        end
-    end
-
-    # Icon options:
-    #   U+0F0AC     nf-fa-globe
-    #   U+0F233     nf-fa-server
-    #   U+0F0C2     nf-fa-cloud
-    #   U+0F484     nf-oct-globe
-    #   U+0EB3A     nf-cod-remote
-    #   U+0EA7A     nf-cod-vm
-    #   U+F069F  󰚟   nf-md-remote
-    #   U+F08B9  󰢹   nf-md-remote_desktop
-    #   U+F08C0  󰣀   nf-md-ssh
-    #   U+F0318  󰌘   nf-md-lan_connect
-    if set --query SSH_CONNECTION[1]; or set --query SSH_TTY[1]
-        set --global _my_prompt_environment "$yellow󰢹$normal  "
-    else if test $is_vm = true
-        set --global _my_prompt_environment "  "
-    end
+# Shells that died without fish_exit leave their universal behind.
+for var in (set --universal --names | string match --regex '^_my_prompt_git_\d+$')
+    set --local pid (string replace _my_prompt_git_ '' $var)
+    command kill -0 $pid 2>/dev/null || set --erase --universal $var
 end
 
-_my_prompt_detect_environment
+# An icon on SSH sessions.
+set --global _my_prompt_environment
+if set --query SSH_CONNECTION[1]; or set --query SSH_TTY[1]
+    set _my_prompt_environment "$_my_prompt_c_dirty󰢹$_my_prompt_c_normal  "
+end
 
-function _my_prompt_pwd --on-variable PWD --on-variable my_prompt_ignored_git_paths --on-variable fish_prompt_pwd_dir_length
+function _my_prompt_pwd --on-variable PWD --on-variable fish_prompt_pwd_dir_length
     set --local git_root (command git --no-optional-locks rev-parse --show-toplevel 2>/dev/null)
     set --local git_base (string replace --all --regex -- "^.*/" "" "$git_root")
     set --local path_sep /
 
     test "$fish_prompt_pwd_dir_length" = 0 && set path_sep
 
-    if set --query git_root[1] && ! contains -- $git_root $my_prompt_ignored_git_paths
-        set --erase _my_prompt_skip_git_prompt
+    if set --query git_root[1]
+        set --erase _my_prompt_skip_git
     else
-        set --global _my_prompt_skip_git_prompt
+        set --global _my_prompt_skip_git
     end
 
+    # Shortens every directory but the repository root and the last one, which
+    # is bold; separators are dim.
     set --global _my_prompt_pwd (
         string replace --ignore-case -- ~ \~ $PWD |
         string replace -- "/$git_base/" /:/ |
@@ -86,38 +61,47 @@ end
 
 function _my_prompt_postexec --on-event fish_postexec
     set --local last_status $pipestatus
-    set --global _my_prompt_status "$_my_prompt_newline$_my_prompt_color_prompt$my_prompt_symbol_prompt"
+    set --global _my_prompt_status "$_my_prompt_c_symbol❱"
 
     for code in $last_status
         if test $code -ne 0
-            set --global _my_prompt_status "$_my_prompt_color_error| "(echo $last_status)" $_my_prompt_newline$_my_prompt_color_prompt$_my_prompt_color_error$my_prompt_symbol_prompt"
+            set _my_prompt_status "$_my_prompt_c_error| $last_status ❱"
             break
         end
     end
 
-    test "$CMD_DURATION" -lt $my_prompt_cmd_duration_threshold && set _my_prompt_cmd_duration && return
+    if test "$CMD_DURATION" -lt 1000
+        set --global _my_prompt_cmd_duration
+        return
+    end
 
     set --local secs (math --scale=1 $CMD_DURATION/1000 % 60)
     set --local mins (math --scale=0 $CMD_DURATION/60000 % 60)
     set --local hours (math --scale=0 $CMD_DURATION/3600000)
-
     set --local out
 
-    test $hours -gt 0 && set --local --append out $hours"h"
-    test $mins -gt 0 && set --local --append out $mins"m"
-    test $secs -gt 0 && set --local --append out $secs"s"
+    test $hours -gt 0 && set --append out $hours"h"
+    test $mins -gt 0 && set --append out $mins"m"
+    test $secs -gt 0 && set --append out $secs"s"
 
     set --global _my_prompt_cmd_duration "$out "
 end
 
 function _my_prompt_prompt --on-event fish_prompt
-    set --query _my_prompt_status || set --global _my_prompt_status "$_my_prompt_newline$_my_prompt_color_prompt$my_prompt_symbol_prompt"
+    set --query _my_prompt_status || set --global _my_prompt_status "$_my_prompt_c_symbol❱"
     set --query _my_prompt_pwd || _my_prompt_pwd
 
     command kill $_my_prompt_last_pid 2>/dev/null
 
-    set --query _my_prompt_skip_git_prompt && set $_my_prompt_git && return
+    if set --query _my_prompt_skip_git
+        set --universal $_my_prompt_git
+        return
+    end
 
+    set --local branch_fmt "$_my_prompt_c_paren($_my_prompt_c_branch\$branch$_my_prompt_c_paren)$_my_prompt_c_normal"
+
+    # Shows the branch right away, then adds the dirty marker and the
+    # ahead/behind counts.
     fish --private --command "
         set branch (
             command git symbolic-ref --short HEAD 2>/dev/null ||
@@ -126,66 +110,30 @@ function _my_prompt_prompt --on-event fish_prompt
                 string replace --regex -- '(.+)' '@\$1'
         )
 
-        test -z \"\$$_my_prompt_git\" && set --universal $_my_prompt_git \"$blue($red\$branch$blue)$normal \"
+        test -z \"\$$_my_prompt_git\" && set --universal $_my_prompt_git \"$branch_fmt \"
 
         command git diff-index --quiet HEAD 2>/dev/null
         test \$status -eq 1 ||
-            count (command git ls-files --others --exclude-standard (command git rev-parse --show-toplevel)) >/dev/null && set info \"$yellow$my_prompt_symbol_git_dirty$normal\"
+            count (command git ls-files --others --exclude-standard (command git rev-parse --show-toplevel)) >/dev/null &&
+            set info \"$_my_prompt_c_dirty✗$_my_prompt_c_normal\"
 
-        for fetch in $my_prompt_fetch false
-            command git rev-list --count --left-right @{upstream}...@ 2>/dev/null |
-                read behind ahead
-
-            switch \"\$behind \$ahead\"
-                case \" \" \"0 0\"
-                case \"0 *\"
-                    set upstream \" $my_prompt_symbol_git_ahead\$ahead\"
-                case \"* 0\"
-                    set upstream \" $my_prompt_symbol_git_behind\$behind\"
-                case \*
-                    set upstream \" $my_prompt_symbol_git_ahead\$ahead $my_prompt_symbol_git_behind\$behind\"
-            end
-
-            set --universal $_my_prompt_git \"$blue($red\$branch$blue)$normal \$info\$upstream \"
-
-            test \$fetch = true && command git fetch --no-tags 2>/dev/null
+        command git rev-list --count --left-right @{upstream}...@ 2>/dev/null | read behind ahead
+        switch \"\$behind \$ahead\"
+            case ' ' '0 0'
+            case '0 *'
+                set upstream \" ↑\$ahead\"
+            case '* 0'
+                set upstream \" ↓\$behind\"
+            case '*'
+                set upstream \" ↑\$ahead ↓\$behind\"
         end
+
+        set --universal $_my_prompt_git \"$branch_fmt \$info\$upstream \"
     " &
 
     set --global _my_prompt_last_pid $last_pid
 end
 
 function _my_prompt_fish_exit --on-event fish_exit
-    set --erase $_my_prompt_git
+    set --erase --universal $_my_prompt_git
 end
-
-#function _my_prompt_uninstall --on-event my_prompt_uninstall
-#    set --names |
-#        string replace --filter --regex -- "^(_?my_prompt_)" "set --erase \$1" |
-#        source
-#    functions --erase (functions --all | string match --entire --regex "^_?my_prompt_")
-#end
-
-set --global my_prompt_color_normal (set_color normal)
-
-for color in my_prompt_color_{pwd,git,error,prompt,duration,start}
-    function $color --on-variable $color --inherit-variable color
-        set --query $color && set --global _$color (set_color $$color)
-    end && $color
-end
-
-function my_prompt_multiline --on-variable my_prompt_multiline
-    if test "$my_prompt_multiline" = true
-        set --global _my_prompt_newline "\n"
-    else
-        set --global _my_prompt_newline ""
-    end
-end && my_prompt_multiline
-
-set --query my_prompt_color_error || set --global my_prompt_color_error $fish_color_error
-set --query my_prompt_symbol_prompt || set --global my_prompt_symbol_prompt ❱
-set --query my_prompt_symbol_git_dirty || set --global my_prompt_symbol_git_dirty ✗
-set --query my_prompt_symbol_git_ahead || set --global my_prompt_symbol_git_ahead ↑
-set --query my_prompt_symbol_git_behind || set --global my_prompt_symbol_git_behind ↓
-set --query my_prompt_multiline || set --global my_prompt_multiline false
-set --query my_prompt_cmd_duration_threshold || set --global my_prompt_cmd_duration_threshold 1000

@@ -141,7 +141,11 @@ in
       '')
       (
         ''
-          set -g my_prompt_color_prompt green
+          # Bold named colours turn bright in Tern; kanagawa's normal cyan
+          # and oldWhite as hex keep it in line with Ghostty.
+          set -g fish_color_redirection 6a9589 --bold
+          set -g fish_color_search_match c8c093 --bold --background=brblack
+          set -g fish_color_selection c8c093 --bold --background=brblack
 
           wtp hook fish | source
 
