@@ -1,4 +1,5 @@
-#!/bin/bash
+# shellcheck shell=bash
+# Packaged by modules/bin.
 #
 # Create a separate user for tunneling
 # sudo adduser tunnel

@@ -14,6 +14,9 @@ store copy and declares the user CLI packages.
 |-- home.nix                        # Packages, file links, activation steps
 |-- modules/shell/                  # Session variables, generated Fish and login profiles
 |-- modules/git/                    # Git config (personal + agent), Fish Git aliases and helpers
+|-- modules/gpg/                    # GnuPG settings and the single gpg-agent
+|-- modules/bin/                    # Nix-built commands: coding-agent wrappers, with-agent, scripts/
+|-- modules/darwin/, modules/linux/ # Platform-only packages
 |-- install.sh                      # POSIX-sh bootstrap and dot CLI
 |-- .config/
 |   |-- nix/nix.conf                # Nix CLI features and policy
@@ -28,9 +31,6 @@ store copy and declares the user CLI packages.
 |   |-- ghostty/, tmux/             # Terminal environment
 |   |-- lazygit/, k9s/              # Development tool configuration
 |   `-- opencode/                   # OpenCode agents, models, and UI settings
-|-- .local/
-|   |-- bin/                        # Personal commands and dot symlink
-|   `-- share/                      # Data; gnupg/ holds only git-ignored keyrings and agent state
 |-- .ssh/                           # SSH policy and public trust anchors
 |-- .gitignore                      # Private and runtime state exclusions
 |-- AGENTS.md
@@ -57,10 +57,11 @@ store copy and declares the user CLI packages.
 | Change the Fish prompt | `.config/fish/conf.d/my_prompt.fish`, `.config/fish/functions/` |
 | Add a Fish function | `.config/fish/functions/` |
 | Change shared environment variables | `modules/shell/default.nix` (`home.sessionVariables`) |
-| Change machine-identity routing | `modules/shell/default.nix` (`programs.fish.shellInit`), `.config/shell/profile`, `.local/bin/with-agent` |
+| Change machine-identity routing | `modules/shell/default.nix` (`programs.fish.shellInit`), `.config/shell/profile`, `modules/bin/default.nix` (`with-agent`) |
 | Change which SSH key each identity uses | `.ssh/config` (`Match … MACHINE_IDENTITY` blocks) |
 | Change login PATH or zsh behavior | `.config/shell/profile`, `.config/shell/.zshrc` |
-| Add a personal command | `.local/bin/` |
+| Add a personal command | `modules/bin/scripts/<name>.sh` plus a `mkScript` entry with its `runtimeInputs` |
+| Add a coding-agent CLI | `modules/bin/default.nix` (`agentClis`) |
 | Change GnuPG, gpg-agent, cache TTLs, or pinentry | `modules/gpg/default.nix` (`programs.gpg`, `services.gpg-agent`) |
 | Add a macOS application or font | `.config/osx/Brewfile` |
 | Change Homebrew bootstrap/update behavior | `.config/osx/homebrew` |
@@ -90,9 +91,12 @@ store copy and declares the user CLI packages.
 - Files an application rewrites at runtime (`lazy-lock.json`, k9s
   `config.yaml`, pi `settings.json`) are listed in `mutable` in `home.nix` and
   link straight to `~/.dotfiles` so the writes land in the checkout.
-- Paths another installer re-links (Tern's `~/.local/bin/omp`) are listed in
-  `forced` in `home.nix`; Home Manager overwrites them instead of failing,
-  because it never backs up foreign symlinks.
+- Commands are Nix packages in `modules/bin`, not tracked files: scripts are
+  `writeShellApplication`s (shellchecked at build time, tools in
+  `runtimeInputs`), and coding-agent CLIs get a `hiPrio` wrapper over their
+  package. `~/.nix-profile/bin` precedes `~/.local/bin` on `PATH`, so binaries
+  other installers drop there (Tern's `omp` link, curl installs) never shadow
+  Nix tools. Codex's self-update check is disabled; it updates via nixpkgs.
 - `homeConfigurations` are keyed `<user>@<flavor>` (`nixos`, `linux`,
   `darwin`); `install.sh` derives the key from `id -un` and the OS. Targets are
   `x86_64-linux` and `aarch64-darwin`.
@@ -109,8 +113,8 @@ store copy and declares the user CLI packages.
   key, imported with `ssh-add` and kept passphrase-protected in its key store.
   `MACHINE_IDENTITY` selects the Git config and, in `.ssh/config`, the key
   order: personal uses only the YubiKey; agent tries the agent key first and
-  falls back to the YubiKey. Coding-agent CLIs get a `.local/bin` wrapper that
-  runs them through `with-agent`.
+  falls back to the YubiKey. Coding-agent CLIs run through `with-agent` when
+  `MACHINE_IDENTITY=agent` or the agent key is present.
 - Environment variables belong in `home.sessionVariables`, never in Fish
   `set -U`/`set -Ux` or a shell profile; every shell sources the generated
   `hm-session-vars`. Use Nix values (`config.xdg.*`) rather than shell
@@ -127,7 +131,8 @@ store copy and declares the user CLI packages.
 
 ## ANTI-PATTERNS
 
-- Editing managed files directly under `~/.config`, `~/.local`, or `~/.ssh`.
+- Editing managed files directly under `~/.config` or `~/.ssh`.
+- Tracking scripts under `.local/bin`; add them to `modules/bin` instead.
 - Adding a Homebrew formula, Homebrew `PATH` entry, or downloaded global-tool
   directory to the shared shell environment.
 - Adding Go, Cargo, npm-global, mise, or equivalent tool bins globally; use the
@@ -198,7 +203,7 @@ Run checks relevant to the changed files:
 sh -n install.sh
 sh -n .config/osx/homebrew
 sh -n .config/osx/defaults
-shellcheck install.sh .config/osx/homebrew .config/osx/defaults .local/bin/with-agent
+shellcheck install.sh .config/osx/homebrew .config/osx/defaults
 for c in coder@nixos nickvd@nixos nickvd@linux nickvd@darwin; do
   nix eval --raw ".#homeConfigurations.\"$c\".activationPackage.drvPath"
 done

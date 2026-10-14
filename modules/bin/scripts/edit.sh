@@ -1,4 +1,5 @@
-#!/bin/sh
+# shellcheck shell=bash
+# Packaged by modules/bin.
 
 #
 # edit(1) - Pipe in and out of $EDITOR

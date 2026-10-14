@@ -10,10 +10,12 @@ if [ -n "$BASH_VERSION" ]; then
     fi
 fi
 
-# User commands and the Home Manager profile own the interactive CLI path.
-# Prepended here because home.sessionPath appends, and the ~/.local/bin
-# wrappers must shadow the Nix binaries they wrap.
-PATH="$HOME/.local/bin:$HOME/.nix-profile/bin:$PATH"
+# The Home Manager profile comes first. ~/.local/bin, where other installers
+# (Tern, curl scripts) drop binaries, comes after it so it cannot shadow Nix
+# tools; both are moved even when an inherited PATH already lists them.
+PATH=$(printf '%s' "$PATH" | tr ':' '\n' |
+    grep -vxF -e "$HOME/.nix-profile/bin" -e "$HOME/.local/bin" | paste -sd: -)
+PATH="$HOME/.nix-profile/bin${PATH:+:$PATH}:$HOME/.local/bin"
 export PATH
 
 # Agent contexts select the agent Git config, which signs with the agent key;

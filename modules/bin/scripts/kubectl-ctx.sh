@@ -1,6 +1,5 @@
-#!/usr/bin/env sh
-
-set -eou pipefail
+# shellcheck shell=bash
+# Packaged by modules/bin (writeShellApplication sets errexit, nounset, pipefail).
 
 filter="${1-}"
 current="$(kubectl config current-context)"

@@ -2,7 +2,6 @@
   config,
   lib,
   pkgs,
-  pkgsMaster,
   machineIdentity,
   ...
 }:
@@ -33,12 +32,6 @@ let
     ".config/pi/settings.json"
   ];
 
-  # Paths other installers claim with their own symlinks, which Home Manager
-  # refuses to back up. Tern links ~/.local/bin/omp to its bundled binary.
-  forced = [
-    ".local/bin/omp"
-  ];
-
   root = toString ./.;
 
   # The flake source contains only git-tracked files, so ignored state
@@ -59,6 +52,7 @@ in
     ./modules/shell
     ./modules/git
     ./modules/gpg
+    ./modules/bin
     ./modules/darwin
     ./modules/linux
   ];
@@ -81,7 +75,6 @@ in
         config.lib.file.mkOutOfStoreSymlink "${dotfiles}/${rel}"
       else
         ./. + "/${rel}";
-    force = lib.elem rel forced;
   });
 
   home.packages = with pkgs; [
@@ -130,13 +123,8 @@ in
     # Dotfiles CLI
     dot
 
-    # Editors & AI
+    # Editors & AI (coding-agent CLIs come from modules/bin)
     python3Packages.ansible-core
-    pkgsMaster.claude-code
-    pkgsMaster.codex
-    opencode
-    pi-coding-agent
-    omp
     shellcheck
     (import ./.config/nvim/package.nix { inherit pkgs; })
   ];

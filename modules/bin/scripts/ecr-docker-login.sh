@@ -1,6 +1,5 @@
-#!/usr/bin/env sh
-
-set -eo pipefail
+# shellcheck shell=bash
+# Packaged by modules/bin (writeShellApplication sets errexit and pipefail).
 
 show_help() {
     cat <<EOF
@@ -27,9 +26,10 @@ ecr_docker_login() {
 
     [ -z "$profile" ] && echo "$RED Profile not provided, either provide a profile with -p or set AWS_PROFILE!$RESET" && exit 1
 
-    local registry_id=$(aws --profile $profile --region $region ecr describe-registry --query 'registryId' --output text)
+    local registry_id
+    registry_id=$(aws --profile "$profile" --region "$region" ecr describe-registry --query 'registryId' --output text)
 
-    aws --profile $profile --region $region ecr get-login-password |
+    aws --profile "$profile" --region "$region" ecr get-login-password |
         docker login --username AWS --password-stdin "$registry_id.dkr.ecr.$region.amazonaws.com"
     exit 0
 }

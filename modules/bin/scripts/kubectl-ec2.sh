@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
+# shellcheck shell=bash
+# Packaged by modules/bin (writeShellApplication sets errexit, nounset, pipefail).
 
 if [ "$#" -eq 0 ]; then
     printf '\e[31m' >&2
