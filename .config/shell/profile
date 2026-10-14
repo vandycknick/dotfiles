@@ -1,6 +1,5 @@
-#!/bin/zsh
-
-# profile file. Runs on login. Environmental variables are set here.
+# Login profile for sh, bash, and zsh. Home Manager prepends the shared session
+# variables (modules/shell); only runtime logic belongs here.
 
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
@@ -11,66 +10,12 @@ if [ -n "$BASH_VERSION" ]; then
 fi
 
 # User commands and the Home Manager profile own the interactive CLI path.
+# Prepended here because home.sessionPath appends, and the ~/.local/bin
+# wrappers must shadow the Nix binaries they wrap.
 PATH="$HOME/.local/bin:$HOME/.nix-profile/bin:$PATH"
 export PATH
 
-# Configure LANGs
-export LANG=en_US.UTF-8
-export LC_ALL=en_US.UTF-8
-
-# Default programs:
-export EDITOR="nvim"
-export TERMINAL="ghostty"
-case "$(uname -s)" in
-    Darwin) export BROWSER="/Applications/Zen.app/Contents/MacOS/zen" ;;
-esac
-
-# XDG Configuration
-export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_DATA_HOME="$HOME/.local/share"
-export XDG_BIN_HOME="$HOME/.local/bin"
-export XDG_CACHE_HOME="$HOME/.cache"
-
-# Pi coding agent
-export PI_CODING_AGENT_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/pi"
-export PI_CODING_AGENT_SESSION_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/pi/sessions"
-
-export LESSHISTFILE="-"
-export ZDOTDIR="${XDG_CONFIG_HOME:-$HOME/.config}/shell"
-export TMUX_TMPDIR="$XDG_RUNTIME_DIR"
-
-# Golang:
-export GOPATH="${XDG_DATA_HOME:-$HOME/.local/share}/go"
-
-# Rust:
-export CARGO_HOME="$XDG_DATA_HOME/cargo"
-export RUSTUP_HOME="$XDG_DATA_HOME/rustup"
-
-# Dotnet:
-export NUGET_PACKAGES="$XDG_CACHE_HOME/NuGet/packages"
-export NUGET_PLUGINS_CACHE_PATH="$XDG_CACHE_HOME/NuGet/plugins-cache"
-
-# AWS Cli
-# https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
-export AWS_CONFIG_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/aws/config"
-export AWS_SHARED_CREDENTIALS_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/aws/credentials"
-
-# Azure CLI
-# https://docs.microsoft.com/en-us/cli/azure/azure-cli-configuration#cli-configuration-file
-export AZURE_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/azure"
-
-# GnuPG
-export GNUPGHOME="${XDG_DATA_HOME:-$HOME/.local/share}/gnupg"
-
-# An inherited tool context takes precedence over the declared machine default.
-if [ -z "${MACHINE_IDENTITY:-}" ]; then
-    if [ -e "$HOME/.config/machine-identity" ] || [ -L "$HOME/.config/machine-identity" ]; then
-        MACHINE_IDENTITY=$(cat "$HOME/.config/machine-identity") || return 1
-    else
-        MACHINE_IDENTITY=personal
-    fi
-fi
-case "$MACHINE_IDENTITY" in
+case "${MACHINE_IDENTITY:-}" in
     agent)
         SSH_AUTH_SOCK=$("$HOME/.local/bin/with-agent" printenv SSH_AUTH_SOCK) || return 1
         if [ -z "$SSH_AUTH_SOCK" ]; then
@@ -87,13 +32,3 @@ case "$MACHINE_IDENTITY" in
         return 1
         ;;
 esac
-export MACHINE_IDENTITY
-
-# K9S
-export K9SCONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/k9s"
-
-# NPM
-export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME/npm/npmrc"
-
-# Deno
-export DENO_INSTALL_ROOT="$XDG_BIN_HOME/.."

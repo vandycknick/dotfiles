@@ -16,6 +16,7 @@ let
     "flake.nix"
     "flake.lock"
     "home.nix"
+    "modules"
     "install.sh"
     "README.md"
     "AGENTS.md"
@@ -54,6 +55,8 @@ let
   '';
 in
 {
+  imports = [ ./modules/shell ];
+
   home.stateVersion = "26.05";
   programs.home-manager.enable = true;
 
@@ -71,29 +74,22 @@ in
       message = "machineIdentity must be personal or agent";
     }
   ];
-  xdg.configFile."machine-identity".text = "${machineIdentity}\n";
 
   # One store-backed link per tracked file, so directories stay real and
   # application state can live next to managed files. Edits apply on switch.
-  home.file =
-    lib.genAttrs managed (rel: {
-      source =
-        if lib.elem rel mutable then
-          config.lib.file.mkOutOfStoreSymlink "${dotfiles}/${rel}"
-        else
-          ./. + "/${rel}";
-      force = lib.elem rel forced;
-    })
-    // {
-      ".profile".source = ./.config/shell/profile;
-      ".zprofile".source = ./.config/shell/profile;
-    };
+  home.file = lib.genAttrs managed (rel: {
+    source =
+      if lib.elem rel mutable then
+        config.lib.file.mkOutOfStoreSymlink "${dotfiles}/${rel}"
+      else
+        ./. + "/${rel}";
+    force = lib.elem rel forced;
+  });
 
   home.packages =
     with pkgs;
     [
       # Shell & environment
-      fish
       tmux
       zoxide
       atuin

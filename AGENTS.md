@@ -12,6 +12,7 @@ store copy and declares the user CLI packages.
 .dotfiles/
 |-- flake.nix, flake.lock           # Inputs and per-host homeConfigurations
 |-- home.nix                        # Packages, file links, activation steps
+|-- modules/shell/                  # Session variables, generated Fish and login profiles
 |-- install.sh                      # POSIX-sh bootstrap and dot CLI
 |-- .config/
 |   |-- nix/nix.conf                # Nix CLI features and policy
@@ -49,10 +50,12 @@ store copy and declares the user CLI packages.
 | Change Neovim options, mappings, or autocommands | `.config/nvim/lua/config/` |
 | Add a general Neovim plugin | `.config/nvim/lua/plugins/` |
 | Add language-specific Neovim support | `.config/nvim/lua/plugins/lang/` |
-| Change Fish interactive startup | `.config/fish/config.fish` |
+| Change Fish interactive startup or keybindings | `modules/shell/default.nix` (`programs.fish`) |
 | Change Fish environment, aliases, Git helpers, or prompt | `.config/fish/conf.d/` |
 | Add a Fish function | `.config/fish/functions/` |
-| Change shared login environment or zsh behavior | `.config/shell/profile`, `.config/shell/.zshrc` |
+| Change shared environment variables | `modules/shell/default.nix` (`home.sessionVariables`) |
+| Change machine-identity routing | `modules/shell/identity.fish`, `.config/shell/profile` |
+| Change login PATH or zsh behavior | `.config/shell/profile`, `.config/shell/.zshrc` |
 | Add a personal command | `.local/bin/` |
 | Change GnuPG agent or pinentry policy | `.local/share/gnupg/`, `.local/bin/pinentry` |
 | Add a macOS application or font | `.config/osx/Brewfile` |
@@ -78,7 +81,8 @@ store copy and declares the user CLI packages.
   untracked files); new files need `git add`. New top-level repo-only files
   must be added to `repoOnly` in `home.nix`; nested `.gitignore` files are
   never linked. Do not track symlinks: they dangle once copied to the store;
-  declare the alias in `home.file` instead (as for `.profile`).
+  declare the alias in `home.file` instead (as for `.profile`). Files a Home
+  Manager module generates (`~/.config/fish/config.fish`) must not be tracked.
 - Files an application rewrites at runtime (`lazy-lock.json`, k9s
   `config.yaml`, pi `settings.json`) are listed in `mutable` in `home.nix` and
   link straight to `~/.dotfiles` so the writes land in the checkout.
@@ -97,8 +101,13 @@ store copy and declares the user CLI packages.
 - Keep `install.sh`, `.config/osx/homebrew`, `.config/osx/defaults`, and
   `.local/bin/pinentry` compatible with POSIX `sh`. Other scripts must satisfy
   the interpreter named by their shebang.
+- Environment variables belong in `home.sessionVariables`, never in Fish
+  `set -U`/`set -Ux` or a shell profile; every shell sources the generated
+  `hm-session-vars`. Use Nix values (`config.xdg.*`) rather than shell
+  expansion, since the generated file exports variables alphabetically.
 - Put Fish startup snippets in `conf.d/` and named functions in `functions/`.
-  Keep `config.fish` focused on global interactive setup.
+  `conf.d/` runs before the generated `config.fish` and cannot see the session
+  variables; code that needs them goes in `programs.fish.shellInit`.
 - Neovim plugin specifications are Lua modules under `lua/plugins/`; language
   modules belong under `lua/plugins/lang/`. Update `lazy-lock.json` only when
   intentionally changing plugin resolution.
@@ -141,8 +150,8 @@ All commands except `help` mutate the environment.
 | Bootstrap | `install.sh` | Installs multi-user Nix, links `~/.dotfiles` to the checkout, runs the Home Manager switch, and sets the Fish login shell. |
 | Home Manager | `home.nix` | Declares user CLI packages, links tracked files, and ensures `~/.gitconfig`. Tools and pi extensions come from Nix; activation never installs from npm or other registries. |
 | Neovim | `.config/nvim/init.lua` | Loads options, mappings, autocommands, and lazy.nvim configuration. |
-| Fish | `.config/fish/config.fish` | Uses vi bindings and initializes direnv, zoxide, Atuin, and wtp interactively. |
-| Shared shell | `.config/shell/profile` | Establishes XDG paths and the Nix/user command path. |
+| Fish | `modules/shell/default.nix` | Generates `config.fish`: session variables, machine identity and GPG agent, vi bindings, and the direnv, zoxide, Atuin, and wtp hooks. |
+| Shared shell | `modules/shell/default.nix`, `.config/shell/profile` | Declares XDG and tool variables once; the generated `.profile`/`.zprofile` source them, then set the user command path and identity routing. |
 | macOS | `.config/osx/` | Keeps application installation and OS defaults separate. |
 | Git | `.config/git/config`, `.config/git/agent` | Personal OpenPGP defaults; agent contexts select the alternate global config for SSH signing without reading Coder's `~/.gitconfig`. |
 | SSH | `.ssh/config` | Enforces strict host checking and separates public service anchors from private host config. |
@@ -197,14 +206,15 @@ validation shortcut: they can change links, packages, the shell, or
 
 - `dot` is a Home Manager package that execs `~/.dotfiles/install.sh`;
   `install.sh` links `~/.dotfiles` to the checkout when it lives elsewhere.
-- `.profile` and `.zprofile` are declared in `home.nix` from
-  `.config/shell/profile`.
+- `.profile` and `.zprofile` are generated in `modules/shell/default.nix`: the
+  Home Manager session variables followed by `.config/shell/profile`.
 - Home Manager owns user CLI tools but not complete desktop sessions or
   system-service daemons.
 - Private SSH host fragments belong under ignored `.ssh/config.d/private/`.
   Public GitHub and Codeberg trust anchors are tracked separately.
 - The tracked `.ssh/id_rsa` file contains public key material despite its
   private-key-style name. Never add the corresponding private key.
-- `MACHINE_IDENTITY` selects personal versus agent routing; Home Manager generates
-  `~/.config/machine-identity` from each target's `machineIdentity`. The dedicated
-  SSH agent never replaces personal socket defaults.
+- `MACHINE_IDENTITY` selects personal versus agent routing; each target's
+  `machineIdentity` is its session-variable default, and an inherited value
+  (`with-agent`) wins. The dedicated SSH agent never replaces personal socket
+  defaults.
