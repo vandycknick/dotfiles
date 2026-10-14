@@ -22,7 +22,7 @@ store copy and declares the user CLI packages.
 |-- modules/linux/                  # Linux-only packages
 |-- install.sh                      # POSIX-sh bootstrap and dot CLI
 |-- .config/
-|   |-- nvim/                       # Lua config, plugins, and Nix wrapper
+|   |-- nvim/                       # Lua config, colorscheme, and the Nix wrapper with plugins
 |   |-- fish/                       # Interactive shell, prompt, and functions
 |   |-- shell/                      # Shared login environment and zsh config
 |   |-- aerospace/                  # macOS tiling window manager (macOS desktops only)
@@ -47,12 +47,13 @@ store copy and declares the user CLI packages.
 | Add or remove a user CLI tool | `home.nix` (`home.packages`); platform-only tools in `modules/darwin/` or `modules/linux/` |
 | Change which repo files are linked into `$HOME` | `home.nix` (`repoOnly`) |
 | Change Nix CLI settings or garbage collection | `modules/nix` |
-| Change packaged Neovim or LSP tools | `.config/nvim/package.nix` (also `nix run .#nvim`) |
+| Add, remove, or update a Neovim plugin, grammar, or LSP tool | `.config/nvim/package.nix` (also `nix run .#nvim`) |
 | Allow an unfree package or track one from nixpkgs master | `flake.nix` (`allowUnfreePredicate`, `fromMaster`) |
 | Change Neovim startup | `.config/nvim/init.lua` |
 | Change Neovim options, mappings, or autocommands | `.config/nvim/lua/config/` |
-| Add a general Neovim plugin | `.config/nvim/lua/plugins/` |
+| Configure a Neovim plugin | `.config/nvim/lua/plugins/` (its package in `package.nix`) |
 | Add language-specific Neovim support | `.config/nvim/lua/plugins/lang/` |
+| Change the Neovim colorscheme | `.config/nvim/colors/titanium.lua`; `init.lua` selects it |
 | Change Fish interactive startup, keybindings, or general aliases | `modules/shell/default.nix` (`programs.fish`) |
 | Change direnv, zoxide, or Atuin integration | `modules/shell/default.nix` (`programs.direnv`, `programs.zoxide`, `programs.atuin`) |
 | Change Fish Git aliases or Git helper functions | `modules/git/default.nix` (`programs.fish.shellAliases`, `programs.fish.functions`) |
@@ -88,11 +89,12 @@ store copy and declares the user CLI packages.
   untracked files); new files need `git add`. New top-level repo-only files
   must be added to `repoOnly` in `home.nix`; nested `.gitignore` files are
   never linked. Do not track symlinks: they dangle once copied to the store;
-  declare the alias in `home.file` instead (as for `.profile`). Files a Home
-  Manager module generates (`~/.config/fish/config.fish`) must not be tracked.
-- Files an application rewrites at runtime (`lazy-lock.json`, k9s
-  `config.yaml`, pi `settings.json`) are listed in `mutable` in `home.nix` and
-  link straight to `~/.dotfiles` so the writes land in the checkout.
+  declare the alias in `home.file` instead (as for `.zprofile`). Files a Home
+  Manager module generates (`~/.config/fish/config.fish`, `~/.bashrc`) must not
+  be tracked.
+- Files an application rewrites at runtime (k9s `config.yaml`, pi
+  `settings.json`) are listed in `mutable` in `home.nix` and link straight to
+  `~/.dotfiles` so the writes land in the checkout.
 - Commands are Nix packages in `modules/bin`, not tracked files: scripts are
   `writeShellApplication`s (shellchecked at build time, tools in
   `runtimeInputs`), and coding-agent CLIs get a `hiPrio` wrapper over their
@@ -112,8 +114,11 @@ store copy and declares the user CLI packages.
   packages must be listed in `allowUnfreePredicate` in `flake.nix`; packages
   that track nixpkgs master (claude-code, codex) are listed in its `fromMaster`
   overlay, so modules always use plain `pkgs`.
-- Neovim runtime executables and LSP tools belong in `.config/nvim/package.nix`;
-  `home.nix` installs it and the root flake exposes it as `packages.nvim`.
+- Neovim plugins, Treesitter grammars, runtime executables, and LSP tools
+  belong in `.config/nvim/package.nix`; `home.nix` installs it and the root
+  flake exposes it as `packages.nvim`. lazy.nvim loads every spec from the Nix
+  plugin directory and never clones; a spec with `dev = false` is the only
+  exception, for trying a plugin before packaging it.
 - On macOS, desktop applications (and fonts) are Homebrew casks in
   `modules/darwin/Brewfile`; every CLI comes from Nix. Activation applies the
   Brewfile on desktop Macs and runs `brew bundle cleanup --force`, so anything
@@ -135,8 +140,8 @@ store copy and declares the user CLI packages.
   `conf.d/` runs before the generated `config.fish` and cannot see the session
   variables; code that needs them goes in `programs.fish.shellInit`.
 - Neovim plugin specifications are Lua modules under `lua/plugins/`; language
-  modules belong under `lua/plugins/lang/`. Update `lazy-lock.json` only when
-  intentionally changing plugin resolution.
+  modules belong under `lua/plugins/lang/`. A new spec needs its package in
+  `package.nix`, keyed by the repository name lazy.nvim uses.
 - Keep credentials, private SSH hosts, cloud state, GnuPG keyrings, and
   generated application files out of Git. Check `.gitignore` before adding
   stateful paths.
@@ -162,7 +167,7 @@ store copy and declares the user CLI packages.
 ## COMMANDS
 
 ```sh
-dot init     # install Nix (and Homebrew on macOS) if missing, switch, set Fish as login shell
+dot init     # install Nix (and Homebrew on macOS) if missing, switch, set Fish as login shell (not on NixOS)
 dot switch   # home-manager switch --flake .#<user>@<hostname>, else .#<user>@<flavor>; -b hm-bak
 dot update   # nix flake update, then switch; leaves flake.lock to commit
 dot help
@@ -174,11 +179,11 @@ All commands except `help` mutate the environment.
 
 | Area | Entry point | Important behavior |
 |---|---|---|
-| Bootstrap | `install.sh` | Installs multi-user Nix, links `~/.dotfiles` to the checkout, runs the Home Manager switch, and sets the Fish login shell. |
+| Bootstrap | `install.sh` | Installs multi-user Nix, links `~/.dotfiles` to the checkout, runs the Home Manager switch, and sets the Fish login shell outside NixOS. |
 | Home Manager | `home.nix` | Declares user CLI packages and links tracked files. Tools and pi extensions come from Nix; activation never installs from npm or other registries. |
-| Neovim | `.config/nvim/init.lua` | Loads options, mappings, autocommands, and lazy.nvim configuration. |
+| Neovim | `.config/nvim/package.nix`, `.config/nvim/init.lua` | The wrapper puts the LSP tools on `PATH` and passes the Nix store paths of lazy.nvim, the plugins, and 49 Treesitter grammars in `vim.g.nix`. `init.lua` loads options, mappings, autocommands, and lazy.nvim, then the titanium colorscheme (from omp's theme; kanagawa stays installed but inactive). |
 | Fish | `modules/shell/default.nix` | Generates `config.fish`: session variables, the gpg-agent socket (kept when forwarded over SSH), agent Git routing, vi bindings, interactive-only aliases, and the wtp hook. The direnv (with nix-direnv), zoxide, and Atuin modules add their own hooks; Atuin settings stay in `.config/atuin/config.toml`. |
-| Shared shell | `modules/shell/default.nix`, `.config/shell/profile` | Declares XDG and tool variables once; the generated `.profile`/`.zprofile` source them, then set the user command path and identity routing. |
+| Shared shell | `modules/shell/default.nix`, `.config/shell/profile` | Declares XDG and tool variables once; the generated `.profile`/`.zprofile` source them, then set the user command path and identity routing. `programs.bash` owns `.profile`, `.bashrc`, and `.bash_profile` with the system bash; on NixOS `.bashrc` hands interactive bash off to Fish (`DOT_NO_FISH=1` stays in bash). |
 | macOS | `modules/darwin/` | Desktop Macs: Dock/Spaces/global defaults, the nested Finder desktop view, and the cask-only Brewfile with cleanup. |
 | Nix | `modules/nix/default.nix` | Generates `~/.config/nix/nix.conf` (flakes enabled; checked against `pkgs.nix` at build). A weekly `nix-collect-garbage --delete-older-than 30d` (launchd on macOS, systemd timer on Linux) also prunes Home Manager generations. `install.sh` passes `NIX_CONFIG` for the first run. |
 | Git | `modules/git/default.nix` | Generates `~/.config/git/config` (personal OpenPGP defaults, Nix-pinned gpg and git-lfs) and `~/.config/git/agent`, which includes it first and switches to SSH signing without reading Coder's `~/.gitconfig`. Activation ensures `~/.gitconfig` exists so `git config --global` writes there. |
@@ -229,8 +234,9 @@ validation shortcut: they can change links, packages, the shell, or
 
 - `dot` is a Home Manager package that execs `~/.dotfiles/install.sh`;
   `install.sh` links `~/.dotfiles` to the checkout when it lives elsewhere.
-- `.profile` and `.zprofile` are generated in `modules/shell/default.nix`: the
-  Home Manager session variables followed by `.config/shell/profile`.
+- `.profile` (through `programs.bash`) and `.zprofile` are generated in
+  `modules/shell/default.nix`: the Home Manager session variables followed by
+  `.config/shell/profile`.
 - Home Manager owns user CLI tools but not complete desktop sessions or
   system-service daemons.
 - Private SSH host fragments belong under ignored `.ssh/config.d/private/`.

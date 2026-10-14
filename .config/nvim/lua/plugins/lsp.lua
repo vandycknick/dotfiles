@@ -3,7 +3,6 @@ local utils = require 'utils'
 return {
   require 'plugins.lang.astro',
   require 'plugins.lang.bash',
-  require 'plugins.lang.csharp',
   require 'plugins.lang.go',
   require 'plugins.lang.harper',
   require 'plugins.lang.helm',
@@ -43,8 +42,7 @@ return {
           map('K', vim.lsp.buf.hover, 'Hover Documentation')
 
           local client = vim.lsp.get_client_by_id(event.data.client_id)
-          ---@diagnostic disable-next-line: param-type-mismatch
-          if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
+          if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
             local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
               buffer = event.buf,
@@ -71,24 +69,10 @@ return {
           -- code, if the language server you are using supports them
           --
           -- This may be unwanted, since they displace some of your code
-          ---@diagnostic disable-next-line: param-type-mismatch
-          if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
+          if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
             map('<leader>th', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, '[T]oggle Inlay [H]ints')
-          end
-
-          ---@diagnostic disable-next-line: undefined-field
-          if client and client.config.keys then
-            ---@diagnostic disable-next-line: undefined-field
-            local keys = client.config.keys
-            if type(keys) == 'function' then
-              keys = keys()
-            end
-            ---@diagnostic disable-next-line: undefined-field
-            for _, key in ipairs(keys) do
-              map(key[1], key[2], key['desc'], key['mode'] or nil)
-            end
           end
         end,
       })
@@ -98,7 +82,18 @@ return {
       for type, icon in pairs(signs) do
         diagnostic_signs[vim.diagnostic.severity[type]] = icon
       end
-      vim.diagnostic.config { signs = { text = diagnostic_signs } }
+      vim.diagnostic.config {
+        signs = { text = diagnostic_signs },
+        -- Only the cursor line's diagnostics, inline; ]d and [d open the float.
+        virtual_text = { current_line = true },
+        jump = {
+          on_jump = function(diagnostic, bufnr)
+            if diagnostic then
+              vim.diagnostic.open_float { bufnr = bufnr, scope = 'cursor', focus = false }
+            end
+          end,
+        },
+      }
 
       local servers = opts.servers
       for server_name, config in pairs(servers) do
@@ -177,13 +172,6 @@ return {
     'saghen/blink.cmp',
     -- optional: provides snippets for the snippet source
     dependencies = 'rafamadriz/friendly-snippets',
-
-    -- use a release tag to download pre-built binaries
-    version = '*',
-    -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
-    -- build = 'cargo build --release',
-    -- If you use nix, you can build from source using latest nightly rust with:
-    -- build = 'nix run .#build-plugin',
 
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config

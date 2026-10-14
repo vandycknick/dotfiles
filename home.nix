@@ -27,7 +27,6 @@ let
   # Files the owning application rewrites at runtime. A read-only store copy
   # would break them, so they link to the checkout and changes show up in git.
   mutable = [
-    ".config/nvim/lazy-lock.json"
     ".config/k9s/config.yaml"
     ".config/pi/settings.json"
   ];

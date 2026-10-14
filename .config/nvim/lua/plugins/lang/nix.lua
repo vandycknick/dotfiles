@@ -4,7 +4,6 @@ return {
     opts = {
       servers = {
         nixd = {
-          mason_install = false,
           cmd = { 'nixd' },
           settings = {
             nixd = {

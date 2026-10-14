@@ -2,9 +2,6 @@ return {
   -- Detect tabstop and shiftwidth automatically
   { 'tpope/vim-sleuth' },
 
-  -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim' },
-
   -- Add gitsign into my gutter
   {
     'lewis6991/gitsigns.nvim',
@@ -58,7 +55,7 @@ return {
         map('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'git [s]tage hunk' })
         map('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'git [r]eset hunk' })
         map('n', '<leader>hS', gitsigns.stage_buffer, { desc = 'git [S]tage buffer' })
-        map('n', '<leader>hu', gitsigns.undo_stage_hunk, { desc = 'git [u]ndo stage hunk' })
+        map('n', '<leader>hi', gitsigns.preview_hunk_inline, { desc = 'git preview hunk [i]nline' })
         map('n', '<leader>hR', gitsigns.reset_buffer, { desc = 'git [R]eset buffer' })
         map('n', '<leader>hp', gitsigns.preview_hunk, { desc = 'git [p]review hunk' })
         map('n', '<leader>hb', gitsigns.blame_line, { desc = 'git [b]lame line' })
@@ -68,44 +65,7 @@ return {
         end, { desc = 'git [D]iff against last commit' })
         -- Toggles
         map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = '[T]oggle git show [b]lame line' })
-        map('n', '<leader>tD', gitsigns.toggle_deleted, { desc = '[T]oggle git show [D]eleted' })
       end,
-    },
-  },
-
-  -- Highlight todo, notes, etc in comments
-  {
-    'folke/todo-comments.nvim',
-    event = 'VimEnter',
-    dependencies = { 'nvim-lua/plenary.nvim' },
-    opts = { signs = false },
-  },
-
-  -- Render markdown documents within my nvim editor
-  {
-    'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
-    ft = { 'markdown' },
-    opts = {
-      file_types = { 'markdown' },
-      heading = {
-        enabled = true,
-        sign = true,
-        icons = {},
-      },
-      overrides = {
-        buftype = {
-          nofile = {
-            code = {
-              style = 'full',
-              left_pad = 0,
-              right_pad = 0,
-              disable_background = true,
-              border = 'none',
-            },
-          },
-        },
-      },
     },
   },
 
@@ -129,16 +89,20 @@ return {
   -- - sr)'  - [S]urround [R]eplace [)] [']
   {
     'nvim-mini/mini.surround',
-    version = '*',
+    opts = {},
   },
 
+  -- Highlight TODO, FIXME, HACK, and NOTE in comments
   {
-    'rachartier/tiny-inline-diagnostic.nvim',
+    'nvim-mini/mini.hipatterns',
     event = 'VeryLazy',
-    priority = 1000,
-    config = function()
-      require('tiny-inline-diagnostic').setup()
-      vim.diagnostic.config { virtual_text = false } -- Disable default virtual text
+    opts = function()
+      local words = { TODO = 'MiniHipatternsTodo', FIXME = 'MiniHipatternsFixme', HACK = 'MiniHipatternsHack', NOTE = 'MiniHipatternsNote' }
+      local highlighters = {}
+      for word, group in pairs(words) do
+        highlighters[word:lower()] = { pattern = '%f[%w]()' .. word .. '()%f[%W]', group = group }
+      end
+      return { highlighters = highlighters }
     end,
   },
 }

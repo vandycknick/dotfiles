@@ -1,14 +1,6 @@
 # Login profile for sh, bash, and zsh. Home Manager prepends the shared session
 # variables and the gpg-agent socket (modules/shell); only runtime logic
-# belongs here.
-
-# if running bash
-if [ -n "$BASH_VERSION" ]; then
-    # include .bashrc if it exists
-    if [ -f "$HOME/.bashrc" ]; then
-	. "$HOME/.bashrc"
-    fi
-fi
+# belongs here. Login bash reads ~/.bashrc from the generated ~/.bash_profile.
 
 # The Home Manager profile comes first. ~/.local/bin, where other installers
 # (Tern, curl scripts) drop binaries, comes after it so it cannot shadow Nix

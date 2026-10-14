@@ -16,6 +16,19 @@ local check_macro_recording = function()
 end
 
 return {
+  -- Icons for everything, including plugins that ask for nvim-web-devicons.
+  {
+    'nvim-mini/mini.icons',
+    lazy = true,
+    opts = {},
+    init = function()
+      package.preload['nvim-web-devicons'] = function()
+        require('mini.icons').mock_nvim_web_devicons()
+        return package.loaded['nvim-web-devicons']
+      end
+    end,
+  },
+
   {
     'stevearc/oil.nvim',
     ---@module 'oil'
@@ -29,85 +42,32 @@ return {
         show_hidden = true,
       },
     },
-    -- Optional dependencies
-    -- dependencies = { { 'nvim-mini/mini.icons', opts = {} } },
-    dependencies = { 'nvim-tree/nvim-web-devicons' }, -- use if you prefer nvim-web-devicons
+    dependencies = { 'nvim-mini/mini.icons' },
     -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
     lazy = false,
     keys = {
-      {
-        '<C-n>',
-        '<CMD>Oil<CR>',
-        { desc = 'Open parent directory' },
-      },
+      { '<C-n>', '<CMD>Oil<CR>', desc = 'Open parent directory' },
     },
   },
 
-  { 'shortcuts/no-neck-pain.nvim', version = '*' },
+  { 'shortcuts/no-neck-pain.nvim' },
 
   -- Which Key
   {
     'folke/which-key.nvim',
     event = 'VimEnter',
-    spec = {
-      { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
-      { '<leader>d', group = '[D]ocument' },
-      { '<leader>r', group = '[R]ename' },
-      { '<leader>s', group = '[S]earch' },
-      { '<leader>w', group = '[W]orkspace' },
-      { '<leader>t', group = '[T]oggle' },
-      { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
-    },
-  },
-
-  {
-    'folke/noice.nvim',
-    event = 'VeryLazy',
     opts = {
-      -- Don't touch the cmdline UI or popupmenu
-      cmdline = { enabled = false },
-      popupmenu = { enabled = false },
-
-      -- Don't replace :messages / cmd output UI
-      messages = { enabled = false },
-
-      -- But DO replace vim.notify (LSP warnings, etc.)
-      notify = {
-        enabled = true,
-        view = 'notify',
+      spec = {
+        { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
+        { '<leader>d', group = '[D]iff and [D]atabase' },
+        { '<leader>g', group = '[G]it' },
+        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>m', group = '[M]arkdown' },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>t', group = '[T]oggle' },
+        { '<leader>u', group = '[U]I' },
       },
-
-      presets = {
-        long_message_to_split = true,
-      },
-
-      -- Optional: send very long notifications to a split instead of spammy popups
-      -- routes = {
-      --   {
-      --     filter = { event = 'notify', min_height = 15 },
-      --     view = 'split',
-      --   },
-      -- },
-    },
-    keys = {
-      {
-        '<leader>nl',
-        function()
-          require('noice').cmd 'last'
-        end,
-        desc = 'shows the last message in a popup',
-      },
-      {
-        '<leader>nh',
-        function()
-          require('noice').cmd 'history'
-        end,
-        desc = 'shows the message history',
-      },
-    },
-    dependencies = {
-      'MunifTanjim/nui.nvim',
-      -- 'rcarriga/nvim-notify', -- recommended for the notify view
     },
   },
 
@@ -115,7 +75,7 @@ return {
   {
     'nanozuki/tabby.nvim',
     event = 'VimEnter',
-    dependencies = 'nvim-tree/nvim-web-devicons',
+    dependencies = 'nvim-mini/mini.icons',
     opts = {
       line = function(line)
         return {
@@ -169,7 +129,6 @@ return {
   -- Statusline
   {
     'echasnovski/mini.statusline',
-    version = '*',
     config = function()
       local statusline = require 'mini.statusline'
       statusline.setup {
@@ -216,7 +175,6 @@ return {
   {
     'sindrets/diffview.nvim',
     event = 'VeryLazy',
-    enabled = true,
     keys = {
       { '<leader>do', '<cmd>DiffviewOpen<cr>', desc = 'Diffview open' },
       { '<leader>dc', '<cmd>DiffviewClose<cr>', desc = 'Diffview close' },

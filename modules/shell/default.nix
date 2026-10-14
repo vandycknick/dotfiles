@@ -25,11 +25,31 @@ let
     '';
 
   # Login sh/bash/zsh: the shared session environment, the agent socket, then
-  # the tracked profile.
-  profile = ''
-    . "${sessionVars}"
+  # the tracked profile. programs.bash writes ~/.profile and sources the
+  # session variables itself.
+  profileExtra = ''
     ${sshAuthSock}
     ${builtins.readFile ../../.config/shell/profile}
+  '';
+  profile = ''
+    . "${sessionVars}"
+    ${profileExtra}
+  '';
+
+  # NixOS rewrites the login shell from the system configuration, so chsh
+  # cannot stick; interactive bash hands off to Fish instead. The TTY and
+  # parent checks keep scripted, agent, and nested shells on bash.
+  isNixOS = isLinux && !config.targets.genericLinux.enable;
+  fish = "${config.programs.fish.package}/bin/fish";
+  fishHandoff = ''
+    # Set DOT_NO_FISH=1 to stay in bash.
+    if [ -z "''${DOT_NO_FISH:-}" ] && [ -t 0 ] && [ -t 1 ] \
+      && [ "$(ps -o comm= -p "$PPID" 2>/dev/null)" != fish ]; then
+      if shopt -q login_shell; then
+        exec ${fish} --login
+      fi
+      exec ${fish}
+    fi
   '';
 in
 {
@@ -81,8 +101,17 @@ in
     TMUX_TMPDIR = "$XDG_RUNTIME_DIR";
   };
 
-  home.file.".profile".text = profile;
   home.file.".zprofile".text = profile;
+
+  # Owns ~/.profile, ~/.bashrc and ~/.bash_profile; bash itself is the system's.
+  programs.bash = {
+    enable = true;
+    package = null;
+    enableCompletion = false;
+    inherit profileExtra;
+    # First in .bashrc, so the tool hooks never load in a session that leaves.
+    initExtra = lib.mkIf isNixOS (lib.mkOrder 50 fishHandoff);
+  };
 
   # Generates ~/.config/fish/config.fish, which sources the session variables.
   # Tracked conf.d/ and functions/ files are still linked individually.

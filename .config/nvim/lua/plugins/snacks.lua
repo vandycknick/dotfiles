@@ -20,11 +20,13 @@ return {
         },
       },
 
+      -- Replaces vim.notify; <leader>sn lists the history.
+      notifier = { enabled = true },
+
       -- https://github.com/folke/snacks.nvim/blob/main/docs/dashboard.md
       dashboard = {
         enabled = true,
         preset = {
-          pick = 'telescope.nvim',
           header = [[
   ███╗   ██╗██╗   ██╗██████╗
     ████╗  ██║██║   ██║██╔══██╗

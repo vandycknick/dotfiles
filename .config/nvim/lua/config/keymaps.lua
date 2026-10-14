@@ -2,13 +2,7 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 vim.keymap.set('n', '<leader>Q', '<cmd>wqa<CR>')
 
--- Diagnostic keymaps
-vim.keymap.set('n', '[d', function()
-  vim.diagnostic.jump { count = -1, float = true }
-end, { desc = 'Go to previous [D]iagnostic message' })
-vim.keymap.set('n', ']d', function()
-  vim.diagnostic.jump { count = 1, float = true }
-end, { desc = 'Go to next [D]iagnostic message' })
+-- Diagnostic keymaps; Neovim maps [d and ]d, and lsp.lua opens the float on jump.
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
@@ -32,11 +26,11 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
--- These mappings control the size of splits (height/width)
-vim.keymap.set('n', '<S-h>', '<c-w>5<', { desc = 'Change window size left.' })
-vim.keymap.set('n', '<S-l>', '<c-w>5>', { desc = 'Change window size right.' })
-vim.keymap.set('n', '<S-k>', '<C-W>+', { desc = 'Change window size top.' })
-vim.keymap.set('n', '<S-j>', '<C-W>-', { desc = 'Change window size bottom.' })
+-- Alt+<hjkl> resizes the current window
+vim.keymap.set('n', '<M-h>', '<C-w>5<', { desc = 'Narrow window' })
+vim.keymap.set('n', '<M-l>', '<C-w>5>', { desc = 'Widen window' })
+vim.keymap.set('n', '<M-k>', '<C-w>+', { desc = 'Taller window' })
+vim.keymap.set('n', '<M-j>', '<C-w>-', { desc = 'Shorter window' })
 
 -- Ctrl+s is the only correct way to save files.
 vim.keymap.set('n', '<C-s>', '<cmd> w <CR>', { desc = 'Save file.' })

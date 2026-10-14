@@ -1,13 +1,11 @@
-local M = {}
-
-M.terminal = {
+-- A terminal split shared by every tab, toggled with <M-;>.
+local terminal = {
   tabs = {},
   buf = nil,
   height = 10,
 }
 
-M.toggle = function()
-  local terminal = M.terminal
+local function toggle()
   local current_tab = vim.api.nvim_get_current_tabpage()
 
   if terminal.tabs[current_tab] == nil then
@@ -49,32 +47,23 @@ M.toggle = function()
   end
 end
 
-M.close = function()
-  M.terminal.tabs = {}
-  M.terminal.buf = nil
-end
+vim.keymap.set({ 'n' }, '<M-;>', toggle, { desc = 'Toggle Terminal Window.' })
 
-return {
-  name = 'terminal',
-  dir = '.',
-  lazy = false,
-  config = function()
-    vim.keymap.set({ 'n' }, '<M-;>', M.toggle, { desc = 'Toggle Terminal Window.' })
-
-    vim.api.nvim_create_autocmd('TermOpen', {
-      desc = 'remove line numbers in terminal',
-      group = vim.api.nvim_create_augroup('nvd-term-open', { clear = true }),
-      callback = function()
-        vim.wo.number = false
-        vim.wo.relativenumber = false
-        vim.wo.statuscolumn = ''
-      end,
-    })
-
-    vim.api.nvim_create_autocmd('TermClose', {
-      desc = 'Close window when terminal job ends',
-      group = vim.api.nvim_create_augroup('nvd-term-close', { clear = true }),
-      callback = M.close,
-    })
+vim.api.nvim_create_autocmd('TermOpen', {
+  desc = 'remove line numbers in terminal',
+  group = vim.api.nvim_create_augroup('nvd-term-open', { clear = true }),
+  callback = function()
+    vim.wo.number = false
+    vim.wo.relativenumber = false
+    vim.wo.statuscolumn = ''
   end,
-}
+})
+
+vim.api.nvim_create_autocmd('TermClose', {
+  desc = 'Close window when terminal job ends',
+  group = vim.api.nvim_create_augroup('nvd-term-close', { clear = true }),
+  callback = function()
+    terminal.tabs = {}
+    terminal.buf = nil
+  end,
+})

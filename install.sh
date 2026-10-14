@@ -7,9 +7,6 @@ set -eu
 NIX_DAEMON_PROFILE="/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh"
 NIX_BIN="$HOME/.nix-profile/bin"
 NIX_FLAKES="extra-experimental-features = nix-command flakes"
-BASHRC="$HOME/.bashrc"
-FISH_HANDOFF_BEGIN="# >>> dot: fish handoff >>>"
-FISH_HANDOFF_END="# <<< dot: fish handoff <<<"
 
 # The dot wrapper execs ~/.dotfiles/install.sh; resolving symlinks finds the
 # real checkout however the script is invoked.
@@ -169,45 +166,13 @@ current_login_shell() {
     esac
 }
 
-has_fish_handoff() {
-    [ -r "$BASHRC" ] && grep -Fqx "$FISH_HANDOFF_BEGIN" "$BASHRC"
-}
-
-# NixOS owns /etc/shells (a read-only store link) and, with immutable users,
-# rewrites the login shell from the system configuration on every activation,
-# so chsh cannot stick. Interactive bash sessions hand off to Fish instead.
-# The TTY and parent checks keep scripted, agent, and nested shells on bash.
-configure_fish_handoff() {
-    if has_fish_handoff; then
-        return
-    fi
-
-    info "Handing interactive bash sessions off to Nix Fish"
-    cat >>"$BASHRC" <<EOF
-$FISH_HANDOFF_BEGIN
-# Managed by dot on NixOS. Set DOT_NO_FISH=1 to stay in bash.
-case \$- in
-    *i*)
-        if [ -z "\${DOT_NO_FISH:-}" ] && [ -t 0 ] && [ -t 1 ] \\
-            && [ -x "$NIX_BIN/fish" ] \\
-            && [ "\$(ps -o comm= -p "\$PPID" 2>/dev/null)" != fish ]; then
-            if shopt -q login_shell; then
-                exec "$NIX_BIN/fish" --login
-            fi
-            exec "$NIX_BIN/fish"
-        fi
-        ;;
-esac
-$FISH_HANDOFF_END
-EOF
-}
-
 configure_login_shell() {
     fish_shell="$NIX_BIN/fish"
     [ -x "$fish_shell" ] || die "Fish is not installed by Home Manager"
 
+    # NixOS: Home Manager's .bashrc hands interactive bash off to Fish
+    # (modules/shell), because the system configuration owns the login shell.
     if is_nixos; then
-        configure_fish_handoff
         return
     fi
 

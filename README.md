@@ -20,7 +20,8 @@ git clone https://github.com/vandycknick/dotfiles.git ~/.dotfiles
 
 The installer installs Nix (and, on macOS, Homebrew for desktop apps) if
 needed, applies the configuration for your user and machine, and
-sets Fish as the login shell. Linux requires systemd and `sudo`. It uses a
+sets Fish as the login shell (on NixOS, interactive bash hands off to Fish
+instead). Linux requires systemd and `sudo`. It uses a
 `<user>@<hostname>` target when `flake.nix` has one, otherwise the generic
 `coder@nixos`, `nickvd@nixos`, `nickvd@linux` (headless), or `nickvd@darwin`
 (desktop). To make a Linux machine a desktop, add a `<user>@<hostname>` entry

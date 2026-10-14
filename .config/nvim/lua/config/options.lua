@@ -87,8 +87,6 @@ vim.api.nvim_create_autocmd('CmdlineLeave', {
   end,
 })
 
-vim.opt.termguicolors = true
-
 -- This does exactly what I want. But I have no idea what it does anymore nor do I know where I found this little trick.
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
@@ -97,12 +95,6 @@ vim.opt.foldlevel = 99
 vim.opt.foldlevelstart = 1
 
 vim.opt.laststatus = 3
-
--- [[ Basic Keymaps ]]
---  See `:help vim.keymap.set()`
-
--- Set highlight on search, but clear on pressing <Esc> in normal mode
-vim.opt.hlsearch = true
 
 -- Just an experiment for now
 vim.opt.showtabline = 2

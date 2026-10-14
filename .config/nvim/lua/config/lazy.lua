@@ -1,29 +1,22 @@
--- Bootstrap lazy.nvim
-local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
-  local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
-  if vim.v.shell_error ~= 0 then
-    vim.api.nvim_echo({
-      { 'Failed to clone lazy.nvim:\n', 'ErrorMsg' },
-      { out, 'WarningMsg' },
-      { '\nPress any key to exit...' },
-    }, true, {})
-    vim.fn.getchar()
-    os.exit(1)
-  end
-end
-
-vim.opt.rtp:prepend(lazypath)
+-- lazy.nvim, the plugins, and the Treesitter grammars come from Nix
+-- (package.nix), which passes their store paths in vim.g.nix.
+local nix = assert(vim.g.nix, 'start Neovim through the Nix wrapper (package.nix)')
+vim.opt.rtp:prepend(nix.lazy)
 
 require('lazy').setup {
   spec = {
-    -- import your plugins
     { import = 'plugins' },
   },
-  -- Configure any other settings here. See the documentation for more details.
-  -- colorscheme that will be used when installing plugins.
-  install = { colorscheme = { 'habamax' } },
-  -- automatically check for plugin updates
+  -- Every spec loads from the Nix plugin directory. To try a plugin before
+  -- adding it to package.nix, set `dev = false` on its spec and lazy clones it.
+  dev = { path = nix.plugins, patterns = { '' }, fallback = false },
+  install = { missing = false },
+  rocks = { enabled = false },
   checker = { enabled = false },
+  -- Versions live in flake.lock; this only records clones made with dev = false.
+  lockfile = vim.fn.stdpath 'state' .. '/lazy-lock.json',
 }
+
+-- After setup, which resets the runtimepath. Ahead of $VIMRUNTIME, so the
+-- nvim-treesitter parsers and queries replace the ones bundled with Neovim.
+vim.opt.rtp:prepend(nix.grammars)
