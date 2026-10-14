@@ -55,7 +55,10 @@ let
   '';
 in
 {
-  imports = [ ./modules/shell ];
+  imports = [
+    ./modules/shell
+    ./modules/git
+  ];
 
   home.stateVersion = "26.05";
   programs.home-manager.enable = true;
@@ -91,9 +94,6 @@ in
     [
       # Shell & environment
       tmux
-      zoxide
-      atuin
-      direnv
       wtp
 
       # File & text navigation

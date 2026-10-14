@@ -81,28 +81,69 @@ in
       source ${./identity.fish}
     '';
 
-    interactiveShellInit = ''
-      set fish_greeting ""
-      set -g fish_key_bindings fish_vi_key_bindings
+    interactiveShellInit = lib.mkMerge [
+      # Ahead of the tool integrations, so their bindings follow the mode switch.
+      (lib.mkBefore ''
+        set fish_greeting ""
+        set -g fish_key_bindings fish_vi_key_bindings
+      '')
+      (
+        ''
+          set -g my_prompt_color_prompt green
 
-      set -g my_prompt_color_prompt green
+          wtp hook fish | source
 
-      direnv hook fish | source
-      zoxide init fish | source
-      atuin init fish | source
-      wtp hook fish | source
+          bind -M insert \cp up-or-search
+          bind -M insert \cn down-or-search
+          bind -M insert \cy accept-autosuggestion
+        ''
+        + lib.optionalString isLinux ''
 
-      bind -M insert \cp up-or-search
-      bind -M insert \cn down-or-search
-      bind -M insert \cy accept-autosuggestion
-    ''
-    + lib.optionalString isLinux ''
+          if test (tty) = /dev/tty1
+            if uwsm check may-start; and uwsm select
+              exec uwsm start default
+            end
+          end
+        ''
+      )
+    ];
 
-      if test (tty) = /dev/tty1
-        if uwsm check may-start; and uwsm select
-          exec uwsm start default
-        end
-      end
-    '';
+    shellAliases = {
+      vim = "nvim";
+      vimdiff = "nvim -d";
+
+      cp = "cp -iv";
+      mv = "mv -iv";
+      rm = "rm -vI";
+      bc = "bc -ql";
+      mkd = "mkdir -pv";
+
+      myip = "dig txt ch +short whoami.cloudflare @1.1.1.1";
+      myip6 = "dig txt ch +short whoami.cloudflare @2606:4700:4700::1111";
+      show_path = "echo $PATH | string split ' '";
+      ls = "eza --git";
+      tree = "eza --tree --long --ignore-glob .git";
+      cat = "bat";
+      k = "kubectl";
+    }
+    // lib.optionalAttrs isLinux {
+      ip = "ip --color=auto";
+      tun0 = "ip -o -4 addr list tun0 | awk -F ' *|/' '{print $4}'";
+      clip = "wl-copy";
+    }
+    // lib.optionalAttrs isDarwin {
+      clip = "pbcopy";
+      uuid = "uuidgen | tr '[:upper:]' '[:lower:]'";
+    };
   };
+
+  # Each module installs its tool and adds the Fish hook to config.fish.
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+    config.global.load_dotenv = true;
+  };
+  programs.zoxide.enable = true;
+  # Settings stay in the tracked .config/atuin/config.toml.
+  programs.atuin.enable = true;
 }

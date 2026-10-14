@@ -13,6 +13,7 @@ store copy and declares the user CLI packages.
 |-- flake.nix, flake.lock           # Inputs and per-host homeConfigurations
 |-- home.nix                        # Packages, file links, activation steps
 |-- modules/shell/                  # Session variables, generated Fish and login profiles
+|-- modules/git/                    # Fish Git aliases and helper functions
 |-- install.sh                      # POSIX-sh bootstrap and dot CLI
 |-- .config/
 |   |-- nix/nix.conf                # Nix CLI features and policy
@@ -50,8 +51,10 @@ store copy and declares the user CLI packages.
 | Change Neovim options, mappings, or autocommands | `.config/nvim/lua/config/` |
 | Add a general Neovim plugin | `.config/nvim/lua/plugins/` |
 | Add language-specific Neovim support | `.config/nvim/lua/plugins/lang/` |
-| Change Fish interactive startup or keybindings | `modules/shell/default.nix` (`programs.fish`) |
-| Change Fish environment, aliases, Git helpers, or prompt | `.config/fish/conf.d/` |
+| Change Fish interactive startup, keybindings, or general aliases | `modules/shell/default.nix` (`programs.fish`) |
+| Change direnv, zoxide, or Atuin integration | `modules/shell/default.nix` (`programs.direnv`, `programs.zoxide`, `programs.atuin`) |
+| Change Fish Git aliases or Git helper functions | `modules/git/default.nix` (`programs.fish.shellAliases`, `programs.fish.functions`) |
+| Change the Fish prompt | `.config/fish/conf.d/my_prompt.fish`, `.config/fish/functions/` |
 | Add a Fish function | `.config/fish/functions/` |
 | Change shared environment variables | `modules/shell/default.nix` (`home.sessionVariables`) |
 | Change machine-identity routing | `modules/shell/identity.fish`, `.config/shell/profile` |
@@ -150,7 +153,7 @@ All commands except `help` mutate the environment.
 | Bootstrap | `install.sh` | Installs multi-user Nix, links `~/.dotfiles` to the checkout, runs the Home Manager switch, and sets the Fish login shell. |
 | Home Manager | `home.nix` | Declares user CLI packages, links tracked files, and ensures `~/.gitconfig`. Tools and pi extensions come from Nix; activation never installs from npm or other registries. |
 | Neovim | `.config/nvim/init.lua` | Loads options, mappings, autocommands, and lazy.nvim configuration. |
-| Fish | `modules/shell/default.nix` | Generates `config.fish`: session variables, machine identity and GPG agent, vi bindings, and the direnv, zoxide, Atuin, and wtp hooks. |
+| Fish | `modules/shell/default.nix` | Generates `config.fish`: session variables, machine identity and GPG agent, vi bindings, interactive-only aliases, and the wtp hook. The direnv (with nix-direnv), zoxide, and Atuin modules add their own hooks; Atuin settings stay in `.config/atuin/config.toml`. |
 | Shared shell | `modules/shell/default.nix`, `.config/shell/profile` | Declares XDG and tool variables once; the generated `.profile`/`.zprofile` source them, then set the user command path and identity routing. |
 | macOS | `.config/osx/` | Keeps application installation and OS defaults separate. |
 | Git | `.config/git/config`, `.config/git/agent` | Personal OpenPGP defaults; agent contexts select the alternate global config for SSH signing without reading Coder's `~/.gitconfig`. |
