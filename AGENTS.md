@@ -30,7 +30,7 @@ store copy and declares the user CLI packages.
 |   `-- opencode/                   # OpenCode agents, models, and UI settings
 |-- .local/
 |   |-- bin/                        # Personal commands and dot symlink
-|   `-- share/gnupg/                # GnuPG policy, never private key material
+|   `-- share/                      # Data; gnupg/ holds only git-ignored keyrings and agent state
 |-- .ssh/                           # SSH policy and public trust anchors
 |-- .gitignore                      # Private and runtime state exclusions
 |-- AGENTS.md
@@ -43,7 +43,7 @@ store copy and declares the user CLI packages.
 |---|---|
 | Bootstrap, switch, update, login shell | `install.sh` |
 | Add a host or user configuration | `flake.nix` |
-| Add or remove a user CLI tool | `home.nix` (`home.packages`) |
+| Add or remove a user CLI tool | `home.nix` (`home.packages`); platform-only tools in `modules/darwin/` or `modules/linux/` |
 | Change which repo files are linked into `$HOME` | `home.nix` (`repoOnly`) |
 | Change Nix CLI behavior | `.config/nix/nix.conf` |
 | Change packaged Neovim or LSP tools | `.config/nvim/package.nix` |
@@ -57,10 +57,11 @@ store copy and declares the user CLI packages.
 | Change the Fish prompt | `.config/fish/conf.d/my_prompt.fish`, `.config/fish/functions/` |
 | Add a Fish function | `.config/fish/functions/` |
 | Change shared environment variables | `modules/shell/default.nix` (`home.sessionVariables`) |
-| Change machine-identity routing | `modules/shell/identity.fish`, `.config/shell/profile` |
+| Change machine-identity routing | `modules/shell/default.nix` (`programs.fish.shellInit`), `.config/shell/profile`, `.local/bin/with-agent` |
+| Change which SSH key each identity uses | `.ssh/config` (`Match … MACHINE_IDENTITY` blocks) |
 | Change login PATH or zsh behavior | `.config/shell/profile`, `.config/shell/.zshrc` |
 | Add a personal command | `.local/bin/` |
-| Change GnuPG agent or pinentry policy | `.local/share/gnupg/`, `.local/bin/pinentry` |
+| Change GnuPG, gpg-agent, cache TTLs, or pinentry | `modules/gpg/default.nix` (`programs.gpg`, `services.gpg-agent`) |
 | Add a macOS application or font | `.config/osx/Brewfile` |
 | Change Homebrew bootstrap/update behavior | `.config/osx/homebrew` |
 | Change macOS preferences | `.config/osx/defaults` |
@@ -101,9 +102,15 @@ store copy and declares the user CLI packages.
   both `home.nix` and the standalone `.config/nvim/flake.nix` import it.
 - Homebrew declarations are macOS-only taps and casks. Formulae are forbidden,
   and Homebrew directories must not be added to shell `PATH`.
-- Keep `install.sh`, `.config/osx/homebrew`, `.config/osx/defaults`, and
-  `.local/bin/pinentry` compatible with POSIX `sh`. Other scripts must satisfy
-  the interpreter named by their shebang.
+- Keep `install.sh`, `.config/osx/homebrew`, and `.config/osx/defaults`
+  compatible with POSIX `sh`. Other scripts must satisfy the interpreter named
+  by their shebang.
+- One gpg-agent serves every context: the YubiKey (personal) and the agent SSH
+  key, imported with `ssh-add` and kept passphrase-protected in its key store.
+  `MACHINE_IDENTITY` selects the Git config and, in `.ssh/config`, the key
+  order: personal uses only the YubiKey; agent tries the agent key first and
+  falls back to the YubiKey. Coding-agent CLIs get a `.local/bin` wrapper that
+  runs them through `with-agent`.
 - Environment variables belong in `home.sessionVariables`, never in Fish
   `set -U`/`set -Ux` or a shell profile; every shell sources the generated
   `hm-session-vars`. Use Nix values (`config.xdg.*`) rather than shell
@@ -153,12 +160,12 @@ All commands except `help` mutate the environment.
 | Bootstrap | `install.sh` | Installs multi-user Nix, links `~/.dotfiles` to the checkout, runs the Home Manager switch, and sets the Fish login shell. |
 | Home Manager | `home.nix` | Declares user CLI packages and links tracked files. Tools and pi extensions come from Nix; activation never installs from npm or other registries. |
 | Neovim | `.config/nvim/init.lua` | Loads options, mappings, autocommands, and lazy.nvim configuration. |
-| Fish | `modules/shell/default.nix` | Generates `config.fish`: session variables, machine identity and GPG agent, vi bindings, interactive-only aliases, and the wtp hook. The direnv (with nix-direnv), zoxide, and Atuin modules add their own hooks; Atuin settings stay in `.config/atuin/config.toml`. |
+| Fish | `modules/shell/default.nix` | Generates `config.fish`: session variables, the gpg-agent socket (kept when forwarded over SSH), agent Git routing, vi bindings, interactive-only aliases, and the wtp hook. The direnv (with nix-direnv), zoxide, and Atuin modules add their own hooks; Atuin settings stay in `.config/atuin/config.toml`. |
 | Shared shell | `modules/shell/default.nix`, `.config/shell/profile` | Declares XDG and tool variables once; the generated `.profile`/`.zprofile` source them, then set the user command path and identity routing. |
 | macOS | `.config/osx/` | Keeps application installation and OS defaults separate. |
 | Git | `modules/git/default.nix` | Generates `~/.config/git/config` (personal OpenPGP defaults, Nix-pinned gpg and git-lfs) and `~/.config/git/agent`, which includes it first and switches to SSH signing without reading Coder's `~/.gitconfig`. Activation ensures `~/.gitconfig` exists so `git config --global` writes there. |
 | SSH | `.ssh/config` | Enforces strict host checking and separates public service anchors from private host config. |
-| GnuPG | `.local/share/gnupg/gpg-agent.conf` | Enables SSH-agent support and delegates platform pinentry selection to the wrapper. |
+| GnuPG | `modules/gpg/default.nix` | drduh-style `gpg.conf`; one gpg-agent with SSH support, 60/120 s passphrase cache, 24 h cache for the agent SSH key, platform pinentry. systemd socket activation on Linux; on macOS every login and `with-agent` run `gpgconf --launch`, because gpg-agent cannot take launchd sockets. |
 | OpenCode | `.config/opencode/opencode.jsonc` | Disables sharing and routes primary, delegated, and lightweight work to explicit models. |
 
 ## DISTINCTIVE STYLES
@@ -191,8 +198,7 @@ Run checks relevant to the changed files:
 sh -n install.sh
 sh -n .config/osx/homebrew
 sh -n .config/osx/defaults
-sh -n .local/bin/pinentry
-shellcheck install.sh .config/osx/homebrew .config/osx/defaults .local/bin/pinentry
+shellcheck install.sh .config/osx/homebrew .config/osx/defaults .local/bin/with-agent
 for c in coder@nixos nickvd@nixos nickvd@linux nickvd@darwin; do
   nix eval --raw ".#homeConfigurations.\"$c\".activationPackage.drvPath"
 done
@@ -219,5 +225,8 @@ validation shortcut: they can change links, packages, the shell, or
   private-key-style name. Never add the corresponding private key.
 - `MACHINE_IDENTITY` selects personal versus agent routing; each target's
   `machineIdentity` is its session-variable default, and an inherited value
-  (`with-agent`) wins. The dedicated SSH agent never replaces personal socket
-  defaults.
+  (`with-agent`) wins.
+- Each machine imports the agent key into gpg-agent once:
+  `ssh-add ~/.ssh/agent_ed25519` (asks for the key's passphrase, then a
+  passphrase to protect it in the agent). It survives agent restarts and
+  reboots and works with the YubiKey unplugged.

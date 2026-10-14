@@ -35,4 +35,10 @@ Edit managed files in this checkout, not their installed links. Add new files
 with `git add` before applying. Use `dot update` to update Nix dependencies and
 apply them; it does not pull this repository.
 
-SSH keys require separate provisioning and unlock.
+SSH keys require separate provisioning. On each machine, import the agent key
+into gpg-agent once (it stays passphrase-protected there and is unlocked about
+once a day):
+
+```sh
+ssh-add ~/.ssh/agent_ed25519
+```

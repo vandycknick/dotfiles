@@ -1,36 +1,32 @@
 #!/bin/sh
 
+# Run a command in the agent context: the agent Git config (SSH signing with
+# the agent key) and, through .ssh/config, the agent key first for SSH. Both
+# keys live in the one gpg-agent.
+
 if [ "$#" -eq 0 ]; then
     echo 'Usage: with-agent COMMAND [ARG ...]' >&2
     exit 2
 fi
 
-case $(uname -s) in
-    Linux)
-        runtime=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}
-        ;;
-    Darwin)
-        if ! runtime=$(getconf DARWIN_USER_TEMP_DIR); then
-            echo 'with-agent: cannot determine Darwin agent runtime directory' >&2
-            exit 2
-        fi
-        ;;
-    *)
-        echo 'with-agent: unsupported operating system' >&2
-        exit 2
-        ;;
-esac
-if [ -z "$runtime" ]; then
-    echo 'with-agent: cannot determine agent runtime directory' >&2
-    exit 2
-fi
 if [ ! -r "$HOME/.config/git/agent" ]; then
     echo 'with-agent: missing managed Git config ~/.config/git/agent; apply dotfiles first' >&2
     exit 2
 fi
 
+# Callers outside a login shell (GUI apps, launchd on macOS) may carry another
+# agent's socket; keep only one forwarded by sshd.
+if [ -z "${SSH_CONNECTION:-}" ] || [ ! -S "${SSH_AUTH_SOCK:-}" ]; then
+    if ! SSH_AUTH_SOCK=$("$HOME/.nix-profile/bin/gpgconf" --list-dirs agent-ssh-socket); then
+        echo 'with-agent: cannot locate the gpg-agent SSH socket' >&2
+        exit 2
+    fi
+    export SSH_AUTH_SOCK
+fi
+# Socket activation on Linux; on macOS this starts the agent if needed.
+"$HOME/.nix-profile/bin/gpgconf" --launch gpg-agent
+
 export MACHINE_IDENTITY=agent
-export SSH_AUTH_SOCK="${runtime%/}/dotfiles-agent"
 export GIT_CONFIG_GLOBAL="$HOME/.config/git/agent"
 export GIT_SSH_COMMAND=ssh
 exec "$@"

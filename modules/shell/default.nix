@@ -11,9 +11,24 @@ let
 
   sessionVars = "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
 
-  # Login sh/bash/zsh: the shared session environment, then the tracked profile.
+  # The gpg-agent socket for sh-family logins, with the same forwarded-agent
+  # guard Home Manager applies to the shells it manages. macOS has no socket
+  # activation for gpg-agent (modules/gpg), so the login starts it.
+  sshAuthSock =
+    lib.optionalString isDarwin ''
+      ${config.programs.gpg.package}/bin/gpgconf --launch gpg-agent
+    ''
+    + lib.optionalString config.sshAuthSock.enable ''
+      if [ -z "''${SSH_AUTH_SOCK:-}" ] || [ -z "''${SSH_CONNECTION:-}" ]; then
+      ${config.sshAuthSock.initialization.bash}
+      fi
+    '';
+
+  # Login sh/bash/zsh: the shared session environment, the agent socket, then
+  # the tracked profile.
   profile = ''
     . "${sessionVars}"
+    ${sshAuthSock}
     ${builtins.readFile ../../.config/shell/profile}
   '';
 in
@@ -56,7 +71,6 @@ in
     AZURE_CONFIG_DIR = "${configHome}/azure";
     K9SCONFIG = "${configHome}/k9s";
 
-    GNUPGHOME = "${dataHome}/gnupg";
     PASSWORD_STORE_DIR = "${dataHome}/password-store";
   }
   // lib.optionalAttrs isDarwin {
@@ -76,9 +90,18 @@ in
     enable = true;
 
     # conf.d/ runs before config.fish and so cannot see the session variables;
-    # anything that depends on them belongs here.
+    # anything that depends on them belongs here. Agent contexts select the
+    # agent Git config, which signs with the agent key; .ssh/config picks the
+    # SSH key from MACHINE_IDENTITY.
     shellInit = ''
-      source ${./identity.fish}
+      switch "$MACHINE_IDENTITY"
+        case agent
+          set -gx GIT_CONFIG_GLOBAL "${configHome}/git/agent"
+          set -gx GIT_SSH_COMMAND ssh
+        case personal
+        case '*'
+          echo 'machine-identity: expected personal or agent' >&2
+      end
     '';
 
     interactiveShellInit = lib.mkMerge [

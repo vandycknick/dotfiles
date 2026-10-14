@@ -58,18 +58,13 @@ in
   imports = [
     ./modules/shell
     ./modules/git
+    ./modules/gpg
+    ./modules/darwin
+    ./modules/linux
   ];
 
   home.stateVersion = "26.05";
   programs.home-manager.enable = true;
-
-  services.ssh-agent = {
-    enable = true;
-    socket = "dotfiles-agent";
-    defaultMaximumIdentityLifetime = null;
-  };
-  # Keep the dedicated agent out of ordinary personal sessions.
-  sshAuthSock.enable = lib.mkForce false;
 
   assertions = [
     {
@@ -89,77 +84,60 @@ in
     force = lib.elem rel forced;
   });
 
-  home.packages =
-    with pkgs;
-    [
-      # Shell & environment
-      tmux
-      wtp
+  home.packages = with pkgs; [
+    # Shell & environment
+    tmux
+    wtp
 
-      # File & text navigation
-      eza
-      bat
-      ripgrep
-      fd
-      fzf
+    # File & text navigation
+    eza
+    bat
+    ripgrep
+    fd
+    fzf
 
-      # Data & code inspection
-      jq
-      yq-go
-      tokei
-      bc
-      bind
-      gum
-      tealdeer
-      wget
+    # Data & code inspection
+    jq
+    yq-go
+    tokei
+    bc
+    bind
+    gum
+    tealdeer
+    wget
 
-      # Git (git and git-lfs come from programs.git)
-      lazygit
-      hunk
+    # Git (git and git-lfs come from programs.git)
+    lazygit
+    hunk
 
-      # Cloud & infrastructure
-      awscli2
-      ssm-session-manager-plugin
-      google-cloud-sdk
-      terraform
-      kubectl
-      kubernetes-helm
-      k9s
-      coder
-      docker-client
-      docker-compose
-      gcx
-      github-cli
+    # Cloud & infrastructure
+    awscli2
+    ssm-session-manager-plugin
+    google-cloud-sdk
+    terraform
+    kubectl
+    kubernetes-helm
+    k9s
+    coder
+    docker-client
+    docker-compose
+    gcx
+    github-cli
 
-      # Secrets
-      gnupg
-      openssh
+    # Secrets (gnupg comes from programs.gpg)
+    openssh
 
-      # Dotfiles CLI
-      dot
+    # Dotfiles CLI
+    dot
 
-      # Editors & AI
-      python3Packages.ansible-core
-      pkgsMaster.claude-code
-      pkgsMaster.codex
-      opencode
-      pi-coding-agent
-      omp
-      shellcheck
-      (import ./.config/nvim/package.nix { inherit pkgs; })
-    ]
-    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
-      # Linux user utilities
-      iproute2
-      pinentry-gnome3
-      procps
-      wl-clipboard
-      xclip
-    ]
-    ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
-      # macOS only
-      pinentry_mac
-      # ~/.docker/config.json uses credsStore osxkeychain.
-      docker-credential-helpers
-    ];
+    # Editors & AI
+    python3Packages.ansible-core
+    pkgsMaster.claude-code
+    pkgsMaster.codex
+    opencode
+    pi-coding-agent
+    omp
+    shellcheck
+    (import ./.config/nvim/package.nix { inherit pkgs; })
+  ];
 }
