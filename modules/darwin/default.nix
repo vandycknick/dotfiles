@@ -6,6 +6,8 @@
 }:
 let
   brewfile = ./Brewfile;
+  # Homebrew only loads third-party tap casks that are explicitly trusted.
+  trustedCasks = [ "nikitabobko/tap/aerospace" ];
 in
 lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
   lib.mkMerge [
@@ -54,6 +56,7 @@ lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
           warnEcho "Homebrew is not installed; skipping the Brewfile (dot init installs it)."
         else
           export HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_ENV_HINTS=1
+          run --quiet "$brew" trust --quiet --cask ${lib.escapeShellArgs trustedCasks}
           if ! "$brew" bundle check --file=${brewfile} --no-upgrade >/dev/null 2>&1; then
             run "$brew" bundle install --file=${brewfile} --no-upgrade
           fi
