@@ -76,6 +76,7 @@ in
     ./modules/git
     ./modules/gpg
     ./modules/bin
+    ./modules/nix
     ./modules/darwin
     ./modules/linux
   ];

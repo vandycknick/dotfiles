@@ -17,11 +17,11 @@ store copy and declares the user CLI packages.
 |-- modules/git/                    # Git config (personal + agent), Fish Git aliases and helpers
 |-- modules/gpg/                    # GnuPG settings and the single gpg-agent
 |-- modules/bin/                    # Nix-built commands: coding-agent wrappers, with-agent, scripts/
+|-- modules/nix/                    # nix.conf settings and weekly garbage collection
 |-- modules/darwin/                 # macOS defaults and the Brewfile (desktop apps)
 |-- modules/linux/                  # Linux-only packages
 |-- install.sh                      # POSIX-sh bootstrap and dot CLI
 |-- .config/
-|   |-- nix/nix.conf                # Nix CLI features and policy
 |   |-- nvim/                       # Lua config, plugins, and Nix wrapper
 |   |-- fish/                       # Interactive shell, prompt, and functions
 |   |-- shell/                      # Shared login environment and zsh config
@@ -46,7 +46,7 @@ store copy and declares the user CLI packages.
 | Add a host or user configuration | `flake.nix` |
 | Add or remove a user CLI tool | `home.nix` (`home.packages`); platform-only tools in `modules/darwin/` or `modules/linux/` |
 | Change which repo files are linked into `$HOME` | `home.nix` (`repoOnly`) |
-| Change Nix CLI behavior | `.config/nix/nix.conf` |
+| Change Nix CLI settings or garbage collection | `modules/nix` |
 | Change packaged Neovim or LSP tools | `.config/nvim/package.nix` (also `nix run .#nvim`) |
 | Allow an unfree package or track one from nixpkgs master | `flake.nix` (`allowUnfreePredicate`, `fromMaster`) |
 | Change Neovim startup | `.config/nvim/init.lua` |
@@ -180,6 +180,7 @@ All commands except `help` mutate the environment.
 | Fish | `modules/shell/default.nix` | Generates `config.fish`: session variables, the gpg-agent socket (kept when forwarded over SSH), agent Git routing, vi bindings, interactive-only aliases, and the wtp hook. The direnv (with nix-direnv), zoxide, and Atuin modules add their own hooks; Atuin settings stay in `.config/atuin/config.toml`. |
 | Shared shell | `modules/shell/default.nix`, `.config/shell/profile` | Declares XDG and tool variables once; the generated `.profile`/`.zprofile` source them, then set the user command path and identity routing. |
 | macOS | `modules/darwin/` | Desktop Macs: Dock/Spaces/global defaults, the nested Finder desktop view, and the cask-only Brewfile with cleanup. |
+| Nix | `modules/nix/default.nix` | Generates `~/.config/nix/nix.conf` (flakes enabled; checked against `pkgs.nix` at build). A weekly `nix-collect-garbage --delete-older-than 30d` (launchd on macOS, systemd timer on Linux) also prunes Home Manager generations. `install.sh` passes `NIX_CONFIG` for the first run. |
 | Git | `modules/git/default.nix` | Generates `~/.config/git/config` (personal OpenPGP defaults, Nix-pinned gpg and git-lfs) and `~/.config/git/agent`, which includes it first and switches to SSH signing without reading Coder's `~/.gitconfig`. Activation ensures `~/.gitconfig` exists so `git config --global` writes there. |
 | SSH | `.ssh/config` | Enforces strict host checking and separates public service anchors from private host config. |
 | GnuPG | `modules/gpg/default.nix` | drduh-style `gpg.conf`; one gpg-agent with SSH support, 60/120 s passphrase cache, 24 h cache for the agent SSH key, platform pinentry. systemd socket activation on Linux; on macOS every login and `with-agent` run `gpgconf --launch`, because gpg-agent cannot take launchd sockets. |
