@@ -1,5 +1,6 @@
 # macOS desktop apps only; CLIs come from Nix.
-tap "nikitabobko/tap"
+# `brew bundle cleanup` resets Homebrew's trust store to what is declared here.
+tap "nikitabobko/tap", trusted: { casks: ["aerospace"] }
 
 cask "1password"
 cask "aerospace"
