@@ -95,13 +95,20 @@ in
 
   # One store-backed link per tracked file, so directories stay real and
   # application state can live next to managed files. Edits apply on switch.
-  home.file = lib.genAttrs managed (rel: {
-    source =
-      if lib.elem rel mutable then
-        config.lib.file.mkOutOfStoreSymlink "${dotfiles}/${rel}"
-      else
-        ./. + "/${rel}";
-  });
+  home.file =
+    lib.genAttrs managed (rel: {
+      source =
+        if lib.elem rel mutable then
+          config.lib.file.mkOutOfStoreSymlink "${dotfiles}/${rel}"
+        else
+          ./. + "/${rel}";
+    })
+    // {
+      # Tern starts outside a login shell, so it reads omp's default folder
+      # instead of PI_CODING_AGENT_DIR; both see the same themes.
+      ".omp/agent/themes".source =
+        config.lib.file.mkOutOfStoreSymlink "${config.xdg.configHome}/pi/themes";
+    };
 
   home.packages = with pkgs; [
     # Shell & environment
