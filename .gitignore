@@ -9,3 +9,6 @@
 !.ssh/known_hosts.services
 .local/share/gnupg/pubring.kbx
 .tmp
+
+# omp locks its config next to the resolved file (the checkout)
+.config/pi/*.lock
