@@ -43,7 +43,7 @@
           };
         in
         {
-          inherit (master) claude-code codex;
+          inherit (master) claude-code codex omp;
         };
 
       pkgsFor = lib.genAttrs systems (
