@@ -9,3 +9,5 @@ disabledProviders:
   - ollama
 power:
   sleepPrevention: "off"
+dev:
+  autoqaConsent: denied
