@@ -28,6 +28,7 @@ let
   # would break them, so they link to the checkout and changes show up in git.
   mutable = [
     ".config/k9s/config.yaml"
+    ".config/pi/config.yml"
     ".config/pi/settings.json"
   ];
 

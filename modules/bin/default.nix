@@ -5,7 +5,7 @@
   ...
 }:
 let
-  inherit (pkgs.stdenv.hostPlatform) isDarwin;
+  inherit (pkgs.stdenv.hostPlatform) isDarwin isLinux;
   gpgconf = "${config.programs.gpg.package}/bin/gpgconf";
 
   # Agent context: the agent Git config (SSH signing with the agent key) and,
@@ -133,7 +133,16 @@ let
         yq-go
       ];
     })
+    omp-coder-auth
   ];
+
+  omp-coder-auth = mkScript "omp-coder-auth" {
+    runtimeInputs = with pkgs; [
+      coreutils
+      jq
+      sqlite
+    ];
+  };
 in
 {
   home.packages = [
@@ -144,4 +153,32 @@ in
     (lib.hiPrio (mkAgentCli cli))
   ]) agentClis
   ++ scripts;
+
+  # Keeps omp signed in with the workspace's Coder external auth (see
+  # scripts/omp-coder-auth.sh). Runs only on Coder workspaces: the coder CLI
+  # needs the agent env file the template's startup script writes.
+  systemd.user = lib.mkIf isLinux {
+    services.omp-coder-auth = {
+      Unit = {
+        Description = "Sign omp in with Coder's Claude and ChatGPT logins";
+        ConditionPathExists = "/var/lib/coder-workspace/env";
+      };
+      Service = {
+        Type = "oneshot";
+        EnvironmentFile = "/var/lib/coder-workspace/env";
+        Environment = [
+          "PI_CODING_AGENT_DIR=${config.home.sessionVariables.PI_CODING_AGENT_DIR}"
+        ];
+        ExecStart = lib.getExe omp-coder-auth;
+      };
+    };
+    timers.omp-coder-auth = {
+      Unit.Description = "Refresh omp's Coder logins";
+      Timer = {
+        OnStartupSec = "1min";
+        OnUnitActiveSec = "10min";
+      };
+      Install.WantedBy = [ "timers.target" ];
+    };
+  };
 }

@@ -2,7 +2,7 @@ theme:
   dark: kanagawa
 defaultThinkingLevel: medium
 hideThinkingBlock: false
-setupVersion: 2
+setupVersion: 3
 disabledProviders:
   - llama.cpp
   - lm-studio
